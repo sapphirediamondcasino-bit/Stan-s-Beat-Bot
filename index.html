@@ -431,46 +431,56 @@
         }
 
         /* American Dad Radio Section */
-        .radio-showcase {
-            background: linear-gradient(135deg, rgba(255, 107, 107, 0.1), rgba(255, 107, 107, 0.05));
-            border: 2px solid rgba(255, 107, 107, 0.3);
-            border-radius: 16px;
-            padding: 60px 40px;
-            margin-bottom: 60px;
-            text-align: center;
-        }
-
-        .radio-showcase h3 {
-            font-size: 36px;
-            margin-bottom: 20px;
-            color: #FF6B6B;
-        }
-
-        .shows-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-top: 40px;
-        }
-
-        .show-card {
-            background: rgba(0, 0, 0, 0.6);
-            padding: 20px;
-            border: 1px solid rgba(255, 107, 107, 0.3);
-            border-radius: 8px;
-            transition: all 0.3s;
-        }
-
-        .show-card:hover {
-            border-color: #FF6B6B;
-            transform: scale(1.05);
-        }
-
-        .show-card .emoji {
-            font-size: 36px;
-            display: block;
-            margin-bottom: 10px;
-        }
+.radio-showcase {
+    background: linear-gradient(135deg, rgba(255, 107, 107, 0.1), rgba(255, 107, 107, 0.05));
+    border: 2px solid rgba(255, 107, 107, 0.3);
+    border-radius: 16px;
+    padding: 60px 40px;
+    margin-bottom: 60px;
+    text-align: center;
+}
+.radio-showcase h3 {
+    font-size: 36px;
+    margin-bottom: 20px;
+    color: #FF6B6B;
+}
+.shows-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-top: 40px;
+}
+.show-card {
+    background: rgba(0, 0, 0, 0.6);
+    padding: 20px;
+    border: 1px solid rgba(255, 107, 107, 0.3);
+    border-radius: 8px;
+    transition: all 0.3s;
+}
+.show-card:hover {
+    border-color: #FF6B6B;
+    transform: scale(1.05);
+}
+.show-card .character-img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 50%;
+    margin: 0 auto 10px;
+    display: block;
+}
+.show-card .character-imgs {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    margin-bottom: 10px;
+}
+.show-card .character-imgs img {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    border-radius: 50%;
+}
 
         /* Premium Section */
         .premium-features {
@@ -610,6 +620,13 @@
             font-size: 64px;
             border: 3px solid rgba(0, 255, 209, 0.3);
             background: linear-gradient(135deg, rgba(0, 255, 209, 0.1), rgba(0, 204, 165, 0.05));
+        }
+
+        .character-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
         }
 
         .speech-bubble {
@@ -926,65 +943,79 @@
                 <h3 style="text-align: center; margin-bottom: 40px; font-size: 32px;">All Show Configurations</h3>
                 
                 <div class="shows-grid">
-                    <div class="show-card">
-                        <span class="emoji">🇺🇸</span>
-                        <h4>Stan Solo</h4>
-                        <p style="color: #888; font-size: 14px;">CIA-approved music</p>
-                    </div>
-                    <div class="show-card">
-                        <span class="emoji">👽</span>
-                        <h4>Roger Solo</h4>
-                        <p style="color: #888; font-size: 14px;">Fabulous chaos</p>
-                    </div>
-                    <div class="show-card">
-                        <span class="emoji">🎮</span>
-                        <h4>Steve Solo</h4>
-                        <p style="color: #888; font-size: 14px;">Nerd jams</p>
-                    </div>
-                    <div class="show-card">
-                        <span class="emoji">🍷</span>
-                        <h4>Francine Solo</h4>
-                        <p style="color: #888; font-size: 14px;">Wine & music</p>
-                    </div>
-                    <div class="show-card">
-                        <span class="emoji">🐟</span>
-                        <h4>Klaus Solo</h4>
-                        <p style="color: #888; font-size: 14px;">German fish vibes</p>
-                    </div>
-                    <div class="show-card">
-                        <span class="emoji">🌱</span>
-                        <h4>Hayley Solo</h4>
-                        <p style="color: #888; font-size: 14px;">Activist anthems</p>
-                    </div>
-                    <div class="show-card">
-                        <span class="emoji">🇺🇸👽</span>
-                        <h4>Stan & Roger</h4>
-                        <p style="color: #888; font-size: 14px;">Classic duo</p>
-                    </div>
-                    <div class="show-card">
-                        <span class="emoji">🎮👽</span>
-                        <h4>Steve & Roger</h4>
-                        <p style="color: #888; font-size: 14px;">Nerd meets chaos</p>
-                    </div>
-                    <div class="show-card">
-                        <span class="emoji">🇺🇸🍷</span>
-                        <h4>Stan & Francine</h4>
-                        <p style="color: #888; font-size: 14px;">Power couple</p>
-                    </div>
-                    <div class="show-card">
-                        <span class="emoji">🌱🐟</span>
-                        <h4>Hayley & Klaus</h4>
-                        <p style="color: #888; font-size: 14px;">Activist & fish</p>
-                    </div>
-                    <div class="show-card">
-                        <span class="emoji">🎭</span>
-                        <h4>Full Cast</h4>
-                        <p style="color: #888; font-size: 14px;">Everyone together!</p>
-                    </div>
-                    <div class="show-card">
-                        <span class="emoji">🎪</span>
-                        <h4>+ More Combos</h4>
-                        <p style="color: #888; font-size: 14px;">16 total shows</p>
+    <div class="show-card">
+        <img src="https://cdn.discordapp.com/attachments/1428592257581318255/1438048059761360977/images-Photoroom_9.png?ex=6915761f&is=6914249f&hm=4549278fcd8ecba85ceb456e16357e35d8f8ee35566769f89f14f1c25f94a12d&" class="character-img" alt="Stan">
+        <h4>Stan Solo</h4>
+        <p style="color: #888; font-size: 14px;">CIA-approved music</p>
+    </div>
+    <div class="show-card">
+        <img src="https://cdn.discordapp.com/attachments/1428592257581318255/1438048120817713172/0f00d4cc6a609200267015e35c5dacc3-Photoroom.png?ex=6915762d&is=691424ad&hm=7626992402f4fd9d7d8bf5861b3a1bac8386d05f27236c7c3532d9c4c343e8ce&" alt="Roger">
+        <h4>Roger Solo</h4>
+        <p style="color: #888; font-size: 14px;">Fabulous chaos</p>
+    </div>
+    <div class="show-card">
+        <img src="https://cdn.discordapp.com/attachments/1428592257581318255/1438048184936042590/Steve_Smith.png?ex=6915763c&is=691424bc&hm=217b3b933e24d0f9018b5c54d66016e4c4916916fb8b47e9827ddeed3890087d&" class="character-img" alt="Steve">
+        <h4>Steve Solo</h4>
+        <p style="color: #888; font-size: 14px;">Nerd jams</p>
+    </div>
+    <div class="show-card">
+        <img src="https://cdn.discordapp.com/attachments/1428592257581318255/1438048028652208229/francine-smith-hayley-smith-family-guy-the-quest-for-stuff-steve-smith-roger-others_1-Photoroom.png?ex=69157617&is=69142497&hm=ece97fd908e39a0989370f24f93e6aec33baed4d5afd2371f2e78d71a623d489&" class="character-img" alt="Francine">
+        <h4>Francine Solo</h4>
+        <p style="color: #888; font-size: 14px;">Wine & music</p>
+    </div>
+    <div class="show-card">
+        <img src="https://cdn.discordapp.com/attachments/1428592257581318255/1438048087238246441/images_1-Photoroom_2.png?ex=69157625&is=691424a5&hm=23881e4db123fcc534d0b361d519f89011c624f1495d66dec56bab12f3aa4104&" class="character-img" alt="Klaus">
+        <h4>Klaus Solo</h4>
+        <p style="color: #888; font-size: 14px;">German fish vibes</p>
+    </div>
+    <div class="show-card">
+        <img src="https://cdn.discordapp.com/attachments/1428592257581318255/1438048149699690537/hayley-smith-american-dad-stan-smith-seth-macfarlane-francine-smith-hayley-williams-thumbnail-Photoroom.png?ex=69157634&is=691424b4&hm=e9e468c19a73a2a7e4e7061a8955be004b25f22602e154f1797ff3cc65a06e62&" alt="Hayley">
+        <h4>Hayley Solo</h4>
+        <p style="color: #888; font-size: 14px;">Activist anthems</p>
+    </div>
+    <div class="show-card">
+        <div class="character-imgs">
+            <img src="https://cdn.discordapp.com/attachments/1428592257581318255/1438048059761360977/images-Photoroom_9.png?ex=6915761f&is=6914249f&hm=4549278fcd8ecba85ceb456e16357e35d8f8ee35566769f89f14f1c25f94a12d&" alt="Stan">
+            <img src="https://cdn.discordapp.com/attachments/1428592257581318255/1438048120817713172/0f00d4cc6a609200267015e35c5dacc3-Photoroom.png?ex=6915762d&is=691424ad&hm=7626992402f4fd9d7d8bf5861b3a1bac8386d05f27236c7c3532d9c4c343e8ce&" alt="Roger">
+        </div>
+        <h4>Stan & Roger</h4>
+        <p style="color: #888; font-size: 14px;">Classic duo</p>
+    </div>
+    <div class="show-card">
+        <div class="character-imgs">
+            <img src="https://cdn.discordapp.com/attachments/1428592257581318255/1438048184936042590/Steve_Smith.png?ex=6915763c&is=691424bc&hm=217b3b933e24d0f9018b5c54d66016e4c4916916fb8b47e9827ddeed3890087d&" alt="Steve">
+            <img src="https://cdn.discordapp.com/attachments/1428592257581318255/1438048120817713172/0f00d4cc6a609200267015e35c5dacc3-Photoroom.png?ex=6915762d&is=691424ad&hm=7626992402f4fd9d7d8bf5861b3a1bac8386d05f27236c7c3532d9c4c343e8ce&" alt="Roger">
+        </div>
+        <h4>Steve & Roger</h4>
+        <p style="color: #888; font-size: 14px;">Nerd meets chaos</p>
+    </div>
+    <div class="show-card">
+        <div class="character-imgs">
+            <img src="https://cdn.discordapp.com/attachments/1428592257581318255/1438048059761360977/images-Photoroom_9.png?ex=6915761f&is=6914249f&hm=4549278fcd8ecba85ceb456e16357e35d8f8ee35566769f89f14f1c25f94a12d&" alt="Stan">
+            <img src="https://cdn.discordapp.com/attachments/1428592257581318255/1438048028652208229/francine-smith-hayley-smith-family-guy-the-quest-for-stuff-steve-smith-roger-others_1-Photoroom.png?ex=69157617&is=69142497&hm=ece97fd908e39a0989370f24f93e6aec33baed4d5afd2371f2e78d71a623d489&" alt="Francine">
+        </div>
+        <h4>Stan & Francine</h4>
+        <p style="color: #888; font-size: 14px;">Power couple</p>
+    </div>
+    <div class="show-card">
+        <div class="character-imgs">
+            <img src="https://cdn.discordapp.com/attachments/1428592257581318255/1438048149699690537/hayley-smith-american-dad-stan-smith-seth-macfarlane-francine-smith-hayley-williams-thumbnail-Photoroom.png?ex=69157634&is=691424b4&hm=e9e468c19a73a2a7e4e7061a8955be004b25f22602e154f1797ff3cc65a06e62&" alt="Hayley">
+            <img src="https://cdn.discordapp.com/attachments/1428592257581318255/1438048087238246441/images_1-Photoroom_2.png?ex=69157625&is=691424a5&hm=23881e4db123fcc534d0b361d519f89011c624f1495d66dec56bab12f3aa4104&" alt="Klaus">
+        </div>
+        <h4>Hayley & Klaus</h4>
+        <p style="color: #888; font-size: 14px;">Activist & fish</p>
+    </div>
+    <div class="show-card">
+        <img src="https://cdn.discordapp.com/attachments/1428592257581318255/1438053261654360215/102-1027792_american-dad-american-dad-png-Photoroom.png?ex=69157af7&is=69142977&hm=9895f511aafab1406e9f569dce4ad79389530fac373e472fc13f3767601583ae&" alt="Full Cast">
+        <h4>Full Cast</h4>
+        <p style="color: #888; font-size: 14px;">Everyone together!</p>
+    </div>
+    <div class="show-card">
+        <img src="https://cdn.discordapp.com/attachments/1428592257581318255/1438053261654360215/102-1027792_american-dad-american-dad-png-Photoroom.png?ex=69157af7&is=69142977&hm=9895f511aafab1406e9f569dce4ad79389530fac373e472fc13f3767601583ae&" class="character-img" alt="More">
+        <h4>+ More Combos</h4>
+        <p style="color: #888; font-size: 14px;">16 total shows</p>
+    </div>
+</div>
                     </div>
                 </div>
             </div>
@@ -1119,7 +1150,7 @@
                 
                 <div class="characters-grid">
                     <div class="character-card">
-                        <div class="character-avatar">🇺🇸</div>
+                        <div class="character-avatar"><img src="https://cdn.discordapp.com/attachments/1428592257581318255/1438048059761360977/images-Photoroom_9.png?ex=6915761f&is=6914249f&hm=4549278fcd8ecba85ceb456e16357e35d8f8ee35566769f89f14f1c25f94a12d&" alt="Character"></div>
                         <div class="speech-bubble">
                             <p>This bot is more patriotic than apple pie! Add it to your server, that's an order!</p>
                         </div>
@@ -1127,7 +1158,7 @@
                         <p style="color: #888; margin-top: 10px;">CIA Deputy Director</p>
                     </div>
                     <div class="character-card">
-                        <div class="character-avatar">👽</div>
+                        <div class="character-avatar"><img src="https://cdn.discordapp.com/attachments/1428592257581318255/1438048120817713172/0f00d4cc6a609200267015e35c5dacc3-Photoroom.png?ex=6915762d&is=691424ad&hm=7626992402f4fd9d7d8bf5861b3a1bac8386d05f27236c7c3532d9c4c343e8ce&" alt="Character"></div>
                         <div class="speech-bubble">
                             <p>I've DJ'd at better parties than this, but this bot? *Chef's kiss* Perfection!</p>
                         </div>
@@ -1135,7 +1166,7 @@
                         <p style="color: #888; margin-top: 10px;">The Alien</p>
                     </div>
                     <div class="character-card">
-                        <div class="character-avatar">🍷</div>
+                        <div class="character-avatar"><img src="https://cdn.discordapp.com/attachments/1428592257581318255/1438048028652208229/francine-smith-hayley-smith-family-guy-the-quest-for-stuff-steve-smith-roger-others_1-Photoroom.png?ex=69157617&is=69142497&hm=ece97fd908e39a0989370f24f93e6aec33baed4d5afd2371f2e78d71a623d489&" alt="Character"></div>
                         <div class="speech-bubble">
                             <p>Finally, a bot that plays my favorite tunes! Stan, invite this to all your CIA servers!</p>
                         </div>
@@ -1143,7 +1174,7 @@
                         <p style="color: #888; margin-top: 10px;">The Heart</p>
                     </div>
                     <div class="character-card">
-                        <div class="character-avatar">🎮</div>
+                        <div class="character-avatar"><img src="https://cdn.discordapp.com/attachments/1428592257581318255/1438048184936042590/Steve_Smith.png?ex=6915763c&is=691424bc&hm=217b3b933e24d0f9018b5c54d66016e4c4916916fb8b47e9827ddeed3890087d&" alt="Character"></div>
                         <div class="speech-bubble">
                             <p>This bot is way cooler than my Magic cards... and that's saying something!</p>
                         </div>
@@ -1151,7 +1182,7 @@
                         <p style="color: #888; margin-top: 10px;">The Nerd</p>
                     </div>
                     <div class="character-card">
-                        <div class="character-avatar">🐟</div>
+                        <div class="character-avatar"><img src="https://cdn.discordapp.com/attachments/1428592257581318255/1438048087238246441/images_1-Photoroom_2.png?ex=69157625&is=691424a5&hm=23881e4db123fcc534d0b361d519f89011c624f1495d66dec56bab12f3aa4104&" alt="Character"></div>
                         <div class="speech-bubble">
                             <p>Zis bot understands ze beauty of music! Unlike ze rest of zis family!</p>
                         </div>
@@ -1159,7 +1190,7 @@
                         <p style="color: #888; margin-top: 10px;">The Fish</p>
                     </div>
                     <div class="character-card">
-                        <div class="character-avatar">🌱</div>
+                        <div class="character-avatar"><img src="https://cdn.discordapp.com/attachments/1428592257581318255/1438048149699690537/hayley-smith-american-dad-stan-smith-seth-macfarlane-francine-smith-hayley-williams-thumbnail-Photoroom.png?ex=69157634&is=691424b4&hm=e9e468c19a73a2a7e4e7061a8955be004b25f22602e154f1797ff3cc65a06e62&" alt="Character"></div>
                         <div class="speech-bubble">
                             <p>This bot plays socially conscious music. Power to the people!</p>
                         </div>
@@ -1189,17 +1220,16 @@
                 </div>
                 <div>
                     <h3>Resources</h3>
-                    <p><a href="https://discord.gg/your_support" target="_blank">Support Server</a></p>
+                    <p><a href="https://discord.gg/AKHnnNrjZN" target="_blank">Support Server</a></p>
                     <p><a href="https://kurraschsystems.com" target="_blank">Kurrasch Systems</a></p>
                     <p><a href="https://kurraschsystems.com/privacy" target="_blank">Privacy Policy</a></p>
                     <p><a href="https://kurraschsystems.com/terms" target="_blank">Terms of Service</a></p>
                 </div>
                 <div>
                     <h3>Connect</h3>
-                    <p><a href="https://discord.gg/your_support" target="_blank">Discord</a></p>
-                    <p><a href="https://twitter.com/kurraschsystems" target="_blank">Twitter</a></p>
-                    <p><a href="https://github.com/kurraschsystems" target="_blank">GitHub</a></p>
-                    <p><a href="mailto:support@kurraschsystems.com">Email Support</a></p>
+                    <p><a href="https://discord.gg/AKHnnNrjZN" target="_blank">Discord</a></p>
+                    <p><a href="https://x.com/lamaswithhats1" target="_blank">Twitter</a></p>
+                    <p><a href="help@kssnexus.online">Email Support</a></p>
                 </div>
             </div>
             <div class="legal-disclaimer">
@@ -1219,48 +1249,57 @@
     </footer>
 
     <script>
-        // Matrix Rain Effect with American Dad Characters
-        const canvas = document.getElementById('matrix-canvas');
-        const ctx = canvas.getContext('2d');
+       // Matrix Rain Effect with American Dad Characters
+const canvas = document.getElementById('matrix-canvas');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
 
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+// Load character images
+const characterImages = [];
+const imageUrls = [
+    'https://cdn.discordapp.com/attachments/.../image1.png',
+    'https://cdn.discordapp.com/attachments/.../image2.png',
+    'https://cdn.discordapp.com/attachments/.../image3.png'
+];
 
-        // American Dad character emojis
-        const characters = '🇺🇸👽🎮🍷🐟🌱🎭🎵🎸🎤🔊🎧';
-        const fontSize = 18;
-        const columns = canvas.width / fontSize;
+imageUrls.forEach(url => {
+    const img = new Image();
+    img.src = url;
+    characterImages.push(img);
+});
 
-        const drops = [];
-        for (let i = 0; i < columns; i++) {
-            drops[i] = Math.floor(Math.random() * canvas.height / fontSize);
+const imageSize = 24;
+const columns = Math.floor(canvas.width / imageSize);
+const drops = [];
+
+for (let i = 0; i < columns; i++) {
+    drops[i] = Math.floor(Math.random() * canvas.height / imageSize);
+}
+
+function drawMatrix() {
+    ctx.fillStyle = 'rgba(10, 10, 10, 0.05)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    for (let i = 0; i < drops.length; i++) {
+        const img = characterImages[Math.floor(Math.random() * characterImages.length)];
+        if (img.complete) {
+            ctx.drawImage(img, i * imageSize, drops[i] * imageSize, imageSize, imageSize);
         }
-
-        function drawMatrix() {
-            ctx.fillStyle = 'rgba(10, 10, 10, 0.05)';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            ctx.fillStyle = '#00FFD1';
-            ctx.font = fontSize + 'px monospace';
-
-            for (let i = 0; i < drops.length; i++) {
-                const char = characters[Math.floor(Math.random() * characters.length)];
-                ctx.fillText(char, i * fontSize, drops[i] * fontSize);
-
-                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
-                    drops[i] = 0;
-                }
-
-                drops[i]++;
-            }
+        
+        if (drops[i] * imageSize > canvas.height && Math.random() > 0.975) {
+            drops[i] = 0;
         }
+        drops[i]++;
+    }
+}
 
-        setInterval(drawMatrix, 50);
+setInterval(drawMatrix, 50);
 
-        window.addEventListener('resize', () => {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        });
+window.addEventListener('resize', () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+});
 
         // Mobile Menu Toggle
         const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
