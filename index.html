@@ -937,6 +937,30 @@
                     <p style="color: #aaa; max-width: 800px; margin: 20px auto;">When you request a song, Stan, Roger, and the gang treat you like a guest on their show with personalized reactions and jokes. It's not just music—it's entertainment!</p>
                 </div>
 
+                <!-- Live Player Control -->
+                <div style="background: linear-gradient(135deg, rgba(0, 255, 209, 0.1), rgba(0, 204, 165, 0.05)); border: 2px solid rgba(0, 255, 209, 0.3); border-radius: 16px; padding: 40px; margin-bottom: 60px; text-align: center;">
+                    <h3 style="font-size: 28px; margin-bottom: 20px; color: #00FFD1;">🎵 Control Bot From Website</h3>
+                    <p style="color: #aaa; margin-bottom: 30px;">Join a voice channel in your Discord server, then control the bot right here!</p>
+                    
+                    <div style="max-width: 600px; margin: 0 auto;">
+                        <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                            <input type="text" id="song-search" placeholder="Enter song name or YouTube URL..." style="flex: 1; padding: 12px 20px; background: rgba(0, 0, 0, 0.6); border: 1px solid rgba(0, 255, 209, 0.3); border-radius: 6px; color: #fff; font-size: 16px;">
+                            <button onclick="playSongFromWebsite()" style="padding: 12px 30px; background: linear-gradient(135deg, #00FFD1, #00CCA5); color: #000; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 16px;">Play</button>
+                        </div>
+                        
+                        <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                            <button onclick="botControl('pause')" style="padding: 10px 20px; background: rgba(255, 255, 255, 0.1); color: #fff; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 6px; cursor: pointer; font-weight: 600;">⏸️ Pause</button>
+                            <button onclick="botControl('resume')" style="padding: 10px 20px; background: rgba(255, 255, 255, 0.1); color: #fff; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 6px; cursor: pointer; font-weight: 600;">▶️ Resume</button>
+                            <button onclick="botControl('skip')" style="padding: 10px 20px; background: rgba(255, 255, 255, 0.1); color: #fff; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 6px; cursor: pointer; font-weight: 600;">⏭️ Skip</button>
+                            <button onclick="botControl('stop')" style="padding: 10px 20px; background: rgba(255, 0, 0, 0.2); color: #fff; border: 1px solid rgba(255, 0, 0, 0.3); border-radius: 6px; cursor: pointer; font-weight: 600;">⏹️ Stop</button>
+                        </div>
+                        
+                        <div id="player-status" style="margin-top: 20px; padding: 15px; background: rgba(0, 0, 0, 0.4); border-radius: 6px; color: #aaa; font-size: 14px;">
+                            Connect your Discord account to control the bot from here
+                        </div>
+                    </div>
+                </div>
+
                 <h3 style="text-align: center; margin-bottom: 40px; font-size: 32px;">All Show Configurations</h3>
                 
                 <div class="shows-grid">
@@ -1081,6 +1105,103 @@
                     <div class="command-card">
                         <code>/stats</code>
                         <p>View bot statistics</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Documentation Section -->
+        <section id="docs" class="tab-content">
+            <div class="container">
+                <h2 class="section-title">Documentation & Troubleshooting</h2>
+                <p class="section-subtitle">Everything you need to know about using Stan's Beat Bot</p>
+
+                <div style="max-width: 900px; margin: 0 auto;">
+                    <!-- Getting Started -->
+                    <div style="background: rgba(255, 255, 255, 0.03); padding: 30px; border: 1px solid rgba(0, 255, 209, 0.2); border-radius: 12px; margin-bottom: 30px;">
+                        <h3 style="color: #00FFD1; font-size: 28px; margin-bottom: 20px;">🚀 Getting Started</h3>
+                        <ol style="color: #aaa; line-height: 2; padding-left: 20px;">
+                            <li><strong style="color: #fff;">Invite the bot</strong> to your Discord server using the invite link</li>
+                            <li><strong style="color: #fff;">Join a voice channel</strong> in your server</li>
+                            <li>Use <code style="background: #000; padding: 2px 8px; border-radius: 4px; color: #00FFD1;">/play [song name]</code> to start playing music</li>
+                            <li>The bot will join your voice channel and start playing!</li>
+                        </ol>
+                    </div>
+
+                    <!-- Common Issues -->
+                    <div style="background: rgba(255, 255, 255, 0.03); padding: 30px; border: 1px solid rgba(255, 107, 107, 0.2); border-radius: 12px; margin-bottom: 30px;">
+                        <h3 style="color: #FF6B6B; font-size: 28px; margin-bottom: 20px;">⚠️ Troubleshooting</h3>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <h4 style="color: #00FFD1; margin-bottom: 10px;">Bot not joining voice channel?</h4>
+                            <ul style="color: #aaa; line-height: 1.8; padding-left: 20px;">
+                                <li>Make sure you're in a voice channel first</li>
+                                <li>Check bot permissions (needs "Connect" and "Speak" permissions)</li>
+                                <li>Try using <code style="background: #000; padding: 2px 8px; border-radius: 4px; color: #00FFD1;">/stop</code> then <code style="background: #000; padding: 2px 8px; border-radius: 4px; color: #00FFD1;">/play</code> again</li>
+                            </ul>
+                        </div>
+
+                        <div style="margin-bottom: 20px;">
+                            <h4 style="color: #00FFD1; margin-bottom: 10px;">No sound playing?</h4>
+                            <ul style="color: #aaa; line-height: 1.8; padding-left: 20px;">
+                                <li>Check your Discord voice settings (User Settings → Voice & Video)</li>
+                                <li>Make sure bot isn't muted in the voice channel</li>
+                                <li>Try adjusting volume with <code style="background: #000; padding: 2px 8px; border-radius: 4px; color: #00FFD1;">/volume 100</code> (Premium only)</li>
+                            </ul>
+                        </div>
+
+                        <div style="margin-bottom: 20px;">
+                            <h4 style="color: #00FFD1; margin-bottom: 10px;">Commands not working?</h4>
+                            <ul style="color: #aaa; line-height: 1.8; padding-left: 20px;">
+                                <li>Make sure you're using slash commands (type <code style="background: #000; padding: 2px 8px; border-radius: 4px; color: #00FFD1;">/</code> to see available commands)</li>
+                                <li>Bot needs "Use Application Commands" permission</li>
+                                <li>Try kicking and re-inviting the bot if commands don't appear</li>
+                            </ul>
+                        </div>
+
+                        <div>
+                            <h4 style="color: #00FFD1; margin-bottom: 10px;">Bot keeps disconnecting?</h4>
+                            <ul style="color: #aaa; line-height: 1.8; padding-left: 20px;">
+                                <li>Enable 24/7 mode with <code style="background: #000; padding: 2px 8px; border-radius: 4px; color: #00FFD1;">/247</code> (Premium only)</li>
+                                <li>Bot auto-disconnects after 60 seconds if no one is in the voice channel</li>
+                                <li>Check your server's voice region settings</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Premium Features -->
+                    <div style="background: rgba(255, 215, 0, 0.05); padding: 30px; border: 1px solid rgba(255, 215, 0, 0.2); border-radius: 12px; margin-bottom: 30px;">
+                        <h3 style="color: #FFD700; font-size: 28px; margin-bottom: 20px;">💎 Premium Features Guide</h3>
+                        
+                        <div style="margin-bottom: 15px;">
+                            <h4 style="color: #00FFD1; margin-bottom: 8px;">Activating Premium</h4>
+                            <p style="color: #aaa; line-height: 1.8;">After subscribing via PayPal, use <code style="background: #000; padding: 2px 8px; border-radius: 4px; color: #00FFD1;">/premium</code> in Discord to link your account and activate premium features instantly.</p>
+                        </div>
+
+                        <div style="margin-bottom: 15px;">
+                            <h4 style="color: #00FFD1; margin-bottom: 8px;">Volume Control</h4>
+                            <p style="color: #aaa; line-height: 1.8;">Use <code style="background: #000; padding: 2px 8px; border-radius: 4px; color: #00FFD1;">/volume [0-200]</code> to adjust bot volume from 0% to 200%.</p>
+                        </div>
+
+                        <div style="margin-bottom: 15px;">
+                            <h4 style="color: #00FFD1; margin-bottom: 8px;">24/7 Mode</h4>
+                            <p style="color: #aaa; line-height: 1.8;">Enable with <code style="background: #000; padding: 2px 8px; border-radius: 4px; color: #00FFD1;">/247</code> to keep the bot connected even when everyone leaves the voice channel.</p>
+                        </div>
+
+                        <div>
+                            <h4 style="color: #00FFD1; margin-bottom: 8px;">No Radio Segments</h4>
+                            <p style="color: #aaa; line-height: 1.8;">Premium users skip American Dad Radio segments between songs for uninterrupted music.</p>
+                        </div>
+                    </div>
+
+                    <!-- Support -->
+                    <div style="background: rgba(255, 255, 255, 0.03); padding: 30px; border: 1px solid rgba(0, 255, 209, 0.2); border-radius: 12px; text-align: center;">
+                        <h3 style="color: #00FFD1; font-size: 28px; margin-bottom: 15px;">Need More Help?</h3>
+                        <p style="color: #aaa; margin-bottom: 20px;">Join our support server or contact us directly</p>
+                        <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                            <a href="https://discord.gg/AKHnnNrjZN" target="_blank" class="btn-primary">Join Support Server</a>
+                            <a href="mailto:help@kssnexus.online" class="btn-secondary">Email Support</a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1473,6 +1594,41 @@
         console.log('Stan\'s Beat Bot Website Loaded');
         console.log('Powered by Kurrasch Systems');
         console.log('API: http://localhost:3006');
+
+        // Bot control functions for live player
+        function playSongFromWebsite() {
+            const songInput = document.getElementById('song-search');
+            const statusDiv = document.getElementById('player-status');
+            const song = songInput.value.trim();
+            
+            if (!song) {
+                statusDiv.innerHTML = '❌ Please enter a song name or URL';
+                statusDiv.style.color = '#ff6b6b';
+                return;
+            }
+            
+            statusDiv.innerHTML = '🎵 Feature coming soon! Use /play command in Discord for now.';
+            statusDiv.style.color = '#00FFD1';
+            
+            // In future: Send request to bot API to play song
+            // await fetch('http://localhost:3006/api/bot/play', { method: 'POST', body: JSON.stringify({song}) });
+        }
+
+        function botControl(action) {
+            const statusDiv = document.getElementById('player-status');
+            statusDiv.innerHTML = `🎵 ${action.toUpperCase()} - Feature coming soon! Use /${action} command in Discord for now.`;
+            statusDiv.style.color = '#00FFD1';
+            
+            // In future: Send control commands to bot API
+            // await fetch(`http://localhost:3006/api/bot/${action}`, { method: 'POST' });
+        }
+
+        // Allow Enter key to trigger play
+        document.getElementById('song-search')?.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                playSongFromWebsite();
+            }
+        });
     </script>
 </body>
 </html>
