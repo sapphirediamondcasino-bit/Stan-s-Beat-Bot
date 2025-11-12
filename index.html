@@ -943,20 +943,49 @@
                     <p style="color: #aaa; margin-bottom: 30px;">Join a voice channel in your Discord server, then control the bot right here!</p>
                     
                     <div style="max-width: 600px; margin: 0 auto;">
-                        <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-                            <input type="text" id="song-search" placeholder="Enter song name or YouTube URL..." style="flex: 1; padding: 12px 20px; background: rgba(0, 0, 0, 0.6); border: 1px solid rgba(0, 255, 209, 0.3); border-radius: 6px; color: #fff; font-size: 16px;">
-                            <button onclick="playSongFromWebsite()" style="padding: 12px 30px; background: linear-gradient(135deg, #00FFD1, #00CCA5); color: #000; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 16px;">Play</button>
+                        <!-- User Info -->
+                        <div id="user-auth" style="margin-bottom: 20px; padding: 15px; background: rgba(0, 0, 0, 0.4); border-radius: 6px;">
+                            <button onclick="loginDiscord()" class="btn-primary">Connect Discord to Control Bot</button>
                         </div>
-                        
-                        <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
-                            <button onclick="botControl('pause')" style="padding: 10px 20px; background: rgba(255, 255, 255, 0.1); color: #fff; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 6px; cursor: pointer; font-weight: 600;">⏸️ Pause</button>
-                            <button onclick="botControl('resume')" style="padding: 10px 20px; background: rgba(255, 255, 255, 0.1); color: #fff; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 6px; cursor: pointer; font-weight: 600;">▶️ Resume</button>
-                            <button onclick="botControl('skip')" style="padding: 10px 20px; background: rgba(255, 255, 255, 0.1); color: #fff; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 6px; cursor: pointer; font-weight: 600;">⏭️ Skip</button>
-                            <button onclick="botControl('stop')" style="padding: 10px 20px; background: rgba(255, 0, 0, 0.2); color: #fff; border: 1px solid rgba(255, 0, 0, 0.3); border-radius: 6px; cursor: pointer; font-weight: 600;">⏹️ Stop</button>
+
+                        <!-- Server Selection -->
+                        <div id="server-select-container" style="display: none; margin-bottom: 20px;">
+                            <select id="server-select" style="width: 100%; padding: 12px; background: rgba(0, 0, 0, 0.6); border: 1px solid rgba(0, 255, 209, 0.3); border-radius: 6px; color: #fff; font-size: 16px;">
+                                <option>Select your server...</option>
+                            </select>
+                        </div>
+
+                        <!-- Play Controls -->
+                        <div id="player-controls" style="display: none;">
+                            <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                                <input type="text" id="song-search" placeholder="Enter song name or YouTube URL..." style="flex: 1; padding: 12px 20px; background: rgba(0, 0, 0, 0.6); border: 1px solid rgba(0, 255, 209, 0.3); border-radius: 6px; color: #fff; font-size: 16px;">
+                                <button onclick="playSongFromWebsite()" style="padding: 12px 30px; background: linear-gradient(135deg, #00FFD1, #00CCA5); color: #000; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 16px;">Play</button>
+                            </div>
+                            
+                            <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 15px;">
+                                <button onclick="botControl('pause')" style="padding: 10px 20px; background: rgba(255, 255, 255, 0.1); color: #fff; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 6px; cursor: pointer; font-weight: 600;">⏸️ Pause</button>
+                                <button onclick="botControl('resume')" style="padding: 10px 20px; background: rgba(255, 255, 255, 0.1); color: #fff; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 6px; cursor: pointer; font-weight: 600;">▶️ Resume</button>
+                                <button onclick="botControl('skip')" style="padding: 10px 20px; background: rgba(255, 255, 255, 0.1); color: #fff; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 6px; cursor: pointer; font-weight: 600;">⏭️ Skip</button>
+                                <button onclick="botControl('shuffle')" style="padding: 10px 20px; background: rgba(255, 255, 255, 0.1); color: #fff; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 6px; cursor: pointer; font-weight: 600;">🔀 Shuffle</button>
+                                <button onclick="botControl('stop')" style="padding: 10px 20px; background: rgba(255, 0, 0, 0.2); color: #fff; border: 1px solid rgba(255, 0, 0, 0.3); border-radius: 6px; cursor: pointer; font-weight: 600;">⏹️ Stop</button>
+                            </div>
+
+                            <!-- Premium Controls -->
+                            <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 15px;">
+                                <button onclick="botControl('volume')" style="padding: 10px 20px; background: rgba(255, 215, 0, 0.2); color: #FFD700; border: 1px solid rgba(255, 215, 0, 0.3); border-radius: 6px; cursor: pointer; font-weight: 600;">🔊 Volume (Premium)</button>
+                                <button onclick="botControl('247')" style="padding: 10px 20px; background: rgba(255, 215, 0, 0.2); color: #FFD700; border: 1px solid rgba(255, 215, 0, 0.3); border-radius: 6px; cursor: pointer; font-weight: 600;">24/7 (Premium)</button>
+                                <button onclick="showQueue()" style="padding: 10px 20px; background: rgba(255, 255, 255, 0.1); color: #fff; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 6px; cursor: pointer; font-weight: 600;">📋 Queue</button>
+                            </div>
                         </div>
                         
                         <div id="player-status" style="margin-top: 20px; padding: 15px; background: rgba(0, 0, 0, 0.4); border-radius: 6px; color: #aaa; font-size: 14px;">
                             Connect your Discord account to control the bot from here
+                        </div>
+
+                        <!-- Current Queue Display -->
+                        <div id="queue-display" style="display: none; margin-top: 20px; max-height: 300px; overflow-y: auto; background: rgba(0, 0, 0, 0.4); border-radius: 6px; padding: 15px;">
+                            <h4 style="color: #00FFD1; margin-bottom: 10px;">Current Queue</h4>
+                            <div id="queue-list"></div>
                         </div>
                     </div>
                 </div>
