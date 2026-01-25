@@ -1444,220 +1444,332 @@
     </footer>
 
     <script>
-        // Matrix Rain Effect with images
-        const canvas = document.getElementById('matrix-canvas');
-        const ctx = canvas.getContext('2d');
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+       // Matrix Rain Effect with American Dad characters
+const canvas = document.getElementById('matrix-canvas');
+const ctx = canvas.getContext('2d');
 
-        // Character images for matrix
-        const characterImages = [];
-        const imageUrls = [
-            'https://cdn.discordapp.com/attachments/1428592257581318255/1438048059761360977/images-Photoroom_9.png?ex=6915761f&is=6914249f&hm=4549278fcd8ecba85ceb456e16357e35d8f8ee35566769f89f14f1c25f94a12d&',
-            'https://cdn.discordapp.com/attachments/1428592257581318255/1438048120817713172/0f00d4cc6a609200267015e35c5dacc3-Photoroom.png?ex=6915762d&is=691424ad&hm=7626992402f4fd9d7d8bf5861b3a1bac8386d05f27236c7c3532d9c4c343e8ce&',
-            'https://cdn.discordapp.com/attachments/1428592257581318255/1438048184936042590/Steve_Smith.png?ex=6915763c&is=691424bc&hm=217b3b933e24d0f9018b5c54d66016e4c4916916fb8b47e9827ddeed3890087d&',
-            'https://cdn.discordapp.com/attachments/1428592257581318255/1438048028652208229/francine-smith-hayley-smith-family-guy-the-quest-for-stuff-steve-smith-roger-others_1-Photoroom.png?ex=69157617&is=69142497&hm=ece97fd908e39a0989370f24f93e6aec33baed4d5afd2371f2e78d71a623d489&',
-            'https://cdn.discordapp.com/attachments/1428592257581318255/1438048087238246441/images_1-Photoroom_2.png?ex=69157625&is=691424a5&hm=23881e4db123fcc534d0b361d519f89011c624f1495d66dec56bab12f3aa4104&',
-            'https://cdn.discordapp.com/attachments/1428592257581318255/1438048149699690537/hayley-smith-american-dad-stan-smith-seth-macfarlane-francine-smith-hayley-williams-thumbnail-Photoroom.png?ex=69157634&is=691424b4&hm=e9e468c19a73a2a7e4e7061a8955be004b25f22602e154f1797ff3cc65a06e62&'
-        ];
+// Set canvas size
+function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+}
+resizeCanvas();
 
-        imageUrls.forEach(url => {
-            const img = new Image();
-            img.src = url;
-            characterImages.push(img);
-        });
+// American Dad character images
+const characterImages = [];
+const imageUrls = [
+    'https://cdn.discordapp.com/attachments/1428592257581318255/1438048059761360977/images-Photoroom_9.png?ex=6915761f&is=6914249f&hm=4549278fcd8ecba85ceb456e16357e35d8f8ee35566769f89f14f1c25f94a12d&',
+    'https://cdn.discordapp.com/attachments/1428592257581318255/1438048120817713172/0f00d4cc6a609200267015e35c5dacc3-Photoroom.png?ex=6915762d&is=691424ad&hm=7626992402f4fd9d7d8bf5861b3a1bac8386d05f27236c7c3532d9c4c343e8ce&',
+    'https://cdn.discordapp.com/attachments/1428592257581318255/1438048184936042590/Steve_Smith.png?ex=6915763c&is=691424bc&hm=217b3b933e24d0f9018b5c54d66016e4c4916916fb8b47e9827ddeed3890087d&',
+    'https://cdn.discordapp.com/attachments/1428592257581318255/1438048028652208229/francine-smith-hayley-smith-family-guy-the-quest-for-stuff-steve-smith-roger-others_1-Photoroom.png?ex=69157617&is=69142497&hm=ece97fd908e39a0989370f24f93e6aec33baed4d5afd2371f2e78d71a623d489&',
+    'https://cdn.discordapp.com/attachments/1428592257581318255/1438048087238246441/images_1-Photoroom_2.png?ex=69157625&is=691424a5&hm=23881e4db123fcc534d0b361d519f89011c624f1495d66dec56bab12f3aa4104&',
+    'https://cdn.discordapp.com/attachments/1428592257581318255/1438048149699690537/hayley-smith-american-dad-stan-smith-seth-macfarlane-francine-smith-hayley-williams-thumbnail-Photoroom.png?ex=69157634&is=691424b4&hm=e9e468c19a73a2a7e4e7061a8955be004b25f22602e154f1797ff3cc65a06e62&'
+];
 
-        const imageSize = 20;
-        const columns = Math.floor(canvas.width / imageSize);
-        const drops = [];
+let imagesLoaded = 0;
+const totalImages = imageUrls.length;
 
-        for (let i = 0; i < columns; i++) {
-            drops[i] = Math.floor(Math.random() * canvas.height / imageSize);
+// Preload all images
+imageUrls.forEach(url => {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => {
+        imagesLoaded++;
+        console.log(`Loaded image ${imagesLoaded}/${totalImages}`);
+        if (imagesLoaded === totalImages) {
+            console.log('All matrix images loaded! Starting animation...');
+            startMatrix();
         }
-
-        function drawMatrix() {
-            ctx.fillStyle = 'rgba(10, 10, 10, 0.05)';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            
-            for (let i = 0; i < drops.length; i++) {
-                const img = characterImages[Math.floor(Math.random() * characterImages.length)];
-                if (img && img.complete) {
-                    ctx.globalAlpha = 0.3;
-                    ctx.drawImage(img, i * imageSize, drops[i] * imageSize, imageSize, imageSize);
-                    ctx.globalAlpha = 1.0;
-                }
-                
-                if (drops[i] * imageSize > canvas.height && Math.random() > 0.975) {
-                    drops[i] = 0;
-                }
-                drops[i]++;
-            }
+    };
+    img.onerror = () => {
+        console.error('Failed to load image:', url);
+        imagesLoaded++;
+        if (imagesLoaded === totalImages) {
+            startMatrix();
         }
+    };
+    img.src = url;
+    characterImages.push(img);
+});
 
-        setInterval(drawMatrix, 50);
+const imageSize = 30;
+let columns = Math.floor(canvas.width / imageSize);
+let drops = [];
 
-        window.addEventListener('resize', () => {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        });
+function initDrops() {
+    columns = Math.floor(canvas.width / imageSize);
+    drops = [];
+    for (let i = 0; i < columns; i++) {
+        drops[i] = Math.floor(Math.random() * canvas.height / imageSize) * -1;
+    }
+}
 
-        // Mobile Menu Toggle
-        const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
-        const mainNav = document.getElementById('main-nav');
+initDrops();
+
+let matrixInterval;
+
+function drawMatrix() {
+    // Fade effect
+    ctx.fillStyle = 'rgba(10, 10, 10, 0.08)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    for (let i = 0; i < drops.length; i++) {
+        // Pick random character image
+        const img = characterImages[Math.floor(Math.random() * characterImages.length)];
         
-        mobileMenuToggle.addEventListener('click', () => {
-            mainNav.classList.toggle('mobile-active');
-            mobileMenuToggle.textContent = mainNav.classList.contains('mobile-active') ? '✕' : '☰';
-        });
+        if (img && img.complete && img.naturalHeight > 0) {
+            const x = i * imageSize;
+            const y = drops[i] * imageSize;
+            
+            // Draw with transparency
+            ctx.globalAlpha = Math.random() * 0.5 + 0.3; // 0.3 to 0.8 opacity
+            ctx.drawImage(img, x, y, imageSize, imageSize);
+            ctx.globalAlpha = 1.0;
+        }
+        
+        // Reset drop to top when it goes off screen
+        if (drops[i] * imageSize > canvas.height && Math.random() > 0.95) {
+            drops[i] = -5;
+        }
+        
+        drops[i]++;
+    }
+}
 
-        // Close mobile menu when clicking a link
-        document.querySelectorAll('#main-nav a').forEach(link => {
-            link.addEventListener('click', () => {
-                mainNav.classList.remove('mobile-active');
-                mobileMenuToggle.textContent = '☰';
-            });
-        });
+function startMatrix() {
+    if (matrixInterval) clearInterval(matrixInterval);
+    matrixInterval = setInterval(drawMatrix, 60);
+}
 
-        // Tab Navigation
-        document.querySelectorAll('a[href^="#"]').forEach(link => {
-            link.addEventListener('click', (e) => {
-                if (link.getAttribute('target') !== '_blank') {
-                    e.preventDefault();
-                    const target = link.getAttribute('href').substring(1);
-                    document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-                    const targetSection = document.getElementById(target);
-                    if (targetSection) {
-                        targetSection.classList.add('active');
-                        window.scrollTo({ top: 0, behavior: 'smooth' });
-                    }
-                    document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
-                    link.classList.add('active');
-                }
-            });
-        });
+window.addEventListener('resize', () => {
+    resizeCanvas();
+    initDrops();
+});
 
-        // Fetch bot stats from API on port 3006
-        async function fetchStats() {
-            try {
-                const response = await fetch('http://localhost:3006/api/stats');
-                
-                if (!response.ok) {
-                    throw new Error('API not responding');
-                }
-                
-                const data = await response.json();
-                
-                // Update stats with real data
-                document.getElementById('server-count').textContent = data.servers || 0;
-                document.getElementById('user-count').textContent = data.users || 0;
-                document.getElementById('songs-played').textContent = data.totalPlays || 0;
-                document.getElementById('ad-shows').textContent = data.adShowsPlayed || 0;
-                
-                // Update status indicator
-                const statusIndicator = document.getElementById('bot-status');
-                const statusText = document.getElementById('status-text');
-                if (data.status === 'online') {
-                    statusIndicator.classList.remove('offline');
-                    statusText.textContent = 'Bot Online';
-                } else {
-                    statusIndicator.classList.add('offline');
-                    statusText.textContent = 'Bot Offline';
-                }
-                
-                console.log('Stats updated:', data);
-            } catch (error) {
-                console.error('Error fetching stats:', error);
-                
-                // Show offline status
-                const statusIndicator = document.getElementById('bot-status');
-                const statusText = document.getElementById('status-text');
+// ============================================
+// API CONFIGURATION
+// ============================================
+
+const API_BASE = window.location.hostname === 'localhost' 
+    ? 'http://localhost:3006'
+    : 'https://api.stansbeatbot.online:3006';
+
+console.log('API Base URL:', API_BASE);
+
+// ============================================
+// MOBILE MENU
+// ============================================
+
+const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+const mainNav = document.getElementById('main-nav');
+
+if (mobileMenuToggle && mainNav) {
+    mobileMenuToggle.addEventListener('click', () => {
+        mainNav.classList.toggle('mobile-active');
+        mobileMenuToggle.textContent = mainNav.classList.contains('mobile-active') ? '✕' : '☰';
+    });
+
+    // Close mobile menu when clicking a link
+    document.querySelectorAll('#main-nav a').forEach(link => {
+        link.addEventListener('click', () => {
+            mainNav.classList.remove('mobile-active');
+            mobileMenuToggle.textContent = '☰';
+        });
+    });
+}
+
+// ============================================
+// TAB NAVIGATION
+// ============================================
+
+document.querySelectorAll('a[href^="#"]').forEach(link => {
+    link.addEventListener('click', (e) => {
+        if (link.getAttribute('target') !== '_blank') {
+            e.preventDefault();
+            const target = link.getAttribute('href').substring(1);
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            const targetSection = document.getElementById(target);
+            if (targetSection) {
+                targetSection.classList.add('active');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+            document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
+            link.classList.add('active');
+        }
+    });
+});
+
+// ============================================
+// API FUNCTIONS
+// ============================================
+
+async function fetchStats() {
+    try {
+        console.log('Fetching stats from:', `${API_BASE}/api/stats`);
+        const response = await fetch(`${API_BASE}/api/stats`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json'
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error(`API returned ${response.status}`);
+        }
+        
+        const data = await response.json();
+        console.log('Stats received:', data);
+        
+        // Update stats with real data
+        const updateElement = (id, value) => {
+            const elem = document.getElementById(id);
+            if (elem) elem.textContent = value || 0;
+        };
+        
+        updateElement('server-count', data.servers);
+        updateElement('user-count', data.users);
+        updateElement('songs-played', data.totalPlays);
+        updateElement('ad-shows', data.adShowsPlayed);
+        
+        // Update status indicator
+        const statusIndicator = document.getElementById('bot-status');
+        const statusText = document.getElementById('status-text');
+        if (statusIndicator && statusText) {
+            if (data.status === 'online') {
+                statusIndicator.classList.remove('offline');
+                statusText.textContent = 'Bot Online';
+            } else {
                 statusIndicator.classList.add('offline');
                 statusText.textContent = 'Bot Offline';
-                
-                // Set fallback values
-                document.getElementById('server-count').textContent = '0';
-                document.getElementById('user-count').textContent = '0';
-                document.getElementById('songs-played').textContent = '0';
-                document.getElementById('ad-shows').textContent = '0';
             }
         }
-
-        // Fetch live feed
-        async function fetchLiveFeed() {
-            try {
-                const response = await fetch('http://localhost:3006/api/feed');
-                if (response.ok) {
-                    const data = await response.json();
-                    console.log('Live feed:', data);
-                }
-            } catch (error) {
-                console.error('Error fetching live feed:', error);
-            }
-        }
-
-        // Check bot health
-        async function checkHealth() {
-            try {
-                const response = await fetch('http://localhost:3006/api/health');
-                if (response.ok) {
-                    const data = await response.json();
-                    console.log('Bot health:', data);
-                }
-            } catch (error) {
-                console.error('Error checking health:', error);
-            }
-        }
-
-        // Initial fetch
-        fetchStats();
-        fetchLiveFeed();
-        checkHealth();
-
-        // Update stats every 30 seconds
-        setInterval(fetchStats, 30000);
         
-        // Update live feed every 60 seconds
-        setInterval(fetchLiveFeed, 60000);
+        return true;
+    } catch (error) {
+        console.error('Error fetching stats:', error);
+        
+        // Show offline status
+        const statusIndicator = document.getElementById('bot-status');
+        const statusText = document.getElementById('status-text');
+        if (statusIndicator) statusIndicator.classList.add('offline');
+        if (statusText) statusText.textContent = 'Bot Offline';
+        
+        // Set fallback values
+        ['server-count', 'user-count', 'songs-played', 'ad-shows'].forEach(id => {
+            const elem = document.getElementById(id);
+            if (elem) elem.textContent = '0';
+        });
+        
+        return false;
+    }
+}
 
-        // Console log for debugging
-        console.log('Stan\'s Beat Bot Website Loaded');
-        console.log('Powered by Kurrasch Systems');
-        console.log('API: http://localhost:3006');
-
-        // Bot control functions for live player
-        function playSongFromWebsite() {
-            const songInput = document.getElementById('song-search');
-            const statusDiv = document.getElementById('player-status');
-            const song = songInput.value.trim();
-            
-            if (!song) {
-                statusDiv.innerHTML = '❌ Please enter a song name or URL';
-                statusDiv.style.color = '#ff6b6b';
-                return;
-            }
-            
-            statusDiv.innerHTML = '🎵 Feature coming soon! Use /play command in Discord for now.';
-            statusDiv.style.color = '#00FFD1';
-            
-            // In future: Send request to bot API to play song
-            // await fetch('http://localhost:3006/api/bot/play', { method: 'POST', body: JSON.stringify({song}) });
-        }
-
-        function botControl(action) {
-            const statusDiv = document.getElementById('player-status');
-            statusDiv.innerHTML = `🎵 ${action.toUpperCase()} - Feature coming soon! Use /${action} command in Discord for now.`;
-            statusDiv.style.color = '#00FFD1';
-            
-            // In future: Send control commands to bot API
-            // await fetch(`http://localhost:3006/api/bot/${action}`, { method: 'POST' });
-        }
-
-        // Allow Enter key to trigger play
-        document.getElementById('song-search')?.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                playSongFromWebsite();
+async function fetchLiveFeed() {
+    try {
+        const response = await fetch(`${API_BASE}/api/feed`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json'
             }
         });
+        
+        if (response.ok) {
+            const data = await response.json();
+            console.log('Live feed:', data);
+            return data;
+        }
+    } catch (error) {
+        console.error('Error fetching live feed:', error);
+    }
+    return null;
+}
+
+async function checkHealth() {
+    try {
+        const response = await fetch(`${API_BASE}/api/health`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json'
+            }
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            console.log('Bot health:', data);
+            return data;
+        }
+    } catch (error) {
+        console.error('Error checking health:', error);
+    }
+    return null;
+}
+
+// ============================================
+// BOT CONTROL FUNCTIONS
+// ============================================
+
+function playSongFromWebsite() {
+    const songInput = document.getElementById('song-search');
+    const statusDiv = document.getElementById('player-status');
+    
+    if (!songInput || !statusDiv) return;
+    
+    const song = songInput.value.trim();
+    
+    if (!song) {
+        statusDiv.innerHTML = '❌ Please enter a song name or URL';
+        statusDiv.style.color = '#ff6b6b';
+        return;
+    }
+    
+    statusDiv.innerHTML = '🎵 Feature coming soon! Use /play command in Discord for now.';
+    statusDiv.style.color = '#00FFD1';
+}
+
+function botControl(action) {
+    const statusDiv = document.getElementById('player-status');
+    if (!statusDiv) return;
+    
+    statusDiv.innerHTML = `🎵 ${action.toUpperCase()} - Feature coming soon! Use /${action} command in Discord for now.`;
+    statusDiv.style.color = '#00FFD1';
+}
+
+// Allow Enter key to trigger play
+const songSearch = document.getElementById('song-search');
+if (songSearch) {
+    songSearch.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            playSongFromWebsite();
+        }
+    });
+}
+
+// ============================================
+// INITIALIZATION
+// ============================================
+
+console.log('Stan\'s Beat Bot Website Loaded');
+console.log('Powered by Kurrasch Systems');
+console.log('API:', API_BASE);
+
+// Initial fetch
+fetchStats();
+fetchLiveFeed();
+checkHealth();
+
+// Update stats every 30 seconds
+setInterval(fetchStats, 30000);
+
+// Update live feed every 60 seconds
+setInterval(fetchLiveFeed, 60000);
+
+// Show loading message until matrix starts
+if (imagesLoaded < totalImages) {
+    console.log('Loading matrix images...');
+    ctx.fillStyle = '#00FFD1';
+    ctx.font = '20px monospace';
+    ctx.fillText('Loading American Dad Matrix...', canvas.width / 2 - 150, canvas.height / 2);
+}
     </script>
 </body>
 </html>
