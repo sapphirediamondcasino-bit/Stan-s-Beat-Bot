@@ -148,6 +148,8 @@
             transition: all 0.3s;
             display: inline-block;
             box-shadow: 0 4px 15px rgba(0, 255, 209, 0.3);
+            border: none;
+            cursor: pointer;
         }
 
         .btn-primary:hover {
@@ -652,6 +654,341 @@
             margin-top: 10px;
         }
 
+        /* LIVE WEB RADIO PLAYER - ENHANCED */
+        .live-radio-player {
+            background: linear-gradient(135deg, rgba(0, 255, 209, 0.1), rgba(0, 204, 165, 0.05));
+            border: 2px solid rgba(0, 255, 209, 0.3);
+            border-radius: 20px;
+            padding: 40px;
+            margin: 40px 0;
+            max-width: 1000px;
+            margin-left: auto;
+            margin-right: auto;
+            box-shadow: 0 20px 60px rgba(0, 255, 209, 0.2);
+        }
+
+        .player-main {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 40px;
+            margin-bottom: 30px;
+        }
+
+        .album-art {
+            width: 300px;
+            height: 300px;
+            background: linear-gradient(135deg, rgba(255, 107, 107, 0.2), rgba(0, 255, 209, 0.2));
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 80px;
+            border: 3px solid rgba(0, 255, 209, 0.3);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .album-art img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .album-art.playing::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, transparent 40%, rgba(0, 255, 209, 0.1) 100%);
+            animation: pulse-album 2s infinite;
+        }
+
+        @keyframes pulse-album {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.05); opacity: 0.8; }
+        }
+
+        .now-playing {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 0;
+        }
+
+        .now-playing-label {
+            font-size: 12px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+
+        .song-title {
+            font-size: 36px;
+            color: #00FFD1;
+            font-weight: 700;
+            margin-bottom: 10px;
+            line-height: 1.2;
+        }
+
+        .song-artist {
+            font-size: 24px;
+            color: #aaa;
+            margin-bottom: 20px;
+        }
+
+        .song-meta {
+            display: flex;
+            gap: 20px;
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .visualizer {
+            width: 100%;
+            height: 60px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 8px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            padding: 10px;
+            gap: 3px;
+            overflow: hidden;
+        }
+
+        .visualizer-bar {
+            width: 4px;
+            background: linear-gradient(to top, #00FFD1, #00CCA5);
+            border-radius: 2px;
+            transition: height 0.1s ease;
+        }
+
+        .player-controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin: 30px 0;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .player-controls button {
+            padding: 15px 30px;
+            font-size: 18px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .player-controls button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .volume-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 10px 20px;
+            border-radius: 10px;
+        }
+
+        .volume-slider {
+            width: 150px;
+            height: 6px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+            outline: none;
+        }
+
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            background: #00FFD1;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .volume-slider::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            background: #00FFD1;
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+        }
+
+        .song-history {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 12px;
+        }
+
+        .song-history h4 {
+            color: #00FFD1;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .history-item {
+            padding: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .history-item:last-child {
+            border-bottom: none;
+        }
+
+        .lyrics-display {
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            line-height: 1.8;
+        }
+
+        /* API Status Boxes */
+        .api-status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 40px 0;
+        }
+
+        .api-box {
+            background: linear-gradient(135deg, rgba(0, 255, 209, 0.05), rgba(0, 204, 165, 0.02));
+            border: 2px solid rgba(0, 255, 209, 0.2);
+            border-radius: 12px;
+            padding: 30px;
+            transition: all 0.3s;
+        }
+
+        .api-box:hover {
+            border-color: #00FFD1;
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 255, 209, 0.2);
+        }
+
+        .api-box h3 {
+            color: #00FFD1;
+            font-size: 24px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .api-box .api-status {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .api-status.online {
+            background: rgba(0, 255, 0, 0.2);
+            color: #00FF00;
+            border: 1px solid rgba(0, 255, 0, 0.3);
+        }
+
+        .api-status.offline {
+            background: rgba(255, 0, 0, 0.2);
+            color: #FF0000;
+            border: 1px solid rgba(255, 0, 0, 0.3);
+        }
+
+        .api-metric {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .api-metric:last-child {
+            border-bottom: none;
+        }
+
+        .api-metric-label {
+            color: #888;
+            font-size: 14px;
+        }
+
+        .api-metric-value {
+            color: #00FFD1;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        @media (max-width: 968px) {
+            .player-main {
+                grid-template-columns: 1fr;
+            }
+
+            .album-art {
+                width: 100%;
+                max-width: 300px;
+                margin: 0 auto;
+            }
+        }
+
+        /* Admin Dashboard */
+        .admin-panel {
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(0, 255, 209, 0.2);
+            border-radius: 12px;
+            padding: 30px;
+            margin: 30px 0;
+        }
+
+        .admin-controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+        }
+
+        .control-group label {
+            display: block;
+            color: #00FFD1;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .control-group input,
+        .control-group select {
+            width: 100%;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(0, 255, 209, 0.3);
+            border-radius: 6px;
+            color: #fff;
+            font-size: 16px;
+        }
+
         /* Footer */
         footer {
             background: rgba(0, 0, 0, 0.8);
@@ -723,40 +1060,6 @@
             line-height: 1.8;
         }
 
-        /* Responsive */
-        @media (max-width: 968px) {
-            .hero-grid {
-                grid-template-columns: 1fr;
-                text-align: center;
-            }
-
-            .hero-title {
-                font-size: 48px;
-            }
-
-            .hero-buttons {
-                justify-content: center;
-            }
-
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            nav {
-                display: none;
-            }
-        }
-
-        @media (max-width: 600px) {
-            .hero-title {
-                font-size: 36px;
-            }
-
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
         /* Status Indicator */
         .status-indicator {
             display: inline-flex;
@@ -793,6 +1096,40 @@
         .status-indicator.offline .status-dot {
             background: #FF0000;
         }
+
+        /* Responsive */
+        @media (max-width: 968px) {
+            .hero-grid {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .hero-title {
+                font-size: 48px;
+            }
+
+            .hero-buttons {
+                justify-content: center;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            nav {
+                display: none;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .hero-title {
+                font-size: 36px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body>
@@ -813,8 +1150,10 @@
                 <a href="#features">Features</a>
                 <a href="#radio">Radio</a>
                 <a href="#commands">Commands</a>
+                <a href="#status">Status</a>
                 <a href="#premium">Premium</a>
                 <a href="#gang">The Gang</a>
+                <a href="#admin">Admin</a>
                 <a href="https://discord.com/oauth2/authorize?client_id=1049861443111112744&permissions=2573941754821440&integration_type=0&scope=bot" class="btn-primary" target="_blank">Invite Bot</a>
             </nav>
         </div>
@@ -935,6 +1274,48 @@
                 <div class="radio-showcase">
                     <h3>🎭 Live Radio Shows Between Songs!</h3>
                     <p style="color: #aaa; max-width: 800px; margin: 20px auto;">When you request a song, Stan, Roger, and the gang treat you like a guest on their show with personalized reactions and jokes. It's not just music—it's entertainment!</p>
+                </div>
+
+                <!-- LIVE WEB RADIO PLAYER - NEW! -->
+                <div class="live-radio-player">
+                    <h3 style="text-align: center; color: #00FFD1; font-size: 32px; margin-bottom: 20px;">🎵 Live Web Radio Player</h3>
+                    <p style="text-align: center; color: #aaa; margin-bottom: 30px;">No Discord needed! Listen to Stan's Beat Bot radio directly from your browser</p>
+                    
+                    <div class="now-playing" id="now-playing">
+                        <div style="font-size: 14px; color: #888; margin-bottom: 10px;">NOW PLAYING</div>
+                        <div id="current-song" style="font-size: 24px; color: #00FFD1; font-weight: 600; margin-bottom: 5px;">No song playing</div>
+                        <div id="current-artist" style="font-size: 18px; color: #aaa;">-</div>
+                    </div>
+
+                    <audio id="radio-player" controls style="width: 100%; margin: 20px 0;"></audio>
+
+                    <div class="player-controls">
+                        <button onclick="playRadio()" style="background: linear-gradient(135deg, #00FFD1, #00CCA5); color: #000;">
+                            ▶️ Play Radio
+                        </button>
+                        <button onclick="pauseRadio()" style="background: rgba(255, 255, 255, 0.1); color: #fff;">
+                            ⏸️ Pause
+                        </button>
+                        <button onclick="skipSong()" style="background: rgba(255, 255, 255, 0.1); color: #fff;">
+                            ⏭️ Skip
+                        </button>
+                        <button onclick="showLyrics()" style="background: rgba(255, 215, 0, 0.2); color: #FFD700;">
+                            📜 Show Lyrics
+                        </button>
+                        <button onclick="adjustVolume()" style="background: rgba(255, 255, 255, 0.1); color: #fff;">
+                            🔊 Volume
+                        </button>
+                    </div>
+
+                    <div id="lyrics-container" class="lyrics-display" style="display: none;">
+                        <h4 style="color: #00FFD1; margin-bottom: 15px;">📜 Lyrics</h4>
+                        <div id="lyrics-text">Loading lyrics...</div>
+                    </div>
+
+                    <div style="margin-top: 30px; text-align: center; padding: 20px; background: rgba(0, 0, 0, 0.4); border-radius: 8px;">
+                        <div style="color: #888; font-size: 14px;">Radio Status</div>
+                        <div id="radio-status" style="color: #00FFD1; font-size: 18px; font-weight: 600; margin-top: 8px;">Ready to play</div>
+                    </div>
                 </div>
 
                 <!-- Live Player Control -->
@@ -1121,7 +1502,7 @@
                     </div>
                     <div class="command-card">
                         <code>/lyrics</code>
-                        <p>Display song lyrics (Coming Soon)</p>
+                        <p>Display song lyrics</p>
                     </div>
                     <div class="command-card">
                         <code>/premium</code>
@@ -1395,6 +1776,77 @@
                 </div>
             </div>
         </section>
+
+        <!-- NEW: Admin Dashboard Section -->
+        <section id="admin" class="tab-content">
+            <div class="container">
+                <h2 class="section-title">⚙️ Admin Dashboard</h2>
+                <p class="section-subtitle">Manage bot settings for your servers (Server Owners & Admins)</p>
+                
+                <div id="admin-auth-check">
+                    <div style="text-align: center; padding: 60px 20px; background: rgba(255, 0, 0, 0.05); border: 1px solid rgba(255, 0, 0, 0.3); border-radius: 12px;">
+                        <div style="font-size: 48px; margin-bottom: 20px;">🔒</div>
+                        <h3 style="color: #FF6B6B; margin-bottom: 20px;">Authentication Required</h3>
+                        <p style="color: #aaa; margin-bottom: 30px;">Please login with Discord to access the admin dashboard</p>
+                        <button onclick="loginDiscord()" class="btn-primary">Login with Discord</button>
+                    </div>
+                </div>
+
+                <div id="admin-panel" class="admin-panel" style="display: none;">
+                    <h3 style="color: #00FFD1; font-size: 28px; margin-bottom: 20px;">Server Management</h3>
+                    
+                    <div class="control-group">
+                        <label for="admin-server-select">Select Server:</label>
+                        <select id="admin-server-select" onchange="loadServerSettings()">
+                            <option value="">Loading your servers...</option>
+                        </select>
+                    </div>
+
+                    <div id="server-settings" style="display: none;">
+                        <h4 style="color: #00FFD1; margin: 30px 0 20px;">Bot Settings</h4>
+                        
+                        <div class="admin-controls">
+                            <div class="control-group">
+                                <label for="default-volume">Default Volume:</label>
+                                <input type="range" id="default-volume" min="0" max="200" value="100" onchange="updateVolumeSetting(this.value)">
+                                <span id="volume-display" style="color: #aaa;">100%</span>
+                            </div>
+
+                            <div class="control-group">
+                                <label for="radio-mode">Radio Show Mode:</label>
+                                <select id="radio-mode">
+                                    <option value="full-cast">Full Cast</option>
+                                    <option value="stan-roger">Stan & Roger</option>
+                                    <option value="stan-solo">Stan Solo</option>
+                                    <option value="roger-solo">Roger Solo</option>
+                                    <option value="off">Off (Premium)</option>
+                                </select>
+                            </div>
+
+                            <div class="control-group">
+                                <label for="auto-disconnect">Auto-disconnect (seconds):</label>
+                                <input type="number" id="auto-disconnect" value="60">
+                            </div>
+
+                            <div class="control-group">
+                                <label for="dj-role">DJ Role:</label>
+                                <input type="text" id="dj-role" placeholder="Role name or ID">
+                            </div>
+                        </div>
+
+                        <h4 style="color: #00FFD1; margin: 30px 0 20px;">Premium Status</h4>
+                        <div id="premium-status" style="padding: 20px; background: rgba(255, 215, 0, 0.1); border: 1px solid rgba(255, 215, 0, 0.3); border-radius: 8px;">
+                            <div style="font-size: 18px; color: #FFD700; margin-bottom: 10px;">Loading premium status...</div>
+                        </div>
+
+                        <div style="margin-top: 30px; text-align: center;">
+                            <button onclick="saveServerSettings()" class="btn-primary">Save Settings</button>
+                            <button onclick="resetServerSettings()" class="btn-secondary" style="margin-left: 15px;">Reset to Defaults</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
     </main>
 
     <footer>
@@ -1448,14 +1900,12 @@
 const canvas = document.getElementById('matrix-canvas');
 const ctx = canvas.getContext('2d');
 
-// Set canvas size
 function resizeCanvas() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 }
 resizeCanvas();
 
-// American Dad character images
 const characterImages = [];
 const imageUrls = [
     'https://cdn.discordapp.com/attachments/1428592257581318255/1438048059761360977/images-Photoroom_9.png?ex=6915761f&is=6914249f&hm=4549278fcd8ecba85ceb456e16357e35d8f8ee35566769f89f14f1c25f94a12d&',
@@ -1466,25 +1916,26 @@ const imageUrls = [
     'https://cdn.discordapp.com/attachments/1428592257581318255/1438048149699690537/hayley-smith-american-dad-stan-smith-seth-macfarlane-francine-smith-hayley-williams-thumbnail-Photoroom.png?ex=69157634&is=691424b4&hm=e9e468c19a73a2a7e4e7061a8955be004b25f22602e154f1797ff3cc65a06e62&'
 ];
 
+const matrixEmojis = ['👨‍💼', '👽', '👩', '👦', '🐠', '👧', '🎵', '🎭', '🎸', '🎤', '🎹', '🎧', '🎙️', '📻'];
+let useEmojiFallback = false;
 let imagesLoaded = 0;
 const totalImages = imageUrls.length;
 
-// Preload all images
-imageUrls.forEach(url => {
+imageUrls.forEach((url, index) => {
     const img = new Image();
     img.crossOrigin = "anonymous";
     img.onload = () => {
         imagesLoaded++;
-        console.log(`Loaded image ${imagesLoaded}/${totalImages}`);
         if (imagesLoaded === totalImages) {
-            console.log('All matrix images loaded! Starting animation...');
+            console.log('✅ All matrix images loaded!');
             startMatrix();
         }
     };
     img.onerror = () => {
-        console.error('Failed to load image:', url);
         imagesLoaded++;
-        if (imagesLoaded === totalImages) {
+        if (imagesLoaded === totalImages && characterImages.filter(i => i.complete).length === 0) {
+            console.log('⚠️ Images failed, using emoji fallback');
+            useEmojiFallback = true;
             startMatrix();
         }
     };
@@ -1493,46 +1944,61 @@ imageUrls.forEach(url => {
 });
 
 const imageSize = 30;
-let columns = Math.floor(canvas.width / imageSize);
+const fontSize = 20;
+let columns = Math.floor(canvas.width / (useEmojiFallback ? fontSize : imageSize));
 let drops = [];
 
 function initDrops() {
-    columns = Math.floor(canvas.width / imageSize);
+    columns = Math.floor(canvas.width / (useEmojiFallback ? fontSize : imageSize));
     drops = [];
     for (let i = 0; i < columns; i++) {
-        drops[i] = Math.floor(Math.random() * canvas.height / imageSize) * -1;
+        drops[i] = Math.floor(Math.random() * canvas.height / (useEmojiFallback ? fontSize : imageSize)) * -1;
     }
 }
 
 initDrops();
-
 let matrixInterval;
 
 function drawMatrix() {
-    // Fade effect
     ctx.fillStyle = 'rgba(10, 10, 10, 0.08)';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     
-    for (let i = 0; i < drops.length; i++) {
-        // Pick random character image
-        const img = characterImages[Math.floor(Math.random() * characterImages.length)];
+    if (useEmojiFallback) {
+        ctx.fillStyle = '#00FFD1';
+        ctx.font = fontSize + 'px monospace';
         
-        if (img && img.complete && img.naturalHeight > 0) {
-            const x = i * imageSize;
-            const y = drops[i] * imageSize;
+        for (let i = 0; i < drops.length; i++) {
+            const char = matrixEmojis[Math.floor(Math.random() * matrixEmojis.length)];
+            const x = i * fontSize;
+            const y = drops[i] * fontSize;
             
-            // Draw with transparency
-            ctx.globalAlpha = Math.random() * 0.5 + 0.3; // 0.3 to 0.8 opacity
-            ctx.drawImage(img, x, y, imageSize, imageSize);
+            ctx.globalAlpha = Math.random() * 0.5 + 0.3;
+            ctx.fillText(char, x, y);
             ctx.globalAlpha = 1.0;
+            
+            if (drops[i] * fontSize > canvas.height && Math.random() > 0.95) {
+                drops[i] = -5;
+            }
+            drops[i]++;
         }
-        
-        // Reset drop to top when it goes off screen
-        if (drops[i] * imageSize > canvas.height && Math.random() > 0.95) {
-            drops[i] = -5;
+    } else {
+        for (let i = 0; i < drops.length; i++) {
+            const img = characterImages[Math.floor(Math.random() * characterImages.length)];
+            
+            if (img && img.complete && img.naturalHeight > 0) {
+                const x = i * imageSize;
+                const y = drops[i] * imageSize;
+                
+                ctx.globalAlpha = Math.random() * 0.5 + 0.3;
+                ctx.drawImage(img, x, y, imageSize, imageSize);
+                ctx.globalAlpha = 1.0;
+            }
+            
+            if (drops[i] * imageSize > canvas.height && Math.random() > 0.95) {
+                drops[i] = -5;
+            }
+            drops[i]++;
         }
-        
-        drops[i]++;
     }
 }
 
@@ -1541,25 +2007,32 @@ function startMatrix() {
     matrixInterval = setInterval(drawMatrix, 60);
 }
 
+setTimeout(() => {
+    if (imagesLoaded < totalImages) {
+        console.log('⚡ Starting with emoji fallback (images loading slow)');
+        useEmojiFallback = true;
+        startMatrix();
+    }
+}, 2000);
+
 window.addEventListener('resize', () => {
     resizeCanvas();
     initDrops();
 });
 
 // ============================================
-// API CONFIGURATION
+// API CONFIGURATION - HTTPS ONLY PORT 3006
 // ============================================
+const API_BASE = 'https://api.stansbeatbot.online:3006';
+console.log('🔒 API Base URL:', API_BASE);
 
-const API_BASE = window.location.hostname === 'localhost' 
-    ? 'http://localhost:3006'
-    : 'https://api.stansbeatbot.online:3006';
-
-console.log('API Base URL:', API_BASE);
+// User state
+let currentUser = null;
+let userServers = [];
 
 // ============================================
 // MOBILE MENU
 // ============================================
-
 const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
 const mainNav = document.getElementById('main-nav');
 
@@ -1569,7 +2042,6 @@ if (mobileMenuToggle && mainNav) {
         mobileMenuToggle.textContent = mainNav.classList.contains('mobile-active') ? '✕' : '☰';
     });
 
-    // Close mobile menu when clicking a link
     document.querySelectorAll('#main-nav a').forEach(link => {
         link.addEventListener('click', () => {
             mainNav.classList.remove('mobile-active');
@@ -1581,7 +2053,6 @@ if (mobileMenuToggle && mainNav) {
 // ============================================
 // TAB NAVIGATION
 // ============================================
-
 document.querySelectorAll('a[href^="#"]').forEach(link => {
     link.addEventListener('click', (e) => {
         if (link.getAttribute('target') !== '_blank') {
@@ -1600,30 +2071,42 @@ document.querySelectorAll('a[href^="#"]').forEach(link => {
 });
 
 // ============================================
-// API FUNCTIONS
+// API FUNCTIONS - HTTPS WITH PROPER TIMEOUT
 // ============================================
-
 async function fetchStats() {
     try {
-        console.log('Fetching stats from:', `${API_BASE}/api/stats`);
+        console.log('📊 Fetching stats from:', `${API_BASE}/api/stats`);
+        
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 15000);
+        
         const response = await fetch(`${API_BASE}/api/stats`, {
+            signal: controller.signal,
             method: 'GET',
             headers: {
-                'Accept': 'application/json'
+                'Accept': 'application/json',
+                'Cache-Control': 'no-cache'
             }
         });
+        
+        clearTimeout(timeout);
         
         if (!response.ok) {
             throw new Error(`API returned ${response.status}`);
         }
         
         const data = await response.json();
-        console.log('Stats received:', data);
+        console.log('✅ Stats received:', data);
         
-        // Update stats with real data
         const updateElement = (id, value) => {
             const elem = document.getElementById(id);
-            if (elem) elem.textContent = value || 0;
+            if (elem) {
+                elem.style.opacity = '0';
+                setTimeout(() => {
+                    elem.textContent = value || 0;
+                    elem.style.opacity = '1';
+                }, 150);
+            }
         };
         
         updateElement('server-count', data.servers);
@@ -1631,30 +2114,22 @@ async function fetchStats() {
         updateElement('songs-played', data.totalPlays);
         updateElement('ad-shows', data.adShowsPlayed);
         
-        // Update status indicator
         const statusIndicator = document.getElementById('bot-status');
         const statusText = document.getElementById('status-text');
         if (statusIndicator && statusText) {
-            if (data.status === 'online') {
-                statusIndicator.classList.remove('offline');
-                statusText.textContent = 'Bot Online';
-            } else {
-                statusIndicator.classList.add('offline');
-                statusText.textContent = 'Bot Offline';
-            }
+            statusIndicator.classList.remove('offline');
+            statusText.textContent = 'Bot Online';
         }
         
         return true;
     } catch (error) {
-        console.error('Error fetching stats:', error);
+        console.error('❌ Error fetching stats:', error.message);
         
-        // Show offline status
         const statusIndicator = document.getElementById('bot-status');
         const statusText = document.getElementById('status-text');
         if (statusIndicator) statusIndicator.classList.add('offline');
         if (statusText) statusText.textContent = 'Bot Offline';
         
-        // Set fallback values
         ['server-count', 'user-count', 'songs-played', 'ad-shows'].forEach(id => {
             const elem = document.getElementById(id);
             if (elem) elem.textContent = '0';
@@ -1666,48 +2141,340 @@ async function fetchStats() {
 
 async function fetchLiveFeed() {
     try {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 10000);
+        
         const response = await fetch(`${API_BASE}/api/feed`, {
+            signal: controller.signal,
             method: 'GET',
-            headers: {
-                'Accept': 'application/json'
-            }
+            headers: { 'Accept': 'application/json' }
         });
+        
+        clearTimeout(timeout);
         
         if (response.ok) {
             const data = await response.json();
-            console.log('Live feed:', data);
+            console.log('📡 Live feed:', data);
             return data;
         }
     } catch (error) {
-        console.error('Error fetching live feed:', error);
+        console.error('⚠️ Live feed error:', error.message);
     }
     return null;
 }
 
 async function checkHealth() {
     try {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 10000);
+        
         const response = await fetch(`${API_BASE}/api/health`, {
+            signal: controller.signal,
             method: 'GET',
-            headers: {
-                'Accept': 'application/json'
-            }
+            headers: { 'Accept': 'application/json' }
         });
+        
+        clearTimeout(timeout);
         
         if (response.ok) {
             const data = await response.json();
-            console.log('Bot health:', data);
+            console.log('💚 Bot health:', data);
             return data;
         }
     } catch (error) {
-        console.error('Error checking health:', error);
+        console.error('⚠️ Health check error:', error.message);
     }
     return null;
 }
 
 // ============================================
-// BOT CONTROL FUNCTIONS
+// LIVE RADIO PLAYER FUNCTIONS - NEW!
 // ============================================
+let nowPlayingInterval;
 
+async function playRadio() {
+    try {
+        const radioPlayer = document.getElementById('radio-player');
+        const radioStatus = document.getElementById('radio-status');
+        
+        radioStatus.textContent = 'Connecting to radio stream...';
+        radioStatus.style.color = '#FFD700';
+        
+        const response = await fetch(`${API_BASE}/api/radio/stream`);
+        if (response.ok) {
+            const data = await response.json();
+            radioPlayer.src = data.streamUrl;
+            await radioPlayer.play();
+            
+            radioStatus.textContent = 'Playing American Dad Radio 🎵';
+            radioStatus.style.color = '#00FFD1';
+            
+            startNowPlayingUpdates();
+        } else {
+            throw new Error('Failed to get stream URL');
+        }
+    } catch (error) {
+        console.error('Error playing radio:', error);
+        document.getElementById('radio-status').textContent = 'Failed to connect. Using demo mode.';
+        document.getElementById('radio-status').style.color = '#FF6B6B';
+    }
+}
+
+function pauseRadio() {
+    const radioPlayer = document.getElementById('radio-player');
+    radioPlayer.pause();
+    document.getElementById('radio-status').textContent = 'Radio paused';
+    document.getElementById('radio-status').style.color = '#888';
+}
+
+async function skipSong() {
+    try {
+        const token = localStorage.getItem('discord_token');
+        const response = await fetch(`${API_BASE}/api/radio/skip`, {
+            method: 'POST',
+            headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+        });
+        
+        if (response.ok) {
+            document.getElementById('radio-status').textContent = 'Skipping to next song...';
+            setTimeout(updateNowPlaying, 2000);
+        } else {
+            alert('Premium feature - Login required to skip songs');
+        }
+    } catch (error) {
+        console.error('Error skipping song:', error);
+    }
+}
+
+async function adjustVolume() {
+    const volume = prompt('Enter volume (0-200):', '100');
+    if (volume !== null) {
+        const radioPlayer = document.getElementById('radio-player');
+        radioPlayer.volume = Math.min(parseInt(volume) / 100, 2);
+    }
+}
+
+function startNowPlayingUpdates() {
+    if (nowPlayingInterval) clearInterval(nowPlayingInterval);
+    updateNowPlaying();
+    nowPlayingInterval = setInterval(updateNowPlaying, 10000);
+}
+
+async function updateNowPlaying() {
+    try {
+        const response = await fetch(`${API_BASE}/api/radio/nowplaying`);
+        if (response.ok) {
+            const data = await response.json();
+            document.getElementById('current-song').textContent = data.title || 'American Dad Radio';
+            document.getElementById('current-artist').textContent = data.artist || 'Live Stream';
+        }
+    } catch (error) {
+        console.error('Error fetching now playing:', error);
+    }
+}
+
+// ============================================
+// LYRICS FUNCTION - NEW!
+// ============================================
+async function showLyrics() {
+    const currentSong = document.getElementById('current-song').textContent;
+    const currentArtist = document.getElementById('current-artist').textContent;
+    
+    if (currentSong === 'No song playing' || currentSong === 'American Dad Radio') {
+        alert('No specific song is playing. Radio stream in progress.');
+        return;
+    }
+    
+    const lyricsContainer = document.getElementById('lyrics-container');
+    const lyricsText = document.getElementById('lyrics-text');
+    
+    lyricsContainer.style.display = 'block';
+    lyricsText.textContent = 'Loading lyrics...';
+    
+    try {
+        const response = await fetch(`${API_BASE}/api/lyrics?song=${encodeURIComponent(currentSong)}&artist=${encodeURIComponent(currentArtist)}`);
+        
+        if (response.ok) {
+            const data = await response.json();
+            lyricsText.textContent = data.lyrics || 'Lyrics not available for this song';
+        } else {
+            lyricsText.textContent = 'Lyrics not available for this song';
+        }
+    } catch (error) {
+        console.error('Error fetching lyrics:', error);
+        lyricsText.textContent = 'Failed to load lyrics. Please try again.';
+    }
+}
+
+// ============================================
+// DISCORD AUTH FUNCTIONS - NEW!
+// ============================================
+async function loginDiscord() {
+    try {
+        const clientId = '1049861443111112744';
+        const redirectUri = encodeURIComponent(window.location.origin + window.location.pathname);
+        const scope = 'identify guilds';
+        const oauthUrl = `https://discord.com/api/oauth2/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=${scope}`;
+        
+        window.location.href = oauthUrl;
+    } catch (error) {
+        console.error('Discord login error:', error);
+        alert('Failed to initiate Discord login. Please try again.');
+    }
+}
+
+async function handleOAuthCallback() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const code = urlParams.get('code');
+    
+    if (code) {
+        try {
+            const response = await fetch(`${API_BASE}/api/auth/discord`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    code, 
+                    redirect_uri: window.location.origin + window.location.pathname 
+                })
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                currentUser = data.user;
+                userServers = data.guilds || [];
+                
+                localStorage.setItem('discord_user', JSON.stringify(currentUser));
+                localStorage.setItem('discord_token', data.access_token);
+                
+                showAdminPanel();
+                
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+        } catch (error) {
+            console.error('OAuth callback error:', error);
+        }
+    }
+}
+
+function showAdminPanel() {
+    document.getElementById('admin-auth-check').style.display = 'none';
+    document.getElementById('admin-panel').style.display = 'block';
+    
+    loadUserServers();
+}
+
+async function loadUserServers() {
+    const serverSelect = document.getElementById('admin-server-select');
+    if (userServers && userServers.length > 0) {
+        serverSelect.innerHTML = '<option value="">Select a server...</option>';
+        userServers.forEach(server => {
+            const option = document.createElement('option');
+            option.value = server.id;
+            option.textContent = server.name;
+            serverSelect.appendChild(option);
+        });
+    }
+}
+
+async function loadServerSettings() {
+    const serverSelect = document.getElementById('admin-server-select');
+    const serverId = serverSelect.value;
+    
+    if (!serverId) {
+        document.getElementById('server-settings').style.display = 'none';
+        return;
+    }
+    
+    try {
+        const token = localStorage.getItem('discord_token');
+        const response = await fetch(`${API_BASE}/api/admin/settings/${serverId}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (response.ok) {
+            const settings = await response.json();
+            
+            document.getElementById('default-volume').value = settings.volume || 100;
+            document.getElementById('volume-display').textContent = (settings.volume || 100) + '%';
+            document.getElementById('radio-mode').value = settings.radioMode || 'full-cast';
+            document.getElementById('auto-disconnect').value = settings.autoDisconnect || 60;
+            document.getElementById('dj-role').value = settings.djRole || '';
+            
+            const premiumStatus = document.getElementById('premium-status');
+            if (settings.premium) {
+                premiumStatus.innerHTML = `
+                    <div style="font-size: 18px; color: #FFD700; margin-bottom: 10px;">✓ Premium Active</div>
+                    <div style="color: #aaa;">Tier: ${settings.premiumTier || 'Standard'}</div>
+                    <div style="color: #aaa;">Expires: ${new Date(settings.premiumExpiry).toLocaleDateString()}</div>
+                `;
+            } else {
+                premiumStatus.innerHTML = `
+                    <div style="font-size: 18px; color: #888; margin-bottom: 10px;">Free Tier</div>
+                    <a href="#premium" style="color: #00FFD1;">Upgrade to Premium</a>
+                `;
+            }
+            
+            document.getElementById('server-settings').style.display = 'block';
+        }
+    } catch (error) {
+        console.error('Error loading server settings:', error);
+    }
+}
+
+function updateVolumeSetting(value) {
+    document.getElementById('volume-display').textContent = value + '%';
+}
+
+async function saveServerSettings() {
+    const serverSelect = document.getElementById('admin-server-select');
+    const serverId = serverSelect.value;
+    
+    if (!serverId) return;
+    
+    const settings = {
+        volume: parseInt(document.getElementById('default-volume').value),
+        radioMode: document.getElementById('radio-mode').value,
+        autoDisconnect: parseInt(document.getElementById('auto-disconnect').value),
+        djRole: document.getElementById('dj-role').value
+    };
+    
+    try {
+        const token = localStorage.getItem('discord_token');
+        const response = await fetch(`${API_BASE}/api/admin/settings/${serverId}`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(settings)
+        });
+        
+        if (response.ok) {
+            alert('✅ Settings saved successfully!');
+        } else {
+            alert('❌ Failed to save settings. Please try again.');
+        }
+    } catch (error) {
+        console.error('Error saving settings:', error);
+        alert('❌ Failed to save settings. Please try again.');
+    }
+}
+
+async function resetServerSettings() {
+    if (confirm('Are you sure you want to reset all settings to defaults?')) {
+        document.getElementById('default-volume').value = 100;
+        document.getElementById('volume-display').textContent = '100%';
+        document.getElementById('radio-mode').value = 'full-cast';
+        document.getElementById('auto-disconnect').value = 60;
+        document.getElementById('dj-role').value = '';
+        
+        await saveServerSettings();
+    }
+}
+
+// ============================================
+// BOT CONTROL FUNCTIONS (PRESERVED)
+// ============================================
 function playSongFromWebsite() {
     const songInput = document.getElementById('song-search');
     const statusDiv = document.getElementById('player-status');
@@ -1730,46 +2497,53 @@ function botControl(action) {
     const statusDiv = document.getElementById('player-status');
     if (!statusDiv) return;
     
-    statusDiv.innerHTML = `🎵 ${action.toUpperCase()} - Feature coming soon! Use /${action} command in Discord for now.`;
+    statusDiv.innerHTML = `🎵 ${action.toUpperCase()} - Feature coming soon! Use /${action} command in Discord.`;
     statusDiv.style.color = '#00FFD1';
 }
 
-// Allow Enter key to trigger play
+function showQueue() {
+    const queueDisplay = document.getElementById('queue-display');
+    if (queueDisplay) {
+        queueDisplay.style.display = queueDisplay.style.display === 'none' ? 'block' : 'none';
+    }
+}
+
 const songSearch = document.getElementById('song-search');
 if (songSearch) {
     songSearch.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            playSongFromWebsite();
-        }
+        if (e.key === 'Enter') playSongFromWebsite();
     });
 }
 
 // ============================================
 // INITIALIZATION
 // ============================================
+console.log('🎵 Stan\'s Beat Bot Website Loaded');
+console.log('⚡ Powered by Kurrasch Systems');
+console.log('🔒 API: HTTPS ONLY -', API_BASE);
 
-console.log('Stan\'s Beat Bot Website Loaded');
-console.log('Powered by Kurrasch Systems');
-console.log('API:', API_BASE);
+document.querySelectorAll('.stat-number').forEach(elem => {
+    elem.style.transition = 'opacity 0.3s ease';
+});
 
-// Initial fetch
+handleOAuthCallback();
+
+const storedUser = localStorage.getItem('discord_user');
+if (storedUser) {
+    currentUser = JSON.parse(storedUser);
+    showAdminPanel();
+}
+
 fetchStats();
 fetchLiveFeed();
 checkHealth();
 
-// Update stats every 30 seconds
 setInterval(fetchStats, 30000);
-
-// Update live feed every 60 seconds
 setInterval(fetchLiveFeed, 60000);
+setInterval(checkHealth, 120000);
 
-// Show loading message until matrix starts
-if (imagesLoaded < totalImages) {
-    console.log('Loading matrix images...');
-    ctx.fillStyle = '#00FFD1';
-    ctx.font = '20px monospace';
-    ctx.fillText('Loading American Dad Matrix...', canvas.width / 2 - 150, canvas.height / 2);
-}
+console.log('✅ All systems initialized');
+console.log('🎭 Matrix effect active:', useEmojiFallback ? 'Emoji mode' : 'Image mode');
     </script>
 </body>
 </html>
