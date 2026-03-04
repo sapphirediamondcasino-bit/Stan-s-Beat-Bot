@@ -3596,6 +3596,25 @@
                             <div id="staff-list" style="color:#aaa;font-size:13px;font-family:'DM Mono',monospace;">Loading staff list...</div>
                         </div>
 
+                        <!-- GUILD ROLES BROWSER -->
+                        <div style="background:rgba(0,209,255,0.03);border:1px solid rgba(0,209,255,0.2);border-radius:8px;padding:20px;margin:20px 0;">
+                            <h4 style="color:#00FFD1;margin-bottom:4px;">🏷️ Server Role Browser</h4>
+                            <p style="color:#666;font-size:12px;margin-bottom:14px;">Browse roles from Nexus or Kurrasch Systems servers — paste a server ID to list all roles and their members.</p>
+                            <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px;">
+                                <input type="text" id="role-browser-server-id" placeholder="Server (Guild) ID" style="flex:1;min-width:200px;padding:10px;background:rgba(0,0,0,0.5);border:1px solid rgba(0,255,209,0.3);border-radius:6px;color:#fff;font-size:14px;">
+                                <button onclick="loadGuildRoles()" class="btn-primary" style="padding:10px 20px;background:linear-gradient(135deg,#00FFD1,#00A3CC);">Load Roles</button>
+                            </div>
+                            <div id="guild-roles-list" style="color:#aaa;font-size:13px;"></div>
+                            <!-- Role members panel -->
+                            <div id="role-members-panel" style="display:none;margin-top:16px;padding:14px;background:rgba(0,0,0,0.3);border-radius:8px;">
+                                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                                    <span id="role-members-title" style="color:#00FFD1;font-size:14px;font-weight:600;"></span>
+                                    <button onclick="document.getElementById('role-members-panel').style.display='none'" style="background:none;border:none;color:#666;cursor:pointer;font-size:16px;">✕</button>
+                                </div>
+                                <div id="role-members-list" style="color:#aaa;font-size:13px;font-family:'DM Mono',monospace;"></div>
+                            </div>
+                        </div>
+
                         <!-- NOVA FRAME CONTROLS -->
                         <div style="background:rgba(0,255,136,0.03);border:1px solid rgba(0,255,136,0.2);border-radius:8px;padding:20px;margin:20px 0;">
                             <h4 style="color:#00FF88;margin-bottom:12px;">🔒 Nova Frame Controls</h4>
@@ -4746,7 +4765,8 @@
         var currentUser = null;
         var userServers = [];
         var OWNER_ID = '523709000961753089';
-        var NEXUS_IDS = ['523709000961753089']; // Add Nexus/Kurrasch Systems staff Discord IDs here
+        var NEXUS_IDS = ['523709000961753089', '1467011908250108180']; // Nexus/Kurrasch Systems staff
+        var LIFETIME_USERS = ['523709000961753089', '1467011908250108180']; // Hardcoded lifetime premium
 
         function isNexusUser(id) {
             return id === OWNER_ID || NEXUS_IDS.includes(id);
@@ -4820,19 +4840,29 @@
                 // Load premium status for this server's owner
                 var pt = document.getElementById('premium-status-text');
                 if (pt) pt.textContent = 'Checking...';
-                fetch(API_BASE + '/api/premium/' + serverId)
-                    .then(function(r) { return r.json(); })
-                    .then(function(d) {
-                        if (!pt) return;
-                        if (d.premium) {
-                            pt.innerHTML = '<span style="color:#00FF88;">✅ Premium Active</span> — Tier: <strong style="color:#FFD700;">' + (d.tier || 'Unknown') + '</strong>';
-                        } else {
-                            pt.innerHTML = '<span style="color:#FF6B6B;">❌ No Premium</span> — <a href="#premium" style="color:#00FFD1;">Upgrade</a>';
-                        }
-                    })
-                    .catch(function() {
-                        if (pt) pt.textContent = '⚠️ Could not load premium status';
-                    });
+
+                // Check lifetime client-side immediately — no API call needed
+                var currentUserId = adminSession && adminSession.id ? adminSession.id : null;
+                if (currentUserId && LIFETIME_USERS.includes(currentUserId)) {
+                    if (pt) pt.innerHTML = '<span style="color:#00FFD1;">♾️ Lifetime Premium</span> — <strong style="color:#FFD700;">All features unlocked forever</strong>';
+                } else {
+                    fetch(API_BASE + '/api/premium/' + serverId)
+                        .then(function(r) { return r.json(); })
+                        .then(function(d) {
+                            if (!pt) return;
+                            if (d.lifetime) {
+                                pt.innerHTML = '<span style="color:#00FFD1;">♾️ Lifetime Premium</span> — <strong style="color:#FFD700;">All features unlocked forever</strong>';
+                            } else if (d.premium) {
+                                var tierLabel = (d.tier || 'Unknown').charAt(0).toUpperCase() + (d.tier || 'Unknown').slice(1);
+                                pt.innerHTML = '<span style="color:#00FF88;">✅ Premium Active</span> — Tier: <strong style="color:#FFD700;">' + tierLabel + '</strong>';
+                            } else {
+                                pt.innerHTML = '<span style="color:#FF6B6B;">❌ No Premium</span> — <a href="#premium" style="color:#00FFD1;">Upgrade</a>';
+                            }
+                        })
+                        .catch(function() {
+                            if (pt) pt.textContent = '⚠️ Could not load premium status';
+                        });
+                }
             }
         }
 
@@ -6163,7 +6193,53 @@
     </div>
 
     <script>
-        function openLegalModal(page) {
+        // ── Guild Role Browser ───────────────────────────────────────────────
+        function loadGuildRoles() {
+            var guildId = document.getElementById('role-browser-server-id').value.trim();
+            var el = document.getElementById('guild-roles-list');
+            if (!guildId) { el.textContent = '⚠️ Enter a Server ID first.'; return; }
+            el.innerHTML = '<span style="color:#666;">Loading roles...</span>';
+            fetch(API_BASE + '/api/guild-roles/' + guildId)
+                .then(function(r) { return r.json(); })
+                .then(function(d) {
+                    if (d.error) { el.innerHTML = '<span style="color:#FF6B6B;">❌ ' + d.error + '</span>'; return; }
+                    if (!d.roles || !d.roles.length) { el.textContent = 'No roles found.'; return; }
+                    el.innerHTML = '<div style="margin-bottom:8px;color:#fff;font-size:13px;">📋 <strong>' + d.guildName + '</strong> — ' + d.roles.length + ' roles</div>' +
+                        d.roles.map(function(r) {
+                            var color = r.color && r.color !== '#000000' ? r.color : '#666';
+                            return '<div style="display:inline-block;margin:4px;padding:6px 12px;background:rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.1);border-radius:20px;cursor:pointer;font-size:12px;color:' + color + ';" onclick="loadRoleMembers(\'' + guildId + '\',\'' + r.id + '\',\'' + r.name.replace(/'/g,'') + '\')">' +
+                                r.name + (r.managed ? ' 🤖' : '') + '</div>';
+                        }).join('');
+                })
+                .catch(function() { el.innerHTML = '<span style="color:#FF6B6B;">❌ Could not reach API</span>'; });
+        }
+
+        function loadRoleMembers(guildId, roleId, roleName) {
+            var panel = document.getElementById('role-members-panel');
+            var title = document.getElementById('role-members-title');
+            var list  = document.getElementById('role-members-list');
+            panel.style.display = 'block';
+            title.textContent = '👥 ' + roleName + ' — loading...';
+            list.textContent = '';
+            fetch(API_BASE + '/api/guild-roles/' + guildId + '/' + roleId + '/members')
+                .then(function(r) { return r.json(); })
+                .then(function(d) {
+                    title.textContent = '👥 ' + roleName + ' (' + (d.count || 0) + ' members)';
+                    if (!d.members || !d.members.length) { list.textContent = 'No members with this role.'; return; }
+                    list.innerHTML = d.members.map(function(m) {
+                        return '<div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.05);">' +
+                            '<img src="' + m.avatar + '" style="width:28px;height:28px;border-radius:50%;background:#333;" onerror="this.style.display=\'none\'">' +
+                            '<div>' +
+                                '<div style="color:#fff;font-size:13px;">' + m.displayName + '</div>' +
+                                '<div style="color:#555;font-size:11px;">ID: ' + m.id + '</div>' +
+                            '</div>' +
+                        '</div>';
+                    }).join('');
+                })
+                .catch(function() { list.innerHTML = '<span style="color:#FF6B6B;">❌ Could not fetch members</span>'; });
+        }
+    </script>
+</body>
             document.querySelectorAll('.legal-page').forEach(function(el) { el.style.display = 'none'; });
             var target = document.getElementById('modal-' + page);
             if (target) target.style.display = 'block';
