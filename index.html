@@ -3564,6 +3564,9 @@
                             <p id="premium-status-text" style="color:#aaa;">Loading premium status...</p>
                         </div>
 
+                        <!-- OWNER-ONLY CONTROLS (523709000961753089) -->
+                        <div id="owner-only-controls" style="display:none;">
+
                         <!-- PREMIUM PER USER -->
                         <div style="background:rgba(0,255,209,0.03);border:1px solid rgba(0,255,209,0.15);border-radius:8px;padding:20px;margin:20px 0;">
                             <h4 style="color:#00FFD1;margin-bottom:12px;">💎 Grant / Revoke Premium</h4>
@@ -3595,6 +3598,8 @@
                             </div>
                             <div id="staff-list" style="color:#aaa;font-size:13px;font-family:'DM Mono',monospace;">Loading staff list...</div>
                         </div>
+
+                        </div><!-- end owner-only-controls -->
 
                         <!-- GUILD ROLES BROWSER -->
                         <div style="background:rgba(0,209,255,0.03);border:1px solid rgba(0,209,255,0.2);border-radius:8px;padding:20px;margin:20px 0;">
@@ -4811,6 +4816,9 @@
             var panel = document.getElementById('admin-panel');
             if (authCheck) authCheck.style.display = 'none';
             if (panel) panel.style.display = 'block';
+            var ownerControls = document.getElementById('owner-only-controls');
+            var currentId = (adminSession && adminSession.id) ? adminSession.id : (currentUser && currentUser.id ? currentUser.id : null);
+            if (ownerControls) ownerControls.style.display = (currentId === OWNER_ID) ? 'block' : 'none';
             loadUserServers();
             sbbPopulateServers();
         }
@@ -4915,6 +4923,8 @@
             localStorage.setItem('admin_session', JSON.stringify(adminSession));
             document.getElementById('admin-auth-check').style.display = 'none';
             document.getElementById('admin-panel').style.display = 'block';
+            var ownerControls = document.getElementById('owner-only-controls');
+            if (ownerControls) ownerControls.style.display = (adminSession && adminSession.id === OWNER_ID) ? 'block' : 'none';
             loadUserServers();
             loadStaffList();
             loadNovaStatus();
