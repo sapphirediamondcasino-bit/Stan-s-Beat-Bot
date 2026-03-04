@@ -3608,14 +3608,7 @@
                         <span class="fa-fairness-badge">📋 Why featured?</span>
                     </div>
                     <div class="fa-spotlight-grid" id="fa-spotlight-grid">
-                        <div class="fa-spotlight-card fa-pinned">
-                            <div class="fa-pin-badge">📌 Pinned</div>
-                            <div class="fa-art" id="jake-kade-art" style="background:linear-gradient(135deg,#FF6B6B,#FF8E53);">JK</div>
-                            <div class="fa-name">Jake Kade</div>
-                            <div class="fa-genre">Hip-Hop</div>
-                            <div class="fa-meta">Pinned · 30 day window</div>
-                            <button class="fa-play-btn" onclick="sbbSearch('Jake Kade')">▶ Play</button>
-                        </div>
+                        <div style="color:#444;font-size:13px;font-family:'DM Mono',monospace;padding:20px 0;">Loading spotlight...</div>
                     </div>
                 </div>
 
@@ -3629,12 +3622,7 @@
                         <span class="fa-rising-badge">🌱 Low-Artist Protected</span>
                     </div>
                     <div class="fa-rising-grid" id="fa-rising-grid">
-                        <div class="fa-artist-card">
-                            <div class="fa-art" style="background:linear-gradient(135deg,#00FFD1,#00CCA5);">?</div>
-                            <div class="fa-name">Loading...</div>
-                            <div class="fa-genre">—</div>
-                            <div class="fa-plays">— plays</div>
-                        </div>
+                        <div style="color:#444;font-size:13px;font-family:'DM Mono',monospace;padding:20px 0;">Loading rising artists...</div>
                     </div>
                 </div>
 
@@ -5431,7 +5419,11 @@
 
         function renderSpotlight(artists) {
             var el = document.getElementById('fa-spotlight-grid');
-            if (!el || !artists.length) return;
+            if (!el) return;
+            if (!artists.length) {
+                el.innerHTML = '<div style="color:#444;font-size:13px;font-family:\'DM Mono\',monospace;padding:20px 0;">No spotlight artists yet — add them via the admin panel.</div>';
+                return;
+            }
             el.innerHTML = artists.map(function(a) {
                 var color = a.pinned ? 'linear-gradient(135deg,#FF6B6B,#FF8E53)' : 'linear-gradient(135deg,#00FFD1,#00CCA5)';
                 var playsHtml = a.plays ? '<div class="fa-plays">' + Number(a.plays).toLocaleString() + ' plays</div>' : '';
@@ -5454,6 +5446,10 @@
         function renderRising(artists) {
             var el = document.getElementById('fa-rising-grid');
             if (!el) return;
+            if (!artists.length) {
+                el.innerHTML = '<div style="color:#444;font-size:13px;font-family:\'DM Mono\',monospace;padding:20px 0;">No rising artists yet — data populates as the bot tracks plays.</div>';
+                return;
+            }
             var colors = ['#00FFD1','#FF6B6B','#FFD700','#A78BFA','#34D399','#F472B6'];
             el.innerHTML = artists.map(function(a, i) {
                 var color = colors[i % colors.length];
@@ -5512,12 +5508,18 @@
                 if (!r.ok) throw new Error('no sessions');
                 var sessions = await r.json();
                 renderSessions(sessions);
-            } catch(e) { /* no sessions API yet */ }
+            } catch(e) {
+                renderSessions([]);
+            }
         }
 
         function renderSessions(sessions) {
             var el = document.getElementById('session-grid');
-            if (!el || !sessions.length) return;
+            if (!el) return;
+            if (!sessions.length) {
+                el.innerHTML = '<div style="color:#444;font-size:13px;font-family:\'DM Mono\',monospace;padding:40px;text-align:center;">No active sessions right now — the bot isn\'t playing in any server.</div>';
+                return;
+            }
             el.innerHTML = sessions.map(function(s) {
                 return '<div class="session-card">'
                     + '<div class="session-card-title">🎵 ' + faEsc(s.serverName || 'Server') + '</div>'
@@ -5614,6 +5616,37 @@
         // QUEUE HISTORY
         // ══════════════════════════════════════════════════════
         var SBB_HISTORY = JSON.parse(localStorage.getItem('sbb_history') || '[]');
+
+        // Also pull server-side history from API and merge in
+        (async function loadServerHistory() {
+            try {
+                var serverId = SBB.serverId || getActiveServerId();
+                var userId = currentUser && currentUser.id;
+                if (!serverId || !userId) return;
+                var r = await fetch(API_BASE + '/api/history/' + serverId + '/' + userId);
+                if (!r.ok) return;
+                var d = await r.json();
+                var serverHistory = d.history || [];
+                if (!serverHistory.length) return;
+                // Merge: add server tracks not already in local history
+                var localTitles = new Set(SBB_HISTORY.map(function(s) { return s.title; }));
+                serverHistory.forEach(function(s) {
+                    if (!localTitles.has(s.title)) {
+                        SBB_HISTORY.push({
+                            title: s.title,
+                            artist: s.artist || s.channel || '',
+                            thumbnail: s.thumbnail || '',
+                            duration: s.duration || 0,
+                            playedAt: s.playedAt || Date.now()
+                        });
+                    }
+                });
+                SBB_HISTORY.sort(function(a, b) { return (b.playedAt || 0) - (a.playedAt || 0); });
+                if (SBB_HISTORY.length > 100) SBB_HISTORY = SBB_HISTORY.slice(0, 100);
+                localStorage.setItem('sbb_history', JSON.stringify(SBB_HISTORY));
+                renderHistory();
+            } catch(e) {}
+        })();
 
         function addToHistory(song) {
             if (!song || !song.title) return;
