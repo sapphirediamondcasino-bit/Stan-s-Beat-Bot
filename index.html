@@ -2601,7 +2601,14 @@
             margin: 0 auto 12px;
             display: flex; align-items: center; justify-content: center;
             font-size: 28px; font-weight: 800; color: #fff;
+            overflow: hidden; flex-shrink: 0;
         }
+        .fa-art img {
+            width: 100%; height: 100%;
+            object-fit: cover; border-radius: 50%; display: block;
+        }
+        .fa-spotlight-card .fa-art { width: 100px; height: 100px; font-size: 32px; }
+        .fa-genre-cards .fa-art { width: 48px; height: 48px; font-size: 16px; margin-bottom: 8px; }
         .fa-name { font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 4px; }
         .fa-genre { font-size: 12px; color: #00FFD1; margin-bottom: 4px; }
         .fa-meta { font-size: 11px; color: #555; margin-bottom: 12px; font-family: 'DM Mono', monospace; }
@@ -3603,11 +3610,11 @@
                     <div class="fa-spotlight-grid" id="fa-spotlight-grid">
                         <div class="fa-spotlight-card fa-pinned">
                             <div class="fa-pin-badge">📌 Pinned</div>
-                            <div class="fa-art" style="background:linear-gradient(135deg,#FF6B6B,#FF8E53);">JK</div>
+                            <div class="fa-art" id="jake-kade-art" style="background:linear-gradient(135deg,#FF6B6B,#FF8E53);">JK</div>
                             <div class="fa-name">Jake Kade</div>
                             <div class="fa-genre">Hip-Hop</div>
                             <div class="fa-meta">Pinned · 30 day window</div>
-                            <button class="fa-play-btn" onclick="sbbSearch()">▶ Play</button>
+                            <button class="fa-play-btn" onclick="sbbSearch('Jake Kade')">▶ Play</button>
                         </div>
                     </div>
                 </div>
@@ -5253,50 +5260,6 @@
             }
         }
 
-        async function loadStatusPage() {
-            var dot   = document.getElementById('status-page-dot');
-            var label = document.getElementById('status-page-label');
-            var upt   = document.getElementById('status-page-uptime');
-            var ss    = document.getElementById('status-servers');
-            var su    = document.getElementById('status-users');
-            var spl   = document.getElementById('status-plays');
-            var sad   = document.getElementById('status-adshows');
-            var np    = document.getElementById('status-now-playing');
-            try {
-                var resp = await fetch(API_BASE + '/api/stats');
-                if (!resp.ok) throw new Error('offline');
-                var data = await resp.json();
-                if (dot)   { dot.style.background = '#00FF88'; dot.style.boxShadow = '0 0 10px #00FF88'; }
-                if (label) { label.textContent = '🟢 Bot Online'; label.style.color = '#00FF88'; }
-                if (upt)   upt.textContent = data.uptime ? 'Uptime: ' + data.uptime : '';
-                if (ss)    ss.textContent = data.servers || 0;
-                if (su)    su.textContent = data.users || 0;
-                if (spl)   spl.textContent = data.totalPlays || 0;
-                if (sad)   sad.textContent = data.adShowsPlayed || 0;
-                var queues = data.activeQueues || [];
-                if (np) {
-                    if (queues.length === 0) {
-                        np.innerHTML = '<p style="color:#888;text-align:center;padding:30px;">Nothing playing right now</p>';
-                    } else {
-                        np.innerHTML = queues.map(function(q) {
-                            return '<div class="queue-item" style="padding:16px;border-bottom:1px solid rgba(255,255,255,0.05);">'
-                                + '<div class="queue-item-art">'
-                                + (q.thumbnail ? '<img src="' + htmlEsc(q.thumbnail) + '">' : '🎵')
-                                + '</div>'
-                                + '<div class="queue-item-info">'
-                                + '<div class="queue-item-title">' + htmlEsc(q.title || 'Unknown') + '</div>'
-                                + '<div class="queue-item-artist" style="color:#00FFD1;">' + htmlEsc(q.serverName || q.guild || '') + '</div>'
-                                + '</div></div>';
-                        }).join('');
-                    }
-                }
-            } catch(e) {
-                if (dot)   { dot.style.background = '#FF4444'; dot.style.boxShadow = '0 0 10px #FF4444'; }
-                if (label) { label.textContent = '🔴 Bot Offline'; label.style.color = '#FF4444'; }
-                if (np)    np.innerHTML = '<p style="color:#888;text-align:center;padding:30px;">Could not reach the bot</p>';
-            }
-        }
-
         // ============================================
         // INITIALIZATION
         // ============================================
@@ -5469,28 +5432,38 @@
                 renderRising(data.rising || []);
                 renderGenreRows(data.genres || {});
             } catch(e) {
-                // Show placeholder cards if API not ready yet
-                renderRising([
-                    { name: 'Jake Kade', genre: 'Hip-Hop', plays: 4200, pinned: true },
-                    { name: 'Rising Artist', genre: 'Indie', plays: 890 },
-                    { name: 'New Sound', genre: 'EDM', plays: 1200 },
-                ]);
+                var el = document.getElementById('fa-rising-grid');
+                if (el) el.innerHTML = '<div style="color:#555;font-size:14px;font-family:DM Mono,monospace;padding:20px 0;">No featured artists yet — data loads from the bot.</div>';
             }
+        }
+
+        function faArtHtml(a, fallbackColor) {
+            var initials = (a.name || '?').split(' ').map(function(w){ return w[0]; }).join('').slice(0,2).toUpperCase();
+            var color = fallbackColor || 'linear-gradient(135deg,#00FFD1,#00CCA5)';
+            if (a.image) {
+                return '<div class="fa-art"><img src="' + faEsc(a.image) + '" alt="' + faEsc(a.name) + '" onerror="this.parentNode.innerHTML=\'<span>' + initials + '</span>\';this.parentNode.style.background=\'' + color + '\';"></div>';
+            }
+            return '<div class="fa-art" style="background:' + color + ';">' + initials + '</div>';
         }
 
         function renderSpotlight(artists) {
             var el = document.getElementById('fa-spotlight-grid');
             if (!el || !artists.length) return;
             el.innerHTML = artists.map(function(a) {
-                var initials = (a.name || '?').split(' ').map(function(w){ return w[0]; }).join('').slice(0,2);
                 var color = a.pinned ? 'linear-gradient(135deg,#FF6B6B,#FF8E53)' : 'linear-gradient(135deg,#00FFD1,#00CCA5)';
+                var playsHtml = a.plays ? '<div class="fa-plays">' + Number(a.plays).toLocaleString() + ' plays</div>' : '';
+                var linkStart = a.url ? '<a href="' + faEsc(a.url) + '" target="_blank" style="text-decoration:none;color:inherit;">' : '';
+                var linkEnd = a.url ? '</a>' : '';
                 return '<div class="fa-spotlight-card' + (a.pinned ? ' fa-pinned' : '') + '">'
                     + (a.pinned ? '<div class="fa-pin-badge">📌 Pinned</div>' : '')
-                    + '<div class="fa-art" style="background:' + color + ';">' + initials + '</div>'
+                    + linkStart
+                    + faArtHtml(a, color)
                     + '<div class="fa-name">' + faEsc(a.name) + '</div>'
+                    + linkEnd
                     + '<div class="fa-genre">' + faEsc(a.genre || '') + '</div>'
                     + '<div class="fa-meta">' + (a.pinned ? 'Pinned' : 'Featured') + ' · ' + faEsc(a.reason || 'Curated pick') + '</div>'
-                    + '<button class="fa-play-btn" onclick="sbbSearch()">▶ Play</button>'
+                    + playsHtml
+                    + '<button class="fa-play-btn" onclick="sbbSearch(\'' + faEsc(a.name) + '\')">▶ Play</button>'
                     + '</div>';
             }).join('');
         }
@@ -5500,13 +5473,16 @@
             if (!el) return;
             var colors = ['#00FFD1','#FF6B6B','#FFD700','#A78BFA','#34D399','#F472B6'];
             el.innerHTML = artists.map(function(a, i) {
-                var initials = (a.name || '?').split(' ').map(function(w){ return w[0]; }).join('').slice(0,2);
+                var color = colors[i % colors.length];
+                var playsHtml = a.plays ? '<div class="fa-plays">' + Number(a.plays).toLocaleString() + ' plays</div>' : '';
+                var linkStart = a.url ? '<a href="' + faEsc(a.url) + '" target="_blank" style="text-decoration:none;color:inherit;">' : '';
+                var linkEnd = a.url ? '</a>' : '';
                 return '<div class="fa-artist-card">'
-                    + '<div class="fa-art" style="background:' + colors[i % colors.length] + ';margin-bottom:10px;">' + initials + '</div>'
+                    + linkStart + faArtHtml(a, 'linear-gradient(135deg,' + color + ',rgba(0,0,0,0.5))') + linkEnd
                     + '<div class="fa-name">' + faEsc(a.name) + '</div>'
                     + '<div class="fa-genre">' + faEsc(a.genre || '') + '</div>'
-                    + '<div class="fa-plays">' + (a.plays || 0).toLocaleString() + ' plays</div>'
-                    + '<button class="fa-play-btn" style="margin-top:8px;" onclick="sbbSearch()">▶ Play</button>'
+                    + playsHtml
+                    + '<button class="fa-play-btn" style="margin-top:8px;" onclick="sbbSearch(\'' + faEsc(a.name) + '\')">▶ Play</button>'
                     + '</div>';
             }).join('');
         }
@@ -5521,12 +5497,13 @@
                     el.innerHTML = '<div style="color:#333;font-size:12px;font-family:DM Mono,monospace;">No data yet</div>';
                     return;
                 }
-                el.innerHTML = artists.slice(0, 5).map(function(a, i) {
-                    var initials = (a.name || '?').slice(0,2);
+                el.innerHTML = artists.slice(0, 5).map(function(a) {
+                    var linkStart = a.url ? '<a href="' + faEsc(a.url) + '" target="_blank" style="text-decoration:none;color:inherit;">' : '';
+                    var linkEnd = a.url ? '</a>' : '';
                     return '<div class="fa-artist-card" style="padding:12px;">'
-                        + '<div class="fa-art" style="width:48px;height:48px;font-size:16px;margin-bottom:8px;background:rgba(0,255,209,0.15);">' + initials + '</div>'
+                        + linkStart + faArtHtml(a, 'rgba(0,255,209,0.15)') + linkEnd
                         + '<div class="fa-name" style="font-size:12px;">' + faEsc(a.name) + '</div>'
-                        + '<div class="fa-plays" style="font-size:11px;">' + (a.plays||0).toLocaleString() + '</div>'
+                        + (a.plays ? '<div class="fa-plays" style="font-size:11px;">' + Number(a.plays).toLocaleString() + '</div>' : '')
                         + '</div>';
                 }).join('');
             });
