@@ -3567,7 +3567,7 @@
                             <p id="premium-status-text" style="color:#aaa;">Loading premium status...</p>
                         </div>
 
-                        <!-- OWNER-ONLY CONTROLS (523709000961753089) -->
+                        <!-- OWNER-ONLY CONTROLS — hidden for non-owners -->
                         <div id="owner-only-controls" style="display:none;">
 
                         <!-- PREMIUM PER USER -->
@@ -3602,7 +3602,7 @@
                             <div id="staff-list" style="color:#aaa;font-size:13px;font-family:'DM Mono',monospace;">Loading staff list...</div>
                         </div>
 
-                        </div><!-- end owner-only-controls -->
+                        </div><!-- /owner-only-controls -->
 
                         <!-- GUILD ROLES BROWSER -->
                         <div style="background:rgba(0,209,255,0.03);border:1px solid rgba(0,209,255,0.2);border-radius:8px;padding:20px;margin:20px 0;">
@@ -4079,7 +4079,7 @@
         </div>
     </footer>
 
-<script>
+   <script>
         // ============================================
         // MATRIX RAIN EFFECT - American Dad Characters
         // ============================================
@@ -4819,9 +4819,9 @@
             var panel = document.getElementById('admin-panel');
             if (authCheck) authCheck.style.display = 'none';
             if (panel) panel.style.display = 'block';
-            var ownerControls = document.getElementById('owner-only-controls');
-            var currentId = (adminSession && adminSession.id) ? adminSession.id : (currentUser && currentUser.id ? currentUser.id : null);
-            if (ownerControls) ownerControls.style.display = (currentId === OWNER_ID) ? 'block' : 'none';
+            var oc = document.getElementById('owner-only-controls');
+            var uid = (adminSession && adminSession.id) || (currentUser && currentUser.id) || '';
+            if (oc) oc.style.display = (uid === OWNER_ID) ? 'block' : 'none';
             loadUserServers();
             sbbPopulateServers();
         }
@@ -4926,8 +4926,8 @@
             localStorage.setItem('admin_session', JSON.stringify(adminSession));
             document.getElementById('admin-auth-check').style.display = 'none';
             document.getElementById('admin-panel').style.display = 'block';
-            var ownerControls = document.getElementById('owner-only-controls');
-            if (ownerControls) ownerControls.style.display = (adminSession && adminSession.id === OWNER_ID) ? 'block' : 'none';
+            var oc = document.getElementById('owner-only-controls');
+            if (oc) oc.style.display = (adminSession && adminSession.id === OWNER_ID) ? 'block' : 'none';
             loadUserServers();
             loadStaffList();
             loadNovaStatus();
@@ -5383,7 +5383,10 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ query: query })
                 });
-                if (!r.ok) throw new Error('Resolve failed');
+                if (!r.ok) {
+                    var errData = await r.json().catch(function(){ return {}; });
+                    throw new Error(errData.error || 'Resolve failed');
+                }
                 var data = await r.json();
 
                 if (!data.streamUrl) throw new Error('No audio URL');
@@ -5412,7 +5415,12 @@
                 };
 
             } catch(e) {
-                sbbSetTrack(null, null, 'Search failed: ' + (e.message || 'unknown'));
+                var msg = e.message || 'unknown error';
+                if (msg.indexOf('ytdl-core') !== -1 || msg.indexOf('MODULE_NOT_FOUND') !== -1) {
+                    msg = 'Web player needs ytdl-core — run: npm install ytdl-core';
+                }
+                sbbSetTrack(null, null, '⚠️ ' + msg);
+                showToast('❌ ' + msg);
                 if (resultsEl) resultsEl.style.display = 'none';
             }
         }
@@ -5667,6 +5675,10 @@
         // FEATURED ARTISTS ENGINE
         // ══════════════════════════════════════════════════════
         async function loadFeaturedArtists() {
+            var spotEl = document.getElementById('fa-spotlight-grid');
+            var risingEl = document.getElementById('fa-rising-grid');
+            if (spotEl) spotEl.innerHTML = '<div style="color:#555;font-size:13px;font-family:\'DM Mono\',monospace;padding:20px 0;">⏳ Loading...</div>';
+            if (risingEl) risingEl.innerHTML = '<div style="color:#555;font-size:13px;font-family:\'DM Mono\',monospace;padding:20px 0;">⏳ Loading...</div>';
             try {
                 var r = await fetch(API_BASE + '/api/featured');
                 if (!r.ok) throw new Error('no data');
@@ -5675,8 +5687,8 @@
                 renderRising(data.rising || []);
                 renderGenreRows(data.genres || {});
             } catch(e) {
-                var el = document.getElementById('fa-rising-grid');
-                if (el) el.innerHTML = '<div style="color:#555;font-size:14px;font-family:DM Mono,monospace;padding:20px 0;">No featured artists yet — data loads from the bot.</div>';
+                if (spotEl) spotEl.innerHTML = '<div style="color:#444;font-size:13px;font-family:\'DM Mono\',monospace;padding:20px 0;">No spotlight artists yet — data loads from the bot as it plays music.</div>';
+                if (risingEl) risingEl.innerHTML = '<div style="color:#444;font-size:13px;font-family:\'DM Mono\',monospace;padding:20px 0;">No rising artists yet — plays accumulate as the bot tracks music.</div>';
             }
         }
 
@@ -5767,14 +5779,14 @@
         // ══════════════════════════════════════════════════════
         async function loadSessions() {
             var serverId = SBB.serverId || getActiveServerId();
-            // Generate user's session URL
             if (serverId && currentUser) {
                 var serverName = (userServers.find(function(s){ return s.id === serverId; }) || {}).name || serverId;
                 var slug = serverName.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g,'-');
-                document.getElementById('session-url-display').innerHTML = 
+                document.getElementById('session-url-display').innerHTML =
                     '<span style="color:#00FFD1;">stansbeatbot.online/session/' + slug + '</span>';
             }
-            // Load active sessions
+            var gridEl = document.getElementById('session-grid');
+            if (gridEl) gridEl.innerHTML = '<div style="color:#555;font-size:13px;font-family:\'DM Mono\',monospace;padding:40px;text-align:center;">⏳ Loading sessions...</div>';
             try {
                 var r = await fetch(API_BASE + '/api/sessions');
                 if (!r.ok) throw new Error('no sessions');
@@ -6124,11 +6136,16 @@
         // Init history on load
         renderHistory();
 
+        // Auto-load all sections immediately so they're ready
+        setTimeout(loadFeaturedArtists, 500);
+        setTimeout(loadSessions, 800);
 
         fetchStats();
         setInterval(fetchStats, 30000);
         setInterval(sbbPollQueue, 5000);
         setInterval(pollVCListeners, 10000);
+        // Refresh sessions every 30s
+        setInterval(loadSessions, 30000);
     </script>
     <!-- ═══ LEGAL MODALS ═══════════════════════════════════════════ -->
     <div id="legal-modal-overlay" onclick="closeLegalModal()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;overflow-y:auto;padding:40px 20px;">
