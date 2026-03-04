@@ -5455,8 +5455,29 @@
                 authArea.innerHTML = '<div class="sbb-user-chip"><img class="sbb-user-avatar" src="' + avatar + '" alt=""><span>' + sbbEsc(currentUser.username) + '</span></div>';
             }
 
-            // Auto-detect active server
-            setTimeout(sbbPollQueue, 300);
+            // Auto-detect: find which server the user is currently in
+            if (currentUser && currentUser.id) {
+                fetch(API_BASE + '/api/auto-detect/' + currentUser.id)
+                    .then(function(r) { return r.json(); })
+                    .then(function(d) {
+                        if (!d.found) { setTimeout(sbbPollQueue, 300); return; }
+                        var sel = document.getElementById('sbb-server-select');
+                        if (sel) { sel.value = d.guildId; SBB.serverId = d.guildId; }
+                        if (d.botPresent && d.playing && d.current) {
+                            sbbSetMode('discord');
+                            sbbSetTrack(d.current.title, d.current.artist, '\uD83C\uDFAE ' + d.guildName);
+                            sbbSetArt(d.current.thumbnail);
+                            if (d.current.duration) SBB.duration = Math.floor(d.current.duration / 1000);
+                            sbbStartProgress();
+                        } else if (d.botPresent) {
+                            sbbSetMode('discord');
+                        }
+                        setTimeout(sbbPollQueue, 300);
+                    })
+                    .catch(function() { setTimeout(sbbPollQueue, 300); });
+            } else {
+                setTimeout(sbbPollQueue, 300);
+            }
         }
 
         // ── RADIO STATIONS ────────────────────────────────
@@ -6281,7 +6302,6 @@
             document.getElementById('legal-modal-overlay').style.display = 'none';
             document.body.style.overflow = '';
         }
-        document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeLegalModal(); });
     </script>
 </body>
 </html>
