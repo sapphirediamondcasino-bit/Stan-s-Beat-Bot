@@ -6239,7 +6239,8 @@
                 .catch(function() { list.innerHTML = '<span style="color:#FF6B6B;">❌ Could not fetch members</span>'; });
         }
     </script>
-</body>
+    <script>
+        function openLegalModal(page) {
             document.querySelectorAll('.legal-page').forEach(function(el) { el.style.display = 'none'; });
             var target = document.getElementById('modal-' + page);
             if (target) target.style.display = 'block';
