@@ -3339,6 +3339,14 @@
                 <h2 class="section-title">All Commands</h2>
                 <p class="section-subtitle">Full slash command reference for Stan's Beat Bot</p>
 
+                <!-- FREE BADGE LEGEND -->
+                <div style="display:flex;gap:16px;align-items:center;margin-bottom:32px;flex-wrap:wrap;">
+                    <span style="background:rgba(0,255,209,0.12);border:1px solid #00FFD1;color:#00FFD1;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;letter-spacing:1px;">FREE</span>
+                    <span style="background:rgba(255,215,0,0.12);border:1px solid #FFD700;color:#FFD700;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;letter-spacing:1px;">💎 PREMIUM</span>
+                    <span style="color:#888;font-size:13px;">All free commands available to every server. Premium unlocks advanced features.</span>
+                </div>
+
+                <!-- PLAYBACK -->
                 <h3 style="color:#00FFD1;font-size:16px;letter-spacing:2px;margin:0 0 16px;text-transform:uppercase;">▶ Playback</h3>
                 <div class="commands-grid" style="margin-bottom:36px;">
                     <div class="command-card"><code>/play [song]</code><p>Play a song or add it to the queue</p></div>
@@ -3349,34 +3357,77 @@
                     <div class="command-card"><code>/resume</code><p>Resume a paused track</p></div>
                     <div class="command-card"><code>/skip</code><p>Skip to the next song</p></div>
                     <div class="command-card"><code>/stop</code><p>Stop playback and clear the queue</p></div>
+                    <div class="command-card"><code>/replay</code><p>Restart the current song from the beginning</p></div>
+                    <div class="command-card"><code>/skipto [position]</code><p>Jump directly to a position in the queue</p></div>
                 </div>
 
+                <!-- QUEUE -->
                 <h3 style="color:#00FFD1;font-size:16px;letter-spacing:2px;margin:0 0 16px;text-transform:uppercase;">📋 Queue</h3>
                 <div class="commands-grid" style="margin-bottom:36px;">
-                    <div class="command-card"><code>/queue</code><p>View the current queue</p></div>
-                    <div class="command-card"><code>/nowplaying</code><p>See what's currently playing</p></div>
+                    <div class="command-card"><code>/queue</code><p>View the current queue with Prev/Next navigation buttons</p></div>
+                    <div class="command-card"><code>/nowplaying</code><p>Now playing with live progress bar and playback buttons</p></div>
                     <div class="command-card"><code>/shuffle</code><p>Shuffle the queue</p></div>
                     <div class="command-card"><code>/loop [mode]</code><p>Loop the current song or entire queue</p></div>
                     <div class="command-card"><code>/move [from] [to]</code><p>Move a song to a different queue position</p></div>
                     <div class="command-card"><code>/remove [position]</code><p>Remove a song from the queue</p></div>
                     <div class="command-card"><code>/clear</code><p>Clear the entire queue</p></div>
                     <div class="command-card"><code>/seek [time]</code><p>Seek to a position in the current track</p></div>
+                    <div class="command-card"><code>/voteskip</code><p>Vote to skip the current song — majority wins</p></div>
+                    <div class="command-card"><code>/grab</code><p>DMs you the current song so you never lose it</p></div>
+                    <div class="command-card"><code>/undo</code><p>Remove the last song you personally added to the queue</p></div>
                 </div>
 
+                <!-- SEARCH & INFO -->
                 <h3 style="color:#00FFD1;font-size:16px;letter-spacing:2px;margin:0 0 16px;text-transform:uppercase;">🔍 Search & Info</h3>
                 <div class="commands-grid" style="margin-bottom:36px;">
                     <div class="command-card"><code>/search [query]</code><p>Search for songs and pick from results</p></div>
                     <div class="command-card"><code>/lyrics</code><p>Display lyrics for the current song</p></div>
                     <div class="command-card"><code>/stats</code><p>View bot statistics and server usage</p></div>
+                    <div class="command-card"><code>/ping</code><p>Show bot latency and API response time</p></div>
+                    <div class="command-card"><code>/songinfo</code><p>Deep dive — views, likes, upload date, channel stats for the current song</p></div>
+                    <div class="command-card"><code>/similar</code><p>5 similar songs as clickable buttons — one tap queues it</p></div>
                     <div class="command-card"><code>/recommend</code><p>Get AI-powered song recommendations</p></div>
+                    <div class="command-card"><code>/history</code><p>Your personal listening history and server top songs</p></div>
+                    <div class="command-card"><code>/wrapped</code><p>Your monthly stats — top songs, top artist, total listening time, streak</p></div>
                 </div>
 
-                <h3 style="color:#FFD700;font-size:16px;letter-spacing:2px;margin:0 0 16px;text-transform:uppercase;">💎 Premium</h3>
+                <!-- AI & RADIO -->
+                <h3 style="color:#00FFD1;font-size:16px;letter-spacing:2px;margin:0 0 16px;text-transform:uppercase;">🤖 AI & Radio</h3>
                 <div class="commands-grid" style="margin-bottom:36px;">
-                    <div class="command-card"><code>/volume [0-200]</code><p>Adjust playback volume · <em style="color:#FFD700;">Premium</em></p></div>
-                    <div class="command-card"><code>/filters</code><p>Apply audio filters (bass boost, nightcore, etc.) · <em style="color:#FFD700;">Premium</em></p></div>
-                    <div class="command-card"><code>/247</code><p>Enable 24/7 stay-in-voice mode · <em style="color:#FFD700;">Premium</em></p></div>
-                    <div class="command-card"><code>/premium</code><p>View and manage your premium subscription</p></div>
+                    <div class="command-card"><code>/247 [genre]</code><p>AutoDJ — continuous genre radio, never stops playing</p></div>
+                    <div class="command-card"><code>/radio [genre]</code><p>Radio station mode with DJ announcer and American Dad drops between tracks</p></div>
+                    <div class="command-card"><code>/mood [mood]</code><p>Queue music by mood — hype, chill, happy, sad, focus, heartbreak, party, late night</p></div>
+                    <div class="command-card"><code>/announcer</code><p>Toggle radio-style song intro cards before each track</p></div>
+                    <div class="command-card"><code>/quiz</code><p>Music quiz — bot plays a clip, first to type the title wins. Leaderboard tracked</p></div>
+                </div>
+
+                <!-- SOCIAL & PLAYLISTS -->
+                <h3 style="color:#00FFD1;font-size:16px;letter-spacing:2px;margin:0 0 16px;text-transform:uppercase;">🎵 Playlists & Social</h3>
+                <div class="commands-grid" style="margin-bottom:36px;">
+                    <div class="command-card"><code>/playlist</code><p>Create personal playlists that follow you across every server. Free: 3 playlists × 50 songs</p></div>
+                    <div class="command-card"><code>/snapshot</code><p>Save and restore the current queue by name. Free: 1 slot</p></div>
+                    <div class="command-card"><code>/favorite</code><p>Save songs to your personal favorites — persists forever across all servers</p></div>
+                    <div class="command-card"><code>/collab</code><p>Collaborative queue mode — fair round-robin so no one person dominates</p></div>
+                    <div class="command-card"><code>/schedule</code><p>Schedule the bot to join and start playing at a set time. Great for events &amp; game nights</p></div>
+                </div>
+
+                <!-- SERVER MANAGEMENT -->
+                <h3 style="color:#00FFD1;font-size:16px;letter-spacing:2px;margin:0 0 16px;text-transform:uppercase;">⚙️ Server Management</h3>
+                <div class="commands-grid" style="margin-bottom:36px;">
+                    <div class="command-card"><code>/djrole [role]</code><p>Lock bot controls to a specific DJ role — admins only</p></div>
+                    <div class="command-card"><code>/dj [@user]</code><p>Grant another user temporary DJ permissions for this session</p></div>
+                    <div class="command-card"><code>/settings</code><p>One command for all server config — autoplay, volume, announce channel, queue notifications</p></div>
+                </div>
+
+                <!-- PREMIUM -->
+                <h3 style="color:#FFD700;font-size:16px;letter-spacing:2px;margin:0 0 16px;text-transform:uppercase;">💎 Premium Only</h3>
+                <div class="commands-grid" style="margin-bottom:36px;">
+                    <div class="command-card"><code>/volume [0-200]</code><p>Adjust playback volume up to 200% · <em style="color:#FFD700;">Premium</em></p></div>
+                    <div class="command-card"><code>/filter [type]</code><p>Audio filters — bass boost, nightcore, vaporwave, 8D, slowed · <em style="color:#FFD700;">Premium</em></p></div>
+                    <div class="command-card"><code>/crossfade</code><p>Smooth transitions between songs instead of hard cuts · <em style="color:#FFD700;">Premium</em></p></div>
+                    <div class="command-card"><code>/playlist</code><p>Unlimited playlists × 200 songs (free gets 3 × 50) · <em style="color:#FFD700;">Premium</em></p></div>
+                    <div class="command-card"><code>/snapshot</code><p>Unlimited named queue snapshots (free gets 1) · <em style="color:#FFD700;">Premium</em></p></div>
+                    <div class="command-card"><code>/premium</code><p>View and manage your premium subscription · <em style="color:#FFD700;">Premium</em></p></div>
                 </div>
             </div>
         </section>
@@ -3390,14 +3441,16 @@
                     <div class="premium-feature">✓ No Ads or Interruptions</div>
                     <div class="premium-feature">✓ Custom Volume Control (0-200%)</div>
                     <div class="premium-feature">✓ Priority Queue Access</div>
-                    <div class="premium-feature">✓ Advanced Audio Filters</div>
-                    <div class="premium-feature">✓ Unlimited Playlist Size (500+)</div>
+                    <div class="premium-feature">✓ Audio Filters — Bass Boost, Nightcore, Vaporwave, 8D, Slowed</div>
+                    <div class="premium-feature">✓ Crossfade — Smooth Song Transitions</div>
+                    <div class="premium-feature">✓ Unlimited Personal Playlists (200 songs each)</div>
+                    <div class="premium-feature">✓ Unlimited Queue Snapshots</div>
                     <div class="premium-feature">✓ 24/7 Voice Presence</div>
                     <div class="premium-feature">✓ Exclusive AI Playlist Builder</div>
-                    <div class="premium-feature">✓ Premium Support & Updates</div>
-                    <div class="premium-feature">✓ Skip Vote Override</div>
+                    <div class="premium-feature">✓ Skip Vote Override — Force skip instantly</div>
                     <div class="premium-feature">✓ Custom Audio Bitrate (320kbps)</div>
-                    <div class="premium-feature">✓ Playlist Import/Export</div>
+                    <div class="premium-feature">✓ DJ Role System — Lock controls to your DJ role</div>
+                    <div class="premium-feature">✓ Premium Support & Updates</div>
                     <div class="premium-feature">✓ No American Dad Radio Segments</div>
                 </div>
                 <h3 style="text-align: center; margin-bottom: 40px; font-size: 32px;">Choose Your Plan</h3>
