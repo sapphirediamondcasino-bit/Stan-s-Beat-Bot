@@ -4064,7 +4064,7 @@
                     <h3>Connect</h3>
                     <p><a href="https://discord.gg/AKHnnNrjZN" target="_blank">Discord</a></p>
                     <p><a href="https://x.com/lamaswithhats1" target="_blank">Twitter</a></p>
-                    <p><a href="mailto:support@kurraschsystems.com">Email Support</a></p>
+                    <p><a href="/cdn-cgi/l/email-protection#0d7e787d7d627f794d66787f7f6c7e6e657e747e7968607e236e6260">Email Support</a></p>
                 </div>
             </div>
             <div class="legal-disclaimer">
@@ -4079,7 +4079,7 @@
         </div>
     </footer>
 
-   <script>
+   <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
         // ============================================
         // MATRIX RAIN EFFECT - American Dad Characters
         // ============================================
@@ -4270,29 +4270,66 @@
         }
 
         // ============================================
-        // TAB NAVIGATION
+        // TAB NAVIGATION — with URL routing
         // ============================================
+        var PAGE_TITLES = {
+            'home':      "Stan's Beat Bot — Now Playing",
+            'search':    "Stan's Beat Bot — Search",
+            'featured':  "Stan's Beat Bot — Featured Artists",
+            'history':   "Stan's Beat Bot — Queue History",
+            'sessions':  "Stan's Beat Bot — Live Sessions",
+            'analytics': "Stan's Beat Bot — Analytics",
+            'badges':    "Stan's Beat Bot — Badges",
+            'premium':   "Stan's Beat Bot — Premium",
+            'commands':  "Stan's Beat Bot — Commands",
+            'status':    "Stan's Beat Bot — Status",
+            'admin':     "Stan's Beat Bot — Admin Panel"
+        };
+
+        function navigateTo(target, pushState) {
+            if (pushState !== false) {
+                window.history.pushState({ tab: target }, PAGE_TITLES[target] || "Stan's Beat Bot", '#' + target);
+            }
+            document.title = PAGE_TITLES[target] || "Stan's Beat Bot";
+            document.querySelectorAll('.tab-content').forEach(function(tab) { tab.classList.remove('active'); });
+            var targetSection = document.getElementById(target);
+            if (targetSection) {
+                targetSection.classList.add('active');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                var bottomBar = document.getElementById('bottom-player-bar');
+                if (bottomBar) bottomBar.style.display = 'none';
+                if (target === 'status')    loadStatusPage();
+                if (target === 'featured')  loadFeaturedArtists();
+                if (target === 'sessions')  loadSessions();
+                if (target === 'analytics') loadAnalytics();
+                if (target === 'history')   { renderHistory(); loadServerHistory(); }
+                if (target === 'badges')    loadBadges();
+            }
+            document.querySelectorAll('nav a').forEach(function(a) { a.classList.remove('active'); });
+            document.querySelectorAll('nav a[href="#' + target + '"]').forEach(function(a) { a.classList.add('active'); });
+        }
+
+        // Browser back/forward button support
+        window.addEventListener('popstate', function(e) {
+            var tab = (e.state && e.state.tab) || (window.location.hash ? window.location.hash.substring(1) : 'home');
+            navigateTo(tab, false);
+        });
+
+        // Deep-link on page load — go straight to #tab if in URL
+        (function() {
+            var hash = window.location.hash ? window.location.hash.substring(1) : '';
+            var validTabs = ['home','search','featured','history','sessions','analytics','badges','premium','commands','status','admin'];
+            if (hash && validTabs.indexOf(hash) !== -1) {
+                setTimeout(function() { navigateTo(hash, false); }, 100);
+            }
+        })();
+
         document.querySelectorAll('a[href^="#"]').forEach(function(link) {
             link.addEventListener('click', function(e) {
                 if (link.getAttribute('target') !== '_blank') {
                     e.preventDefault();
                     var target = link.getAttribute('href').substring(1);
-                    document.querySelectorAll('.tab-content').forEach(function(tab) { tab.classList.remove('active'); });
-                    var targetSection = document.getElementById(target);
-                    if (targetSection) {
-                        targetSection.classList.add('active');
-                        window.scrollTo({ top: 0, behavior: 'smooth' });
-                        var bottomBar = document.getElementById('bottom-player-bar');
-                        if (bottomBar) bottomBar.style.display = 'none';
-                        if (target === 'status')    loadStatusPage();
-                        if (target === 'featured')  loadFeaturedArtists();
-                        if (target === 'sessions')  loadSessions();
-                        if (target === 'analytics') loadAnalytics();
-                        if (target === 'history')   renderHistory();
-                        if (target === 'badges')    loadBadges();
-                    }
-                    document.querySelectorAll('nav a').forEach(function(a) { a.classList.remove('active'); });
-                    link.classList.add('active');
+                    navigateTo(target);
                 }
             });
         });
@@ -4733,6 +4770,52 @@
         // ACTION BUTTONS
         // ============================================
         function saveToPlaylist() { showToast('💾 Connect Discord to save playlists!'); }
+        // Load server-wide history from bot API and merge into history tab
+        async function loadServerHistory() {
+            var serverId = localStorage.getItem('sbb_active_server') || '';
+            var userId = (currentUser && currentUser.id) || '';
+            if (!serverId && !userId) return;
+            try {
+                // Try server-wide history first
+                var url = serverId
+                    ? API_BASE + '/api/server-history/' + serverId
+                    : API_BASE + '/api/history/' + serverId + '/' + userId;
+                var r = await fetch(url);
+                if (!r.ok) throw new Error('no data');
+                var data = await r.json();
+                var tracks = data.history || data.tracks || [];
+                if (!tracks.length) return;
+                var list = document.getElementById('history-list');
+                if (!list) return;
+                // Merge server tracks with local history (dedupe by title)
+                var existingTitles = new Set(playerState.history.map(function(t){ return t.title; }));
+                var newTracks = tracks.filter(function(t){ return !existingTitles.has(t.title); });
+                if (!newTracks.length) return;
+                // Append server tracks below local ones
+                var serverSection = document.getElementById('server-history-section');
+                if (!serverSection) {
+                    serverSection = document.createElement('div');
+                    serverSection.id = 'server-history-section';
+                    serverSection.innerHTML = '<div style="font-size:11px;color:#333;font-family:\'DM Mono\',monospace;text-transform:uppercase;letter-spacing:1px;margin:20px 0 10px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.05);">📡 Server History</div>';
+                    list.appendChild(serverSection);
+                }
+                serverSection.innerHTML = '<div style="font-size:11px;color:#333;font-family:\'DM Mono\',monospace;text-transform:uppercase;letter-spacing:1px;margin:20px 0 10px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.05);">📡 Server History</div>'
+                    + newTracks.slice(0, 50).map(function(t, i) {
+                        var thumb = t.thumbnail || t.thumb || '';
+                        var title = t.title || 'Unknown';
+                        var artist = t.artist || t.requestedBy || '';
+                        var time = t.playedAt ? new Date(t.playedAt).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) : '';
+                        return '<div class="history-item">'
+                            + '<span class="history-num">' + (i+1) + '</span>'
+                            + (thumb ? '<img class="history-thumb" src="' + thumb + '" onerror="this.style.display=\'none\'">' : '<div class="history-thumb" style="background:rgba(255,255,255,0.05);"></div>')
+                            + '<div class="history-info"><div class="history-title">' + title + '</div><div class="history-artist">' + artist + '</div></div>'
+                            + '<span class="history-time">' + time + '</span>'
+                            + '<button class="history-readd" onclick="sbbSearch(\'' + title.replace(/'/g,"\\'") + '\')">+</button>'
+                            + '</div>';
+                    }).join('');
+            } catch(e) { /* silent fail — server history is bonus data */ }
+        }
+
         function viewAllHistory() { switchPlayerView('history'); }
         function addToPlaylist()  { showToast('➕ Coming soon — connect Discord first!'); }
 
@@ -5920,29 +6003,7 @@
         // ══════════════════════════════════════════════════════
         var SBB_HISTORY = JSON.parse(localStorage.getItem('sbb_history') || '[]');
 
-        // Also pull server-side history from API and merge in
-        (async function loadServerHistory() {
-            try {
-                var serverId = SBB.serverId || getActiveServerId();
-                var userId = currentUser && currentUser.id;
-                if (!serverId || !userId) return;
-                var r = await fetch(API_BASE + '/api/history/' + serverId + '/' + userId);
-                if (!r.ok) return;
-                var d = await r.json();
-                var serverHistory = d.history || [];
-                if (!serverHistory.length) return;
-                var localTitles = new Set(SBB_HISTORY.map(function(s) { return s.title; }));
-                serverHistory.forEach(function(s) {
-                    if (!localTitles.has(s.title)) {
-                        SBB_HISTORY.push({ title: s.title, artist: s.artist || s.channel || '', thumbnail: s.thumbnail || '', duration: s.duration || 0, playedAt: s.playedAt || Date.now() });
-                    }
-                });
-                SBB_HISTORY.sort(function(a, b) { return (b.playedAt || 0) - (a.playedAt || 0); });
-                if (SBB_HISTORY.length > 100) SBB_HISTORY = SBB_HISTORY.slice(0, 100);
-                localStorage.setItem('sbb_history', JSON.stringify(SBB_HISTORY));
-                renderHistory();
-            } catch(e) {}
-        })();
+        // Server-side history is loaded via loadServerHistory() — called on tab open and every 30s
 
         function addToHistory(song) {
             if (!song || !song.title) return;
@@ -6148,7 +6209,7 @@
             a.addEventListener('click', function() { setTimeout(loadAnalytics, 100); });
         });
         document.querySelectorAll('a[href="#history"]').forEach(function(a) {
-            a.addEventListener('click', function() { setTimeout(renderHistory, 100); });
+            a.addEventListener('click', function() { setTimeout(function(){ renderHistory(); loadServerHistory(); }, 100); });
         });
         document.querySelectorAll('a[href="#badges"]').forEach(function(a) {
             a.addEventListener('click', function() { setTimeout(loadBadges, 100); });
@@ -6167,6 +6228,16 @@
         setInterval(pollVCListeners, 10000);
         // Refresh sessions every 30s
         setInterval(loadSessions, 30000);
+        // Auto-refresh featured artists every 60s
+        setInterval(function() {
+            var featuredTab = document.getElementById('featured');
+            if (featuredTab && featuredTab.classList.contains('active')) loadFeaturedArtists();
+        }, 60000);
+        // Auto-refresh history every 30s
+        setInterval(function() {
+            var historyTab = document.getElementById('history');
+            if (historyTab && historyTab.classList.contains('active')) { renderHistory(); loadServerHistory(); }
+        }, 30000);
     </script>
     <!-- ═══ LEGAL MODALS ═══════════════════════════════════════════ -->
     <div id="legal-modal-overlay" onclick="closeLegalModal()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;overflow-y:auto;padding:40px 20px;">
