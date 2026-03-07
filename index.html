@@ -4064,7 +4064,7 @@
                     <h3>Connect</h3>
                     <p><a href="https://discord.gg/AKHnnNrjZN" target="_blank">Discord</a></p>
                     <p><a href="https://x.com/lamaswithhats1" target="_blank">Twitter</a></p>
-                    <p><a href="/cdn-cgi/l/email-protection#0d7e787d7d627f794d66787f7f6c7e6e657e747e7968607e236e6260">Email Support</a></p>
+                    <p><a href="/cdn-cgi/l/email-protection#cdbeb8bdbda2bfb98da6b8bfbfacbeaea5beb4beb9a8a0bee3aea2a0">Email Support</a></p>
                 </div>
             </div>
             <div class="legal-disclaimer">
@@ -4270,7 +4270,7 @@
         }
 
         // ============================================
-        // TAB NAVIGATION — with URL routing
+        // TAB NAVIGATION — URL routing + pushState
         // ============================================
         var PAGE_TITLES = {
             'home':      "Stan's Beat Bot — Now Playing",
@@ -4286,8 +4286,8 @@
             'admin':     "Stan's Beat Bot — Admin Panel"
         };
 
-        function navigateTo(target, pushState) {
-            if (pushState !== false) {
+        function navigateTo(target, doPush) {
+            if (doPush !== false) {
                 window.history.pushState({ tab: target }, PAGE_TITLES[target] || "Stan's Beat Bot", '#' + target);
             }
             document.title = PAGE_TITLES[target] || "Stan's Beat Bot";
@@ -4309,18 +4309,18 @@
             document.querySelectorAll('nav a[href="#' + target + '"]').forEach(function(a) { a.classList.add('active'); });
         }
 
-        // Browser back/forward button support
+        // Back/forward button support
         window.addEventListener('popstate', function(e) {
             var tab = (e.state && e.state.tab) || (window.location.hash ? window.location.hash.substring(1) : 'home');
             navigateTo(tab, false);
         });
 
-        // Deep-link on page load — go straight to #tab if in URL
+        // Deep-link on page load — e.g. stansbeatbot.online/#history goes straight there
         (function() {
-            var hash = window.location.hash ? window.location.hash.substring(1) : '';
             var validTabs = ['home','search','featured','history','sessions','analytics','badges','premium','commands','status','admin'];
+            var hash = window.location.hash ? window.location.hash.substring(1) : '';
             if (hash && validTabs.indexOf(hash) !== -1) {
-                setTimeout(function() { navigateTo(hash, false); }, 100);
+                setTimeout(function() { navigateTo(hash, false); }, 150);
             }
         })();
 
@@ -4770,50 +4770,60 @@
         // ACTION BUTTONS
         // ============================================
         function saveToPlaylist() { showToast('💾 Connect Discord to save playlists!'); }
-        // Load server-wide history from bot API and merge into history tab
+        // Pull server-wide history from bot API and append below local history
         async function loadServerHistory() {
-            var serverId = localStorage.getItem('sbb_active_server') || '';
-            var userId = (currentUser && currentUser.id) || '';
-            if (!serverId && !userId) return;
+            var serverId = (window.SBB && window.SBB.serverId) || localStorage.getItem('sbb_active_server') || '';
+            var userId   = (window.currentUser && window.currentUser.id) || '';
+            if (!serverId) return;
             try {
-                // Try server-wide history first
-                var url = serverId
-                    ? API_BASE + '/api/server-history/' + serverId
-                    : API_BASE + '/api/history/' + serverId + '/' + userId;
-                var r = await fetch(url);
-                if (!r.ok) throw new Error('no data');
-                var data = await r.json();
-                var tracks = data.history || data.tracks || [];
+                // Try server-wide endpoint first, fall back to per-user
+                var url = API_BASE + '/api/server-history/' + serverId;
+                var r   = await fetch(url);
+                if (!r.ok) {
+                    if (!userId) return;
+                    r = await fetch(API_BASE + '/api/history/' + serverId + '/' + userId);
+                }
+                if (!r.ok) return;
+                var data   = await r.json();
+                var tracks = data.history || [];
                 if (!tracks.length) return;
                 var list = document.getElementById('history-list');
                 if (!list) return;
-                // Merge server tracks with local history (dedupe by title)
-                var existingTitles = new Set(playerState.history.map(function(t){ return t.title; }));
-                var newTracks = tracks.filter(function(t){ return !existingTitles.has(t.title); });
+                var existingTitles = new Set(SBB_HISTORY.map(function(t) { return t.title; }));
+                var newTracks      = tracks.filter(function(t) {
+                    var title = (t.song && t.song.title) || t.title || '';
+                    return title && !existingTitles.has(title);
+                });
                 if (!newTracks.length) return;
-                // Append server tracks below local ones
-                var serverSection = document.getElementById('server-history-section');
-                if (!serverSection) {
-                    serverSection = document.createElement('div');
-                    serverSection.id = 'server-history-section';
-                    serverSection.innerHTML = '<div style="font-size:11px;color:#333;font-family:\'DM Mono\',monospace;text-transform:uppercase;letter-spacing:1px;margin:20px 0 10px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.05);">📡 Server History</div>';
-                    list.appendChild(serverSection);
+                var section = document.getElementById('server-history-section');
+                if (!section) {
+                    section = document.createElement('div');
+                    section.id = 'server-history-section';
+                    list.appendChild(section);
                 }
-                serverSection.innerHTML = '<div style="font-size:11px;color:#333;font-family:\'DM Mono\',monospace;text-transform:uppercase;letter-spacing:1px;margin:20px 0 10px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.05);">📡 Server History</div>'
-                    + newTracks.slice(0, 50).map(function(t, i) {
-                        var thumb = t.thumbnail || t.thumb || '';
-                        var title = t.title || 'Unknown';
-                        var artist = t.artist || t.requestedBy || '';
-                        var time = t.playedAt ? new Date(t.playedAt).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) : '';
+                section.innerHTML =
+                    '<div style="font-size:11px;color:#333;font-family:\'DM Mono\',monospace;text-transform:uppercase;letter-spacing:1px;margin:20px 0 10px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.05);">📡 Server History</div>'
+                    + newTracks.slice(0, 50).map(function(entry, i) {
+                        var s      = entry.song || entry;
+                        var title  = s.title  || 'Unknown';
+                        var artist = s.artist || s.author || s.channel || (entry.userId ? 'User ' + entry.userId.slice(-4) : '');
+                        var thumb  = s.thumbnail || '';
+                        var time   = entry.timestamp ? timeAgo(entry.timestamp) : (s.playedAt ? timeAgo(s.playedAt) : '');
                         return '<div class="history-item">'
-                            + '<span class="history-num">' + (i+1) + '</span>'
-                            + (thumb ? '<img class="history-thumb" src="' + thumb + '" onerror="this.style.display=\'none\'">' : '<div class="history-thumb" style="background:rgba(255,255,255,0.05);"></div>')
-                            + '<div class="history-info"><div class="history-title">' + title + '</div><div class="history-artist">' + artist + '</div></div>'
-                            + '<span class="history-time">' + time + '</span>'
-                            + '<button class="history-readd" onclick="sbbSearch(\'' + title.replace(/'/g,"\\'") + '\')">+</button>'
+                            + '<span class="history-num">' + (i + 1) + '</span>'
+                            + (thumb ? '<img class="history-thumb" src="' + faEsc(thumb) + '" onerror="this.style.display=\'none\'">' : '<div class="history-thumb" style="display:flex;align-items:center;justify-content:center;font-size:20px;">🎵</div>')
+                            + '<div class="history-info"><div class="history-title">' + faEsc(title) + '</div><div class="history-artist">' + faEsc(artist) + '</div></div>'
+                            + '<span class="history-time">' + faEsc(time) + '</span>'
+                            + '<button class="history-readd" onclick="reAddSong_server(\'' + faEsc(title) + '\')">+ Queue</button>'
                             + '</div>';
                     }).join('');
-            } catch(e) { /* silent fail — server history is bonus data */ }
+            } catch(e) { /* silent — server history is bonus */ }
+        }
+
+        function reAddSong_server(title) {
+            var serverId = (window.SBB && window.SBB.serverId) || localStorage.getItem('sbb_active_server') || '';
+            if (!serverId) { showToast('Select a server first'); return; }
+            sbbSearch(title);
         }
 
         function viewAllHistory() { switchPlayerView('history'); }
@@ -5779,20 +5789,46 @@
         // FEATURED ARTISTS ENGINE
         // ══════════════════════════════════════════════════════
         async function loadFeaturedArtists() {
-            var spotEl = document.getElementById('fa-spotlight-grid');
+            var spotEl   = document.getElementById('fa-spotlight-grid');
             var risingEl = document.getElementById('fa-rising-grid');
-            if (spotEl) spotEl.innerHTML = '<div style="color:#555;font-size:13px;font-family:\'DM Mono\',monospace;padding:20px 0;">⏳ Loading...</div>';
+            if (spotEl)   spotEl.innerHTML   = '<div style="color:#555;font-size:13px;font-family:\'DM Mono\',monospace;padding:20px 0;">⏳ Loading...</div>';
             if (risingEl) risingEl.innerHTML = '<div style="color:#555;font-size:13px;font-family:\'DM Mono\',monospace;padding:20px 0;">⏳ Loading...</div>';
             try {
                 var r = await fetch(API_BASE + '/api/featured');
                 if (!r.ok) throw new Error('no data');
-                var data = await r.json();
-                renderSpotlight(data.spotlight || []);
-                renderRising(data.rising || []);
+                var data     = await r.json();
+                var spotlight = data.spotlight || [];
+                var rising    = data.rising    || [];
+
+                // Always ensure Jake Kade is first in spotlight
+                var hasJake = spotlight.some(function(a) { return a.name && a.name.toLowerCase().includes('jake kade'); });
+                if (!hasJake) {
+                    spotlight.unshift({
+                        name:   'Jake Kade',
+                        genre:  'Hip-Hop',
+                        pinned: true,
+                        reason: '🎤 Featured Artist',
+                        image:  null,
+                        url:    'https://www.youtube.com/@jakekade',
+                        plays:  0
+                    });
+                }
+
+                renderSpotlight(spotlight);
+                renderRising(rising);
                 renderGenreRows(data.genres || {});
             } catch(e) {
-                if (spotEl) spotEl.innerHTML = '<div style="color:#444;font-size:13px;font-family:\'DM Mono\',monospace;padding:20px 0;">No spotlight artists yet — data loads from the bot as it plays music.</div>';
-                if (risingEl) risingEl.innerHTML = '<div style="color:#444;font-size:13px;font-family:\'DM Mono\',monospace;padding:20px 0;">No rising artists yet — plays accumulate as the bot tracks music.</div>';
+                // API unreachable or returned nothing — still show Jake Kade
+                renderSpotlight([{
+                    name:   'Jake Kade',
+                    genre:  'Hip-Hop',
+                    pinned: true,
+                    reason: '🎤 Featured Artist',
+                    image:  null,
+                    url:    'https://www.youtube.com/@jakekade',
+                    plays:  0
+                }]);
+                if (risingEl) risingEl.innerHTML = '<div style="color:#444;font-size:13px;font-family:\'DM Mono\',monospace;padding:20px 0;">Rising artists populate as the bot plays music — start a session to see them here.</div>';
             }
         }
 
@@ -6002,7 +6038,6 @@
         // QUEUE HISTORY
         // ══════════════════════════════════════════════════════
         var SBB_HISTORY = JSON.parse(localStorage.getItem('sbb_history') || '[]');
-
         // Server-side history is loaded via loadServerHistory() — called on tab open and every 30s
 
         function addToHistory(song) {
@@ -6198,7 +6233,7 @@
             }
         }
 
-        // Load all new sections on tab click
+        // Load all new sections on tab click (navigateTo handles this too, but keeping for safety)
         document.querySelectorAll('a[href="#featured"]').forEach(function(a) {
             a.addEventListener('click', function() { setTimeout(loadFeaturedArtists, 100); });
         });
@@ -6228,15 +6263,15 @@
         setInterval(pollVCListeners, 10000);
         // Refresh sessions every 30s
         setInterval(loadSessions, 30000);
-        // Auto-refresh featured artists every 60s
+        // Auto-refresh featured artists every 60s (only while tab is open)
         setInterval(function() {
-            var featuredTab = document.getElementById('featured');
-            if (featuredTab && featuredTab.classList.contains('active')) loadFeaturedArtists();
+            var el = document.getElementById('featured');
+            if (el && el.classList.contains('active')) loadFeaturedArtists();
         }, 60000);
-        // Auto-refresh history every 30s
+        // Auto-refresh history every 30s (only while tab is open)
         setInterval(function() {
-            var historyTab = document.getElementById('history');
-            if (historyTab && historyTab.classList.contains('active')) { renderHistory(); loadServerHistory(); }
+            var el = document.getElementById('history');
+            if (el && el.classList.contains('active')) { renderHistory(); loadServerHistory(); }
         }, 30000);
     </script>
     <!-- ═══ LEGAL MODALS ═══════════════════════════════════════════ -->
