@@ -3210,7 +3210,7 @@
         <section id="status" class="tab-content">
             <div class="container">
                 <h2 class="section-title">📊 System Status</h2>
-                <p class="section-subtitle">Live status, uptime, and metrics for Stan's Beat Bot</p>
+                <p class="section-subtitle">Live status, uptime, and metrics for Stan's Beat Bot v3.0</p>
 
                 <!-- MASTER STATUS BANNER -->
                 <div class="status-banner" id="status-banner">
@@ -3226,9 +3226,10 @@
                     <button onclick="loadStatusPage()" class="status-refresh-btn">🔄 Refresh</button>
                 </div>
 
-                <!-- SERVICE CARDS -->
+                <!-- SERVICE CARDS — ROW 1 -->
                 <div class="status-services-grid">
-                    <!-- Bot -->
+
+                    <!-- Discord Bot -->
                     <div class="status-service-card" id="svc-bot">
                         <div class="svc-header">
                             <span class="svc-icon">🤖</span>
@@ -3277,7 +3278,7 @@
                         <div class="svc-metrics">
                             <div class="svc-metric"><span class="svc-metric-label">Auth Status</span><span class="svc-metric-val" id="svc-nova-auth">—</span></div>
                             <div class="svc-metric"><span class="svc-metric-label">Security</span><span class="svc-metric-val" style="color:#00FFD1;">Active</span></div>
-                            <div class="svc-metric"><span class="svc-metric-label">Provider</span><span class="svc-metric-val">Kurrasch</span></div>
+                            <div class="svc-metric"><span class="svc-metric-label">Provider</span><span class="svc-metric-val">Kurrasch Systems</span></div>
                             <div class="svc-metric"><span class="svc-metric-label">Sync</span><span class="svc-metric-val" id="svc-nova-sync">—</span></div>
                         </div>
                     </div>
@@ -3285,10 +3286,10 @@
                     <!-- AI Engine -->
                     <div class="status-service-card" id="svc-ai">
                         <div class="svc-header">
-                            <span class="svc-icon">🤖</span>
+                            <span class="svc-icon">🧠</span>
                             <div>
                                 <div class="svc-name">AI Engine</div>
-                                <div class="svc-desc">Recommendations & Auto DJ</div>
+                                <div class="svc-desc">Recommendations, mood detection & Auto DJ</div>
                             </div>
                             <div class="svc-badge" id="svc-ai-badge">—</div>
                         </div>
@@ -3299,9 +3300,82 @@
                             <div class="svc-metric"><span class="svc-metric-label">Users Tracked</span><span class="svc-metric-val" id="svc-ai-users">—</span></div>
                         </div>
                     </div>
+
+                    <!-- Stan AI -->
+                    <div class="status-service-card" id="svc-stan">
+                        <div class="svc-header">
+                            <span class="svc-icon">🎖️</span>
+                            <div>
+                                <div class="svc-name">Stan AI</div>
+                                <div class="svc-desc">Personality engine · reacts to key moments</div>
+                            </div>
+                            <div class="svc-badge" id="svc-stan-badge">—</div>
+                        </div>
+                        <div class="svc-metrics">
+                            <div class="svc-metric"><span class="svc-metric-label">Active Sessions</span><span class="svc-metric-val" id="svc-stan-sessions">—</span></div>
+                            <div class="svc-metric"><span class="svc-metric-label">Reactions Sent</span><span class="svc-metric-val" id="svc-stan-reactions">—</span></div>
+                            <div class="svc-metric"><span class="svc-metric-label">Personality</span><span class="svc-metric-val" style="color:#FFD700;">Stan Smith</span></div>
+                            <div class="svc-metric"><span class="svc-metric-label">Memory</span><span class="svc-metric-val" style="color:#00FFD1;">Per-session ✓</span></div>
+                        </div>
+                    </div>
+
+                    <!-- Stream Engine -->
+                    <div class="status-service-card" id="svc-stream">
+                        <div class="svc-header">
+                            <span class="svc-icon">🎵</span>
+                            <div>
+                                <div class="svc-name">Stream Engine</div>
+                                <div class="svc-desc">yt-dlp · audio pipeline · cache</div>
+                            </div>
+                            <div class="svc-badge" id="svc-stream-badge">—</div>
+                        </div>
+                        <div class="svc-metrics">
+                            <div class="svc-metric"><span class="svc-metric-label">Cache Hit Rate</span><span class="svc-metric-val" id="svc-stream-cache">—</span></div>
+                            <div class="svc-metric"><span class="svc-metric-label">Active Streams</span><span class="svc-metric-val" id="svc-stream-active">—</span></div>
+                            <div class="svc-metric"><span class="svc-metric-label">URL TTL</span><span class="svc-metric-val" style="color:#00FFD1;">4.5 min ✓</span></div>
+                            <div class="svc-metric"><span class="svc-metric-label">Cookies</span><span class="svc-metric-val" id="svc-stream-cookies">—</span></div>
+                        </div>
+                    </div>
+
+                    <!-- Audio Features -->
+                    <div class="status-service-card" id="svc-audio">
+                        <div class="svc-header">
+                            <span class="svc-icon">🎛️</span>
+                            <div>
+                                <div class="svc-name">Audio Features</div>
+                                <div class="svc-desc">Filters · crossfade · DJ announcer</div>
+                            </div>
+                            <div class="svc-badge online" id="svc-audio-badge">Online</div>
+                        </div>
+                        <div class="svc-metrics">
+                            <div class="svc-metric"><span class="svc-metric-label">Filters</span><span class="svc-metric-val" style="color:#FFD700;">Bass · Nightcore · 8D · Vaporwave · Slowed</span></div>
+                            <div class="svc-metric"><span class="svc-metric-label">Crossfade</span><span class="svc-metric-val" id="svc-audio-crossfade">—</span></div>
+                            <div class="svc-metric"><span class="svc-metric-label">DJ Announcer</span><span class="svc-metric-val" id="svc-audio-announcer">—</span></div>
+                            <div class="svc-metric"><span class="svc-metric-label">American Dad Radio</span><span class="svc-metric-val" style="color:#00FFD1;">Active ✓</span></div>
+                        </div>
+                    </div>
+
+                    <!-- Premium System -->
+                    <div class="status-service-card" id="svc-premium">
+                        <div class="svc-header">
+                            <span class="svc-icon">💎</span>
+                            <div>
+                                <div class="svc-name">Premium System</div>
+                                <div class="svc-desc">Subscriptions · PayPal · feature gates</div>
+                            </div>
+                            <div class="svc-badge" id="svc-premium-badge">—</div>
+                        </div>
+                        <div class="svc-metrics">
+                            <div class="svc-metric"><span class="svc-metric-label">Premium Users</span><span class="svc-metric-val" id="svc-premium-users">—</span></div>
+                            <div class="svc-metric"><span class="svc-metric-label">Premium Servers</span><span class="svc-metric-val" id="svc-premium-servers">—</span></div>
+                            <div class="svc-metric"><span class="svc-metric-label">Payment Gateway</span><span class="svc-metric-val" style="color:#00FFD1;">PayPal ✓</span></div>
+                            <div class="svc-metric"><span class="svc-metric-label">Lifetime Slots</span><span class="svc-metric-val" id="svc-premium-lifetime">—</span></div>
+                        </div>
+                    </div>
+
                 </div>
 
-                <!-- SYSTEM RESOURCE BAR -->
+                <!-- SYSTEM RESOURCE BARS -->
                 <div class="status-resources">
                     <h3 style="color:#00FFD1;font-size:20px;margin-bottom:24px;">⚡ System Resources</h3>
                     <div class="resource-grid">
@@ -3316,20 +3390,69 @@
                             <div class="resource-val" id="res-heap-val">—</div>
                         </div>
                         <div class="resource-item">
-                            <div class="resource-label">Cache Hit Rate</div>
+                            <div class="resource-label">Stream Cache Hit Rate</div>
                             <div class="resource-bar-track"><div class="resource-bar-fill" id="res-cache-fill" style="width:0%;background:linear-gradient(90deg,#00FFD1,#00FF88)"></div></div>
                             <div class="resource-val" id="res-cache-val">—</div>
+                        </div>
+                        <div class="resource-item">
+                            <div class="resource-label">Commands Executed</div>
+                            <div class="resource-bar-track"><div class="resource-bar-fill" id="res-cmd-fill" style="width:0%;background:linear-gradient(90deg,#a855f7,#6366f1)"></div></div>
+                            <div class="resource-val" id="res-cmd-val">—</div>
                         </div>
                     </div>
                 </div>
 
-                <!-- INCIDENT HISTORY -->
+                <!-- V3 FEATURES QUICK STATUS -->
+                <div class="status-resources" style="margin-top:24px;">
+                    <h3 style="color:#00FFD1;font-size:20px;margin-bottom:20px;">🚀 v3.0 Features</h3>
+                    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;">
+                        <div style="background:rgba(0,255,209,0.06);border:1px solid rgba(0,255,209,0.15);border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:10px;">
+                            <span style="font-size:18px;">🎖️</span><div><div style="color:#fff;font-size:13px;font-weight:700;">Stan AI</div><div style="color:#00FFD1;font-size:11px;" id="feat-stan">Checking...</div></div>
+                        </div>
+                        <div style="background:rgba(0,255,209,0.06);border:1px solid rgba(0,255,209,0.15);border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:10px;">
+                            <span style="font-size:18px;">🎛️</span><div><div style="color:#fff;font-size:13px;font-weight:700;">Audio Filters</div><div style="color:#00FFD1;font-size:11px;">5 presets · Premium</div></div>
+                        </div>
+                        <div style="background:rgba(0,255,209,0.06);border:1px solid rgba(0,255,209,0.15);border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:10px;">
+                            <span style="font-size:18px;">🎵</span><div><div style="color:#fff;font-size:13px;font-weight:700;">Crossfade</div><div style="color:#00FFD1;font-size:11px;">Smooth transitions · Premium</div></div>
+                        </div>
+                        <div style="background:rgba(0,255,209,0.06);border:1px solid rgba(0,255,209,0.15);border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:10px;">
+                            <span style="font-size:18px;">🧠</span><div><div style="color:#fff;font-size:13px;font-weight:700;">Mood Queue</div><div style="color:#00FFD1;font-size:11px;">8 moods · /mood</div></div>
+                        </div>
+                        <div style="background:rgba(0,255,209,0.06);border:1px solid rgba(0,255,209,0.15);border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:10px;">
+                            <span style="font-size:18px;">🎮</span><div><div style="color:#fff;font-size:13px;font-weight:700;">Music Quiz</div><div style="color:#00FFD1;font-size:11px;">Live leaderboard · /quiz</div></div>
+                        </div>
+                        <div style="background:rgba(0,255,209,0.06);border:1px solid rgba(0,255,209,0.15);border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:10px;">
+                            <span style="font-size:18px;">📻</span><div><div style="color:#fff;font-size:13px;font-weight:700;">Radio Mode</div><div style="color:#00FFD1;font-size:11px;">Genre radio · /radio</div></div>
+                        </div>
+                        <div style="background:rgba(0,255,209,0.06);border:1px solid rgba(0,255,209,0.15);border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:10px;">
+                            <span style="font-size:18px;">📅</span><div><div style="color:#fff;font-size:13px;font-weight:700;">Wrapped Stats</div><div style="color:#00FFD1;font-size:11px;">Monthly recap · /wrapped</div></div>
+                        </div>
+                        <div style="background:rgba(0,255,209,0.06);border:1px solid rgba(0,255,209,0.15);border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:10px;">
+                            <span style="font-size:18px;">🗓️</span><div><div style="color:#fff;font-size:13px;font-weight:700;">Scheduler</div><div style="color:#00FFD1;font-size:11px;">Timed sessions · /schedule</div></div>
+                        </div>
+                        <div style="background:rgba(0,255,209,0.06);border:1px solid rgba(0,255,209,0.15);border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:10px;">
+                            <span style="font-size:18px;">🤝</span><div><div style="color:#fff;font-size:13px;font-weight:700;">Collab Queue</div><div style="color:#00FFD1;font-size:11px;">Fair round-robin · /collab</div></div>
+                        </div>
+                        <div style="background:rgba(0,255,209,0.06);border:1px solid rgba(0,255,209,0.15);border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:10px;">
+                            <span style="font-size:18px;">⚙️</span><div><div style="color:#fff;font-size:13px;font-weight:700;">Server Settings</div><div style="color:#00FFD1;font-size:11px;">All config · /settings</div></div>
+                        </div>
+                        <div style="background:rgba(0,255,209,0.06);border:1px solid rgba(0,255,209,0.15);border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:10px;">
+                            <span style="font-size:18px;">🎵</span><div><div style="color:#fff;font-size:13px;font-weight:700;">Personal Playlists</div><div style="color:#00FFD1;font-size:11px;">Cross-server · /playlist</div></div>
+                        </div>
+                        <div style="background:rgba(0,255,209,0.06);border:1px solid rgba(0,255,209,0.15);border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:10px;">
+                            <span style="font-size:18px;">🔔</span><div><div style="color:#fff;font-size:13px;font-weight:700;">Queue Notifications</div><div style="color:#00FFD1;font-size:11px;">DM when next up</div></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- INCIDENT LOG -->
                 <div class="status-incidents">
                     <h3 style="color:#00FFD1;font-size:20px;margin-bottom:20px;">📋 Recent Activity</h3>
                     <div id="status-incidents-list">
                         <div style="color:#555;font-size:14px;padding:20px 0;">Loading activity log...</div>
                     </div>
                 </div>
+
             </div>
         </section>
 
@@ -5793,73 +5916,124 @@
         }
 
         async function loadStatusPage() {
-            var bannerDot = document.getElementById('status-banner-dot');
+            var bannerDot   = document.getElementById('status-banner-dot');
             var bannerTitle = document.getElementById('status-banner-title');
-            var bannerSub = document.getElementById('status-banner-sub');
+            var bannerSub   = document.getElementById('status-banner-sub');
             var t0 = Date.now();
+
+            // ── 1. Health check / API latency ─────────────────────────────────
             try {
                 var ctrl = new AbortController();
-                var tmo = setTimeout(function() { ctrl.abort(); }, 8000);
-                var hr = await fetch(API_BASE + '/api/health', { signal: ctrl.signal });
+                var tmo  = setTimeout(function() { ctrl.abort(); }, 8000);
+                var hr   = await fetch(API_BASE + '/api/health', { signal: ctrl.signal });
                 clearTimeout(tmo);
                 var latency = Date.now() - t0;
-                document.getElementById('svc-api-badge').textContent = 'Online';
-                document.getElementById('svc-api-badge').className = 'svc-badge online';
-                document.getElementById('svc-latency').textContent = latency + 'ms';
-                document.getElementById('svc-lastcheck').textContent = new Date().toLocaleTimeString();
+                document.getElementById('svc-api-badge').textContent  = 'Online';
+                document.getElementById('svc-api-badge').className    = 'svc-badge online';
+                document.getElementById('svc-latency').textContent    = latency + 'ms';
+                document.getElementById('svc-lastcheck').textContent  = new Date().toLocaleTimeString();
                 addStatusLog('ok', 'API health check passed (' + latency + 'ms)');
             } catch(e) {
                 document.getElementById('svc-api-badge').textContent = 'Offline';
-                document.getElementById('svc-api-badge').className = 'svc-badge offline';
-                if (bannerDot) { bannerDot.className = 'status-banner-dot offline'; }
+                document.getElementById('svc-api-badge').className   = 'svc-badge offline';
+                if (bannerDot)   bannerDot.className   = 'status-banner-dot offline';
                 if (bannerTitle) bannerTitle.textContent = '⚠️ API Unreachable';
-                if (bannerSub) bannerSub.textContent = 'Cannot connect to api.stansbeatbot.online:3006';
+                if (bannerSub)   bannerSub.textContent   = 'Cannot connect to api.stansbeatbot.online:3006';
                 addStatusLog('err', 'API unreachable: ' + (e.message || 'timeout'));
                 return;
             }
+
+            // ── 2. Stats — populates everything else ──────────────────────────
             try {
                 var sr = await fetch(API_BASE + '/api/stats');
                 if (sr.ok) {
-                    var stats = await sr.json();
+                    var s = await sr.json();
+
+                    // Discord Bot card
                     document.getElementById('svc-bot-badge').textContent = 'Online';
-                    document.getElementById('svc-bot-badge').className = 'svc-badge online';
-                    document.getElementById('svc-servers').textContent = (stats.servers || 0).toLocaleString();
-                    document.getElementById('svc-users').textContent = (stats.users || 0).toLocaleString();
-                    document.getElementById('svc-queues').textContent = (stats.totalQueues || 0).toLocaleString();
-                    document.getElementById('svc-plays').textContent = (stats.totalPlays || 0).toLocaleString();
-                    document.getElementById('status-uptime-val').textContent = fmtUptime(stats.uptime || 0);
-                    var mem = stats.memory;
+                    document.getElementById('svc-bot-badge').className   = 'svc-badge online';
+                    document.getElementById('svc-servers').textContent   = (s.servers || 0).toLocaleString();
+                    document.getElementById('svc-users').textContent     = (s.users || 0).toLocaleString();
+                    document.getElementById('svc-queues').textContent    = (s.totalQueues || 0).toLocaleString();
+                    document.getElementById('svc-plays').textContent     = (s.totalPlays || 0).toLocaleString();
+                    document.getElementById('status-uptime-val').textContent = fmtUptime(s.uptime || 0);
+
+                    // Memory bars
+                    var mem = s.memory;
                     if (mem) {
-                        var RSS_CAP = 1536 * 1024 * 1024; // 1.5 GB reference
-                        var HEAP_CAP = 1024 * 1024 * 1024; // 1 GB reference for bar
+                        var RSS_CAP  = 1536 * 1024 * 1024;
+                        var HEAP_CAP = 1024 * 1024 * 1024;
                         var rp = Math.min((mem.rss / RSS_CAP) * 100, 100);
                         var hp = Math.min((mem.heapUsed / HEAP_CAP) * 100, 100);
-                        document.getElementById('res-mem-fill').style.width = rp.toFixed(1) + '%';
-                        document.getElementById('res-mem-val').textContent = fmtBytes(mem.rss) + ' / 1.5 GB';
+                        document.getElementById('res-mem-fill').style.width  = rp.toFixed(1) + '%';
+                        document.getElementById('res-mem-val').textContent   = fmtBytes(mem.rss) + ' / 1.5 GB';
                         document.getElementById('res-heap-fill').style.width = hp.toFixed(1) + '%';
-                        document.getElementById('res-heap-val').textContent = fmtBytes(mem.heapUsed) + ' used · ' + fmtBytes(mem.heapTotal) + ' allocated';
+                        document.getElementById('res-heap-val').textContent  = fmtBytes(mem.heapUsed) + ' used · ' + fmtBytes(mem.heapTotal) + ' allocated';
                     }
-                    var novaOk = stats.novaFrame !== false;
+
+                    // Nova Frame card
+                    var novaOk = s.novaFrame !== false;
                     document.getElementById('svc-nova-badge').textContent = novaOk ? 'Connected' : 'Disconnected';
-                    document.getElementById('svc-nova-badge').className = 'svc-badge ' + (novaOk ? 'online' : 'offline');
-                    document.getElementById('svc-nova-auth').textContent = novaOk ? 'Authenticated ✓' : 'Not authenticated';
-                    document.getElementById('svc-nova-sync').textContent = novaOk ? 'In sync' : 'Out of sync';
-                    var ai = stats.ai || {};
-                    document.getElementById('svc-ai-badge').textContent = 'Online';
-                    document.getElementById('svc-ai-badge').className = 'svc-badge online';
-                    document.getElementById('svc-ai-songs').textContent = (ai.trackedSongs || 0).toLocaleString();
+                    document.getElementById('svc-nova-badge').className   = 'svc-badge ' + (novaOk ? 'online' : 'offline');
+                    document.getElementById('svc-nova-auth').textContent  = novaOk ? 'Authenticated ✓' : 'Not authenticated';
+                    document.getElementById('svc-nova-sync').textContent  = novaOk ? 'In sync' : 'Out of sync';
+
+                    // AI Engine card
+                    var ai = s.ai || {};
+                    document.getElementById('svc-ai-badge').textContent   = 'Online';
+                    document.getElementById('svc-ai-badge').className     = 'svc-badge online';
+                    document.getElementById('svc-ai-songs').textContent   = (ai.trackedSongs || 0).toLocaleString();
                     document.getElementById('svc-ai-listens').textContent = (ai.totalListens || 0).toLocaleString();
-                    document.getElementById('svc-ai-autodj').textContent = (ai.autoDJGuilds || 0);
-                    document.getElementById('svc-ai-users').textContent = (ai.trackedUsers || 0).toLocaleString();
-                    var ch = stats.cacheHitRate || 0;
-                    document.getElementById('res-cache-fill').style.width = ch + '%';
-                    document.getElementById('res-cache-val').textContent = ch + '%';
-                    if (bannerDot) bannerDot.className = 'status-banner-dot online';
-                    if (bannerTitle) bannerTitle.textContent = '✅ All Systems Operational';
-                    if (bannerSub) bannerSub.textContent = 'API · Bot · Nova Frame · AI Engine — all running';
-                    addStatusLog('ok', 'All systems check passed · ' + (stats.servers||0) + ' servers · uptime ' + fmtUptime(stats.uptime||0));
+                    document.getElementById('svc-ai-autodj').textContent  = (ai.autoDJGuilds || 0);
+                    document.getElementById('svc-ai-users').textContent   = (ai.trackedUsers || 0).toLocaleString();
+
+                    // Stan AI card
+                    var stanSessions = s.stanAISessions || (s.totalQueues || 0);
+                    document.getElementById('svc-stan-badge').textContent    = 'Online';
+                    document.getElementById('svc-stan-badge').className      = 'svc-badge online';
+                    document.getElementById('svc-stan-sessions').textContent = stanSessions;
+                    document.getElementById('svc-stan-reactions').textContent = (s.stanReactions || '—');
+                    document.getElementById('feat-stan').textContent         = 'Online · judging your playlist';
+
+                    // Stream Engine card
+                    var ch = s.cacheHitRate || 0;
+                    document.getElementById('svc-stream-badge').textContent   = 'Online';
+                    document.getElementById('svc-stream-badge').className     = 'svc-badge online';
+                    document.getElementById('svc-stream-cache').textContent   = ch + '%';
+                    document.getElementById('svc-stream-active').textContent  = (s.totalQueues || 0);
+                    document.getElementById('svc-stream-cookies').textContent = s.cookiesLoaded ? 'Loaded ✓' : '⚠️ Missing';
+                    document.getElementById('res-cache-fill').style.width     = ch + '%';
+                    document.getElementById('res-cache-val').textContent      = ch + '%';
+
+                    // Audio Features card
+                    document.getElementById('svc-audio-crossfade').textContent  = (s.crossfadeGuilds || 0) + ' guilds active';
+                    document.getElementById('svc-audio-announcer').textContent  = (s.announcerGuilds || 0) + ' guilds active';
+
+                    // Premium System card
+                    var pm = s.premium || {};
+                    document.getElementById('svc-premium-badge').textContent    = 'Online';
+                    document.getElementById('svc-premium-badge').className      = 'svc-badge online';
+                    document.getElementById('svc-premium-users').textContent    = (pm.totalUsers || 0).toLocaleString();
+                    document.getElementById('svc-premium-servers').textContent  = (pm.totalServers || 0).toLocaleString();
+                    document.getElementById('svc-premium-lifetime').textContent = (pm.lifetimeUsers || 0);
+
+                    // Commands executed bar (relative — cap at 10k for bar width)
+                    var cmds = s.commandsExecuted || 0;
+                    var cmdPct = Math.min((cmds / 10000) * 100, 100);
+                    document.getElementById('res-cmd-fill').style.width = cmdPct.toFixed(1) + '%';
+                    document.getElementById('res-cmd-val').textContent  = cmds.toLocaleString() + ' this session';
+
+                    // Banner
+                    var allOk = novaOk;
+                    if (bannerDot)   bannerDot.className     = 'status-banner-dot ' + (allOk ? 'online' : 'degraded');
+                    if (bannerTitle) bannerTitle.textContent = allOk ? '✅ All Systems Operational' : '⚡ Partially Degraded';
+                    if (bannerSub)   bannerSub.textContent   = 'API · Bot · Nova Frame · AI Engine · Stan AI — v3.0';
+
+                    addStatusLog('ok', 'All systems check passed · ' + (s.servers||0) + ' servers · uptime ' + fmtUptime(s.uptime||0));
                 }
-            } catch(e) { addStatusLog('warn', 'Stats fetch failed: ' + (e.message||'unknown')); }
+            } catch(e) {
+                addStatusLog('warn', 'Stats fetch failed: ' + (e.message || 'unknown'));
+            }
         }
 
         document.querySelectorAll('a[href="#status"]').forEach(function(a) {
