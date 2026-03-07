@@ -3746,17 +3746,25 @@
                             <div class="fa-genre-label">🎤 Hip-Hop</div>
                             <div class="fa-genre-cards" id="genre-hiphop"></div>
                         </div>
-                        <div class="fa-genre-row" data-genre="EDM">
-                            <div class="fa-genre-label">⚡ EDM</div>
-                            <div class="fa-genre-cards" id="genre-edm"></div>
+                        <div class="fa-genre-row" data-genre="R&B">
+                            <div class="fa-genre-label">🎶 R&amp;B</div>
+                            <div class="fa-genre-cards" id="genre-rnb"></div>
+                        </div>
+                        <div class="fa-genre-row" data-genre="Pop">
+                            <div class="fa-genre-label">🎵 Pop</div>
+                            <div class="fa-genre-cards" id="genre-pop"></div>
                         </div>
                         <div class="fa-genre-row" data-genre="Rock">
                             <div class="fa-genre-label">🎸 Rock</div>
                             <div class="fa-genre-cards" id="genre-rock"></div>
                         </div>
-                        <div class="fa-genre-row" data-genre="Pop">
-                            <div class="fa-genre-label">🎶 Pop</div>
-                            <div class="fa-genre-cards" id="genre-pop"></div>
+                        <div class="fa-genre-row" data-genre="Metal">
+                            <div class="fa-genre-label">🤘 Metal</div>
+                            <div class="fa-genre-cards" id="genre-metal"></div>
+                        </div>
+                        <div class="fa-genre-row" data-genre="EDM">
+                            <div class="fa-genre-label">⚡ EDM</div>
+                            <div class="fa-genre-cards" id="genre-edm"></div>
                         </div>
                         <div class="fa-genre-row" data-genre="Country">
                             <div class="fa-genre-label">🤠 Country</div>
@@ -3765,6 +3773,26 @@
                         <div class="fa-genre-row" data-genre="Indie">
                             <div class="fa-genre-label">🌿 Indie</div>
                             <div class="fa-genre-cards" id="genre-indie"></div>
+                        </div>
+                        <div class="fa-genre-row" data-genre="Lo-Fi">
+                            <div class="fa-genre-label">☕ Lo-Fi</div>
+                            <div class="fa-genre-cards" id="genre-lofi"></div>
+                        </div>
+                        <div class="fa-genre-row" data-genre="Latin">
+                            <div class="fa-genre-label">💃 Latin</div>
+                            <div class="fa-genre-cards" id="genre-latin"></div>
+                        </div>
+                        <div class="fa-genre-row" data-genre="K-Pop">
+                            <div class="fa-genre-label">🇰🇷 K-Pop</div>
+                            <div class="fa-genre-cards" id="genre-kpop"></div>
+                        </div>
+                        <div class="fa-genre-row" data-genre="Anime">
+                            <div class="fa-genre-label">🗾 Anime</div>
+                            <div class="fa-genre-cards" id="genre-anime"></div>
+                        </div>
+                        <div class="fa-genre-row" data-genre="Gaming">
+                            <div class="fa-genre-label">🎮 Gaming</div>
+                            <div class="fa-genre-cards" id="genre-gaming"></div>
                         </div>
                     </div>
                 </div>
@@ -5844,8 +5872,8 @@
         function renderSpotlight(artists) {
             var el = document.getElementById('fa-spotlight-grid');
             if (!el) return;
-            if (!artists.length) {
-                el.innerHTML = '<div style="color:#444;font-size:13px;font-family:\'DM Mono\',monospace;padding:20px 0;">No spotlight artists yet — add them via the admin panel.</div>';
+            if (!artists || !artists.length) {
+                el.innerHTML = '<div style="color:#444;font-size:13px;font-family:\'DM Mono\',monospace;padding:20px 0;">No spotlight artists yet.</div>';
                 return;
             }
             el.innerHTML = artists.map(function(a) {
@@ -5853,6 +5881,8 @@
                 var playsHtml = a.plays ? '<div class="fa-plays">' + Number(a.plays).toLocaleString() + ' plays</div>' : '';
                 var linkStart = a.url ? '<a href="' + faEsc(a.url) + '" target="_blank" style="text-decoration:none;color:inherit;">' : '';
                 var linkEnd = a.url ? '</a>' : '';
+                var playArg = (a.topSong && a.topSong.url) ? a.topSong.url : a.name;
+                var playLabel = (a.topSong && a.topSong.title) ? '▶ ' + faEsc(a.topSong.title).slice(0,28) + (a.topSong.title.length > 28 ? '...' : '') : '▶ Play';
                 return '<div class="fa-spotlight-card' + (a.pinned ? ' fa-pinned' : '') + '">'
                     + (a.pinned ? '<div class="fa-pin-badge">📌 Pinned</div>' : '')
                     + linkStart
@@ -5862,16 +5892,16 @@
                     + '<div class="fa-genre">' + faEsc(a.genre || '') + '</div>'
                     + '<div class="fa-meta">' + (a.pinned ? 'Pinned' : 'Featured') + ' · ' + faEsc(a.reason || 'Curated pick') + '</div>'
                     + playsHtml
-                    + '<button class="fa-play-btn" onclick="sbbSearch(\'' + faEsc(a.name) + '\')">▶ Play</button>'
+                    + '<button class="fa-play-btn" title="' + faEsc((a.topSong && a.topSong.title) ? a.topSong.title : a.name) + '" onclick="faPlayArtist(\'' + playArg.replace(/'/g, "\\'") + '\')">▶ Play</button>'
                     + '</div>';
             }).join('');
         }
 
-        function renderRising(artists) {
+                function renderRising(artists) {
             var el = document.getElementById('fa-rising-grid');
             if (!el) return;
-            if (!artists.length) {
-                el.innerHTML = '<div style="color:#444;font-size:13px;font-family:\'DM Mono\',monospace;padding:20px 0;">No rising artists yet — data populates as the bot tracks plays.</div>';
+            if (!artists || !artists.length) {
+                el.innerHTML = '<div style="color:#444;font-size:13px;font-family:\'DM Mono\',monospace;padding:20px 0;">No rising artists yet — seeding in progress, check back shortly.</div>';
                 return;
             }
             var colors = ['#00FFD1','#FF6B6B','#FFD700','#A78BFA','#34D399','#F472B6'];
@@ -5880,39 +5910,65 @@
                 var playsHtml = a.plays ? '<div class="fa-plays">' + Number(a.plays).toLocaleString() + ' plays</div>' : '';
                 var linkStart = a.url ? '<a href="' + faEsc(a.url) + '" target="_blank" style="text-decoration:none;color:inherit;">' : '';
                 var linkEnd = a.url ? '</a>' : '';
+                var playArg = (a.topSong && a.topSong.url) ? a.topSong.url : a.name;
+                var playLabel = (a.topSong && a.topSong.title) ? '▶ ' + faEsc(a.topSong.title).slice(0,22) + (a.topSong.title.length > 22 ? '...' : '') : '▶ Play';
                 return '<div class="fa-artist-card">'
                     + linkStart + faArtHtml(a, 'linear-gradient(135deg,' + color + ',rgba(0,0,0,0.5))') + linkEnd
                     + '<div class="fa-name">' + faEsc(a.name) + '</div>'
                     + '<div class="fa-genre">' + faEsc(a.genre || '') + '</div>'
                     + playsHtml
-                    + '<button class="fa-play-btn" style="margin-top:8px;" onclick="sbbSearch(\'' + faEsc(a.name) + '\')">▶ Play</button>'
+                    + '<button class="fa-play-btn" style="margin-top:8px;" title="' + faEsc((a.topSong && a.topSong.title) ? a.topSong.title : a.name) + '" onclick="faPlayArtist(\'' + playArg.replace(/'/g, "\\'") + '\')">▶ Play</button>'
                     + '</div>';
             }).join('');
         }
 
-        function renderGenreRows(genres) {
-            var genreMap = { 'Hip-Hop': 'hiphop', 'EDM': 'edm', 'Rock': 'rock', 'Pop': 'pop', 'Country': 'country', 'Indie': 'indie' };
+                function renderGenreRows(genres) {
+            var genreMap = {
+                'Hip-Hop': 'hiphop', 'R&B': 'rnb', 'Pop': 'pop', 'Rock': 'rock',
+                'Metal': 'metal', 'EDM': 'edm', 'Country': 'country', 'Indie': 'indie',
+                'Lo-Fi': 'lofi', 'Latin': 'latin', 'K-Pop': 'kpop', 'Anime': 'anime', 'Gaming': 'gaming'
+            };
             Object.keys(genreMap).forEach(function(genre) {
                 var el = document.getElementById('genre-' + genreMap[genre]);
                 if (!el) return;
                 var artists = genres[genre] || [];
                 if (!artists.length) {
-                    el.innerHTML = '<div style="color:#333;font-size:12px;font-family:DM Mono,monospace;">No data yet</div>';
+                    el.innerHTML = '<div style="color:#333;font-size:12px;font-family:DM Mono,monospace;padding:8px 0;">Seeding...</div>';
                     return;
                 }
-                el.innerHTML = artists.slice(0, 5).map(function(a) {
+                el.innerHTML = artists.slice(0, 6).map(function(a) {
                     var linkStart = a.url ? '<a href="' + faEsc(a.url) + '" target="_blank" style="text-decoration:none;color:inherit;">' : '';
                     var linkEnd = a.url ? '</a>' : '';
+                    var playArg = (a.topSong && a.topSong.url) ? a.topSong.url : a.name;
+                    var playLabel = (a.topSong && a.topSong.title) ? '▶ ' + faEsc(a.topSong.title).slice(0,20) + (a.topSong.title.length > 20 ? '...' : '') : '▶ Play';
                     return '<div class="fa-artist-card" style="padding:12px;">'
                         + linkStart + faArtHtml(a, 'rgba(0,255,209,0.15)') + linkEnd
                         + '<div class="fa-name" style="font-size:12px;">' + faEsc(a.name) + '</div>'
                         + (a.plays ? '<div class="fa-plays" style="font-size:11px;">' + Number(a.plays).toLocaleString() + '</div>' : '')
+                        + '<button class="fa-play-btn" style="margin-top:6px;font-size:10px;padding:4px 8px;" title="' + faEsc((a.topSong && a.topSong.title) ? a.topSong.title : a.name) + '" onclick="faPlayArtist(\'' + playArg.replace(/'/g, "\\'") + '\')">▶ Play</button>'
                         + '</div>';
                 }).join('');
             });
         }
 
-        function faEsc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+                function faEsc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+        // Play an artist's top song — accepts a YouTube URL or falls back to search by name
+        function faPlayArtist(urlOrName) {
+            if (!urlOrName) return;
+            var isUrl = urlOrName.startsWith('http');
+            if (isUrl) {
+                // Direct YouTube URL — put it in the search box and trigger play
+                var input = document.getElementById('sbb-search-input');
+                if (input) {
+                    input.value = urlOrName;
+                    sbbSearch();
+                }
+            } else {
+                // Artist name — search for them
+                sbbSearch(urlOrName);
+            }
+        }
 
         // ══════════════════════════════════════════════════════
         // SESSION PAGES
