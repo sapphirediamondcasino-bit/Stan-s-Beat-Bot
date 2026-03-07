@@ -5816,51 +5816,65 @@
         // ══════════════════════════════════════════════════════
         // FEATURED ARTISTS ENGINE
         // ══════════════════════════════════════════════════════
-        async function loadFeaturedArtists() {
+        var _featuredPollTimer = null;
+        var _featuredPollAttempts = 0;
+
+        async function loadFeaturedArtists(isRetry) {
             var spotEl   = document.getElementById('fa-spotlight-grid');
             var risingEl = document.getElementById('fa-rising-grid');
-            if (spotEl)   spotEl.innerHTML   = '<div style="color:#555;font-size:13px;font-family:\'DM Mono\',monospace;padding:20px 0;">⏳ Loading...</div>';
-            if (risingEl) risingEl.innerHTML = '<div style="color:#555;font-size:13px;font-family:\'DM Mono\',monospace;padding:20px 0;">⏳ Loading...</div>';
+            if (!isRetry) {
+                if (spotEl)   spotEl.innerHTML   = '<div style="color:#555;font-size:13px;font-family:\'DM Mono\',monospace;padding:20px 0;">⏳ Loading...</div>';
+                if (risingEl) risingEl.innerHTML = '<div style="color:#555;font-size:13px;font-family:\'DM Mono\',monospace;padding:20px 0;">⏳ Loading...</div>';
+                _featuredPollAttempts = 0;
+                if (_featuredPollTimer) { clearTimeout(_featuredPollTimer); _featuredPollTimer = null; }
+            }
             try {
                 var r = await fetch(API_BASE + '/api/featured');
                 if (!r.ok) throw new Error('no data');
-                var data     = await r.json();
+                var data      = await r.json();
                 var spotlight = data.spotlight || [];
                 var rising    = data.rising    || [];
+                var genres    = data.genres    || {};
 
-                // Always ensure Jake Kade is first in spotlight
-                var hasJake = spotlight.some(function(a) { return a.name && a.name.toLowerCase().includes('jake kade'); });
+                // Count how many genres have actual artists (not seeding)
+                var populatedGenres = Object.values(genres).filter(function(g){ return g && g.length > 0; }).length;
+                var totalGenreKeys  = Object.keys(genres).length;
+
+                // Always ensure Jake Kade is in spotlight
+                var hasJake = spotlight.some(function(a){ return a.name && a.name.toLowerCase().includes('jake kade'); });
                 if (!hasJake) {
-                    spotlight.unshift({
-                        name:   'Jake Kade',
-                        genre:  'Hip-Hop',
-                        pinned: true,
-                        reason: '🎤 Featured Artist',
-                        image:  null,
-                        url:    'https://www.youtube.com/@jakekade',
-                        plays:  0
-                    });
+                    spotlight.unshift({ name:'Jake Kade', genre:'Hip-Hop', pinned:true, reason:'🎤 Featured Artist', image:null, url:'https://www.youtube.com/@jakekade', plays:0 });
                 }
 
                 renderSpotlight(spotlight);
                 renderRising(rising);
-                renderGenreRows(data.genres || {});
+                renderGenreRows(genres);
+
+                // If genres are still empty (seeding not done), poll every 15s for up to 3 minutes
+                if (populatedGenres === 0 && _featuredPollAttempts < 12) {
+                    _featuredPollAttempts++;
+                    _featuredPollTimer = setTimeout(function(){ loadFeaturedArtists(true); }, 15000);
+                    // Update genre rows to show a nicer waiting message
+                    var genreMap = { 'Hip-Hop':'hiphop','R&B':'rnb','Pop':'pop','Rock':'rock','Metal':'metal','EDM':'edm','Country':'country','Indie':'indie','Lo-Fi':'lofi','Latin':'latin','K-Pop':'kpop','Anime':'anime','Gaming':'gaming' };
+                    Object.values(genreMap).forEach(function(id) {
+                        var el = document.getElementById('genre-' + id);
+                        if (el && (!el.innerHTML || el.innerHTML.includes('Seeding'))) {
+                            el.innerHTML = '<div style="color:#444;font-size:12px;font-family:DM Mono,monospace;padding:8px 0;">⏳ Loading artists... (retry ' + _featuredPollAttempts + '/12)</div>';
+                        }
+                    });
+                }
             } catch(e) {
-                // API unreachable or returned nothing — still show Jake Kade
-                renderSpotlight([{
-                    name:   'Jake Kade',
-                    genre:  'Hip-Hop',
-                    pinned: true,
-                    reason: '🎤 Featured Artist',
-                    image:  null,
-                    url:    'https://www.youtube.com/@jakekade',
-                    plays:  0
-                }]);
-                if (risingEl) risingEl.innerHTML = '<div style="color:#444;font-size:13px;font-family:\'DM Mono\',monospace;padding:20px 0;">Rising artists populate as the bot plays music — start a session to see them here.</div>';
+                renderSpotlight([{ name:'Jake Kade', genre:'Hip-Hop', pinned:true, reason:'🎤 Featured Artist', image:null, url:'https://www.youtube.com/@jakekade', plays:0 }]);
+                if (risingEl) risingEl.innerHTML = '<div style="color:#444;font-size:13px;font-family:\'DM Mono\',monospace;padding:20px 0;">Rising artists load as the bot plays music.</div>';
+                // Still retry genres on error
+                if (_featuredPollAttempts < 12) {
+                    _featuredPollAttempts++;
+                    _featuredPollTimer = setTimeout(function(){ loadFeaturedArtists(true); }, 15000);
+                }
             }
         }
 
-        function faArtHtml(a, fallbackColor) {
+                function faArtHtml(a, fallbackColor) {
             var initials = (a.name || '?').split(' ').map(function(w){ return w[0]; }).join('').slice(0,2).toUpperCase();
             var color = fallbackColor || 'linear-gradient(135deg,#00FFD1,#00CCA5)';
             if (a.image) {
