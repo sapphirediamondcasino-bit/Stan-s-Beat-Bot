@@ -5383,8 +5383,38 @@
             progressTimer: null,
             mode: 'idle',  // 'idle' | 'discord' | 'web'
             audio: new Audio(),
+            webQueue: [],         // local queue for web mode
+            webQueueIndex: 0,     // current position in web queue
         };
         SBB.audio.volume = 0.8;
+
+        // Web audio — auto-advance queue when song ends
+        SBB.audio.addEventListener('ended', function() {
+            if (SBB.loop) {
+                SBB.audio.currentTime = 0;
+                SBB.audio.play();
+                return;
+            }
+            SBB.webQueueIndex++;
+            if (SBB.webQueueIndex < SBB.webQueue.length) {
+                sbbPlayWebQueueIndex(SBB.webQueueIndex);
+            } else {
+                sbbSetPlayState(false);
+                sbbSetTrack("Stan's Beat Bot", 'Queue finished', 'Search for more songs above');
+                SBB.webQueue = [];
+                SBB.webQueueIndex = 0;
+                sbbRenderQueue([]);
+            }
+        });
+
+        // Web audio — live progress sync from real audio element
+        SBB.audio.addEventListener('timeupdate', function() {
+            if (SBB.mode !== 'web') return;
+            var el  = SBB.audio.currentTime;
+            var dur = SBB.audio.duration || 0;
+            if (!isNaN(dur)) sbbSetProgress(el, dur);
+            sbbRefreshWebQueueMiniBar();
+        });
 
         // ── HELPERS ──────────────────────────────────────
         function sbbEsc(s) {
@@ -5457,11 +5487,14 @@
             if (dur)  dur.textContent = duration > 0 ? sbbFmt(duration * 1000) : 'LIVE';
         }
         function sbbStartProgress() {
+            // Web mode uses the 'timeupdate' audio event instead — no interval needed
+            if (SBB.mode === 'web') return;
             if (SBB.progressTimer) clearInterval(SBB.progressTimer);
             SBB.progressTimer = setInterval(function() {
                 if (!SBB.playing) return;
                 SBB.elapsed++;
                 sbbSetProgress(SBB.elapsed, SBB.duration);
+                sbbRefreshWebQueueMiniBar();   // keep mini-bar in sync during Discord mode
             }, 1000);
         }
 
@@ -5575,7 +5608,6 @@
                         }
                     } catch(e) {}
                 }
-                // If still no bot found, switch to web mode
                 if (!SBB.serverId && SBB.mode === 'idle') {
                     sbbSetMode('web');
                     sbbSetTrack(null, null, '🌐 Web Player — search a song to start');
@@ -5594,8 +5626,12 @@
                     var c = data.current;
                     sbbSetTrack(c.title, c.artist || c.channel || c.author || '—', '');
                     sbbSetArt(c.thumbnail);
-                    if (c.duration) {
-                        SBB.duration = Math.floor(c.duration / 1000);
+                    // Sync duration from API (ms → seconds)
+                    if (c.duration) SBB.duration = Math.floor(c.duration / 1000);
+                    // Sync elapsed from API so bar never drifts
+                    if (typeof data.elapsed === 'number') {
+                        SBB.elapsed = Math.floor(data.elapsed / 1000);
+                        sbbSetProgress(SBB.elapsed, SBB.duration);
                     }
                     sbbSetMode('discord');
                 }
@@ -5606,34 +5642,89 @@
                     if (data.playing) sbbStartProgress();
                     else if (SBB.progressTimer) clearInterval(SBB.progressTimer);
                 }
+                // Keep ticking locally — poll will re-sync every 5s
+                if (data.playing && !SBB.progressTimer) sbbStartProgress();
 
-                // Render queue
-                sbbRenderQueue(data.songs || []);
+                // Render queue with requesters
+                sbbRenderQueue(data.songs || [], data.requesters || {});
 
             } catch(e) { /* bot offline */ }
         }
 
-        function sbbRenderQueue(songs) {
-            var list = document.getElementById('sbb-queue-list');
+        function sbbRenderQueue(songs, requesters) {
+            var list  = document.getElementById('sbb-queue-list');
             var count = document.getElementById('sbb-queue-count');
             if (!list) return;
+            requesters = requesters || {};
             if (count) count.textContent = songs.length + ' song' + (songs.length !== 1 ? 's' : '');
             if (!songs.length) {
                 list.innerHTML = '<div class="sbb-queue-empty">Queue is empty</div>';
                 return;
             }
             list.innerHTML = songs.map(function(s, i) {
-                var thumb = s.thumbnail ? '<img class="sbb-queue-thumb" src="' + sbbEsc(s.thumbnail) + '" alt="">' : '<div class="sbb-queue-thumb"></div>';
-                return '<div class="sbb-queue-item' + (i === 0 ? ' sbb-playing' : '') + '">'
-                    + '<span class="sbb-queue-num">' + (i === 0 ? '♪' : i + 1) + '</span>'
+                var isNow = (i === 0);
+                var thumb = s.thumbnail
+                    ? '<img class="sbb-queue-thumb" src="' + sbbEsc(s.thumbnail) + '" alt="">'
+                    : '<div class="sbb-queue-thumb" style="background:rgba(0,255,209,0.08);display:flex;align-items:center;justify-content:center;font-size:14px;">' + (isNow ? '🎵' : '♪') + '</div>';
+                var durMs  = s.duration || 0;
+                var durStr = durMs ? sbbFmt(durMs) : '—';
+                // requester lookup — songs array may have .id or use index
+                var reqId  = s.id || '';
+                var req    = requesters[reqId] || s.requester || null;
+                var reqTag = req
+                    ? '<span style="font-size:10px;color:#00FFD1;opacity:0.7;margin-left:2px;">· ' + sbbEsc(req.username || req) + '</span>'
+                    : '';
+                // mini progress bar for now-playing item
+                var miniBar = '';
+                if (isNow && SBB.duration > 0) {
+                    var pct = Math.min((SBB.elapsed / SBB.duration) * 100, 100).toFixed(1);
+                    miniBar = '<div id="sbb-queue-mini-bar-track" style="height:2px;background:rgba(255,255,255,0.08);border-radius:2px;margin-top:4px;overflow:hidden;">'
+                        + '<div id="sbb-queue-mini-bar-fill" style="height:100%;width:' + pct + '%;background:#00FFD1;border-radius:2px;transition:width 0.8s linear;"></div>'
+                        + '</div>'
+                        + '<div style="display:flex;justify-content:space-between;margin-top:2px;">'
+                        + '<span style="font-size:9px;color:#444;font-family:DM Mono,monospace;" id="sbb-queue-mini-elapsed">' + sbbFmt(SBB.elapsed * 1000) + '</span>'
+                        + '<span style="font-size:9px;color:#444;font-family:DM Mono,monospace;">' + durStr + '</span>'
+                        + '</div>';
+                }
+                return '<div class="sbb-queue-item' + (isNow ? ' sbb-playing' : '') + '">'
+                    + '<span class="sbb-queue-num">' + (isNow ? '♪' : i) + '</span>'
                     + thumb
                     + '<div class="sbb-queue-info">'
-                    + '<div class="sbb-queue-title">' + sbbEsc(s.title || 'Unknown') + '</div>'
+                    + '<div class="sbb-queue-title">' + sbbEsc(s.title || 'Unknown') + reqTag + '</div>'
                     + '<div class="sbb-queue-artist">' + sbbEsc(s.artist || s.channel || s.author || '—') + '</div>'
+                    + miniBar
                     + '</div>'
-                    + '<span class="sbb-queue-dur">' + (s.duration ? sbbFmt(s.duration) : '—') + '</span>'
+                    + '<span class="sbb-queue-dur">' + (isNow ? '' : durStr) + '</span>'
                     + '</div>';
             }).join('');
+        }
+
+        // Update just the mini-bar fill + elapsed without re-rendering the whole queue
+        function sbbRefreshWebQueueMiniBar() {
+            var fill = document.getElementById('sbb-queue-mini-bar-fill');
+            var elapsed = document.getElementById('sbb-queue-mini-elapsed');
+            if (fill && SBB.duration > 0) {
+                var pct = Math.min((SBB.elapsed / SBB.duration) * 100, 100).toFixed(1);
+                fill.style.width = pct + '%';
+            }
+            if (elapsed) elapsed.textContent = sbbFmt(SBB.elapsed * 1000);
+        }
+
+        // Play a specific index in the web queue
+        function sbbPlayWebQueueIndex(idx) {
+            var song = SBB.webQueue[idx];
+            if (!song || !song.streamUrl) return;
+            SBB.webQueueIndex = idx;
+            SBB.audio.src = song.streamUrl;
+            SBB.audio.play().then(function() {
+                sbbSetPlayState(true);
+                sbbSetTrack(song.title, song.artist || song.author || '—', '🌐 Web Player');
+                if (song.thumbnail) sbbSetArt(song.thumbnail);
+            }).catch(function() {
+                sbbSetTrack(null, null, 'Playback blocked — click play');
+            });
+            // Re-render queue so now-playing highlight moves
+            sbbRenderQueue(SBB.webQueue.slice(idx));
         }
 
         // ── SEARCH ────────────────────────────────────────
@@ -5672,9 +5763,10 @@
                 return;
             }
 
-            // WEB MODE — resolve URL and play in browser
+            // WEB MODE — resolve URL, add to web queue, auto-play if nothing running
             sbbSetMode('web');
             try {
+                sbbSetTrack(null, null, '🔍 Resolving...');
                 var r = await fetch(API_BASE + '/api/resolve-url', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -5685,31 +5777,33 @@
                     throw new Error(errData.error || 'Resolve failed');
                 }
                 var data = await r.json();
+                if (!data.streamUrl) throw new Error('No audio URL returned');
 
-                if (!data.streamUrl) throw new Error('No audio URL');
-
-                sbbSetTrack(data.title || query, data.artist || '—', '🌐 Web Player');
-                sbbSetArt(data.thumbnail);
-                if (data.duration) SBB.duration = Math.floor(data.duration / 1000);
-                SBB.elapsed = 0;
-                sbbSetProgress(0, SBB.duration);
-
-                SBB.audio.src = data.streamUrl;
-                SBB.audio.volume = SBB.volume / 100;
-                SBB.audio.play().then(function() {
-                    sbbSetPlayState(true);
-                    sbbStartProgress();
-                    input.value = '';
-                    if (resultsEl) resultsEl.style.display = 'none';
-                }).catch(function() {
-                    sbbSetTrack(null, null, 'Click ▶ to play');
-                    if (resultsEl) resultsEl.style.display = 'none';
-                });
-
-                SBB.audio.onended = function() {
-                    sbbSetPlayState(false);
-                    sbbSetTrack('Stan\'s Beat Bot', 'Search for next song', '');
+                // Build a song object and push it onto the web queue
+                var songObj = {
+                    streamUrl:  data.streamUrl,
+                    title:      data.title     || query,
+                    artist:     data.artist    || data.author || data.channel || '—',
+                    thumbnail:  data.thumbnail || null,
+                    duration:   data.duration  || 0,    // ms
+                    id:         data.id        || Date.now().toString()
                 };
+                SBB.webQueue.push(songObj);
+
+                input.value = '';
+                if (resultsEl) resultsEl.style.display = 'none';
+
+                // If nothing playing yet — start immediately
+                if (!SBB.playing) {
+                    SBB.webQueueIndex = SBB.webQueue.length - 1;
+                    sbbPlayWebQueueIndex(SBB.webQueueIndex);
+                } else {
+                    // Already playing — just update the queue display
+                    sbbSetTrack(null, null, '✓ Added to queue (#' + SBB.webQueue.length + ')');
+                    // Re-render from current playing index
+                    sbbRenderQueue(SBB.webQueue.slice(SBB.webQueueIndex));
+                    showToast('➕ Added: ' + songObj.title);
+                }
 
             } catch(e) {
                 var msg = e.message || 'unknown error';
