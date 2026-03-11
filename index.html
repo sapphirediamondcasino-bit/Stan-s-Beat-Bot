@@ -6607,9 +6607,11 @@
         }
 
         // Hook sbbPollQueue to auto-add to history
-        var _origSbbPollQueue = sbbPollQueue;
+        // NOTE: must use a wrapper var — redeclaring function sbbPollQueue() would
+        // cause hoisting to make _origSbbPollQueue point to the new wrapper, infinite recursion.
         var _lastHistoryTitle = '';
-        async function sbbPollQueue() {
+        var _origSbbPollQueue = sbbPollQueue;
+        var sbbPollQueueWithHistory = async function() {
             await _origSbbPollQueue.apply(this, arguments);
             // If song changed, add to history
             var titleEl = document.getElementById('sbb-track-title');
@@ -6622,7 +6624,8 @@
                     thumbnail: (document.getElementById('sbb-art-img') || {}).src || '',
                 });
             }
-        }
+        };
+        sbbPollQueue = sbbPollQueueWithHistory;
 
         // Load all new sections on tab click (navigateTo handles this too, but keeping for safety)
         document.querySelectorAll('a[href="#featured"]').forEach(function(a) {
