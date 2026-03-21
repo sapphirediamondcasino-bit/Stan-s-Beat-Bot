@@ -1913,6 +1913,13 @@
             background: #121212;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
             padding: 8px 0;
+
+        /* Cloud 9 + Bot Page responsive */
+        @media (max-width: 900px) {
+            .c9-grid { grid-template-columns: 1fr !important; }
+            .botpage-hero-grid { grid-template-columns: 1fr !important; padding: 40px 0 !important; min-height: auto !important; }
+            .botpage-split-grid { grid-template-columns: 1fr !important; }
+        }
             z-index: 99;
         }
 
@@ -2905,6 +2912,8 @@
                 <a href="#analytics">Analytics</a>
                 <a href="#history">History</a>
                 <a href="#badges">Badges</a>
+                <a href="#cloud9">Cloud 9</a>
+                <a href="#botpage">About</a>
                 <a href="https://discord.com/oauth2/authorize?client_id=1049861443111112744&permissions=8&response_type=code&redirect_uri=https%3A%2F%2Fstansbeatbot.online%2F&integration_type=0&scope=identify+bot+guilds" class="btn-primary" target="_blank">Invite Bot</a>
             </nav>
         </div>
@@ -4234,12 +4243,380 @@
                             <div class="badge-req">5 genres queued</div>
                             <div class="badge-status" id="badge-vibemaster-status">Locked</div>
                         </div>
-                    </div>
+
+                        <!-- ── MUSIC PLAYER EXTENDED BADGES ── -->
+                        <div class="badge-card" id="badge-streakmaster">
+                            <div class="badge-icon">🎯</div>
+                            <div class="badge-name">Streak Master</div>
+                            <div class="badge-req">7 days in a row</div>
+                            <div class="badge-status" id="badge-streakmaster-status">Locked</div>
+                        </div>
+                        <div class="badge-card" id="badge-genreexplorer">
+                            <div class="badge-icon">🎸</div>
+                            <div class="badge-name">Genre Explorer</div>
+                            <div class="badge-req">10 different genres</div>
+                            <div class="badge-status" id="badge-genreexplorer-status">Locked</div>
+                        </div>
+                        <div class="badge-card" id="badge-nightowl">
+                            <div class="badge-icon">🌙</div>
+                            <div class="badge-name">Night Owl</div>
+                            <div class="badge-req">Queue songs after midnight</div>
+                            <div class="badge-status" id="badge-nightowl-status">Locked</div>
+                        </div>
+                        <div class="badge-card" id="badge-speedqueuer">
+                            <div class="badge-icon">⚡</div>
+                            <div class="badge-name">Speed Queuer</div>
+                            <div class="badge-req">10 songs in under 5 minutes</div>
+                            <div class="badge-status" id="badge-speedqueuer-status">Locked</div>
+                        </div>
+                        <div class="badge-card" id="badge-collabking">
+                            <div class="badge-icon">🤝</div>
+                            <div class="badge-name">Collab King</div>
+                            <div class="badge-req">Use /collab in 5 sessions</div>
+                            <div class="badge-status" id="badge-collabking-status">Locked</div>
+                        </div>
+                        <div class="badge-card" id="badge-radiolistener">
+                            <div class="badge-icon">📻</div>
+                            <div class="badge-name">Radio Listener</div>
+                            <div class="badge-req">1 hour on any radio mode</div>
+                            <div class="badge-status" id="badge-radiolistener-status">Locked</div>
+                        </div>
+                        <div class="badge-card" id="badge-wrappedpro">
+                            <div class="badge-icon">📅</div>
+                            <div class="badge-name">Wrapped Pro</div>
+                            <div class="badge-req">View /wrapped 3 months</div>
+                            <div class="badge-status" id="badge-wrappedpro-status">Locked</div>
+                        </div>
+                        <div class="badge-card" id="badge-quizmaster">
+                            <div class="badge-icon">🎮</div>
+                            <div class="badge-name">Quiz Master</div>
+                            <div class="badge-req">Win 10 music quizzes</div>
+                            <div class="badge-status" id="badge-quizmaster-status">Locked</div>
+                        </div>
+
+                        <!-- ── CLOUD 9 RADIO BADGES ── -->
+                        <div class="badge-card" id="badge-c9contributor">
+                            <div class="badge-icon">🎤</div>
+                            <div class="badge-name">C9 Contributor</div>
+                            <div class="badge-req">Submit 1 track to Cloud 9</div>
+                            <div class="badge-status" id="badge-c9contributor-status">Locked</div>
+                        </div>
+                        <div class="badge-card" id="badge-verifiedartist">
+                            <div class="badge-icon">✅</div>
+                            <div class="badge-name">Verified Artist</div>
+                            <div class="badge-req">Verified original creator</div>
+                            <div class="badge-status" id="badge-verifiedartist-status">Locked</div>
+                        </div>
+                        <div class="badge-card" id="badge-topartist">
+                            <div class="badge-icon">🏆</div>
+                            <div class="badge-name">Top Artist</div>
+                            <div class="badge-req">Most-played submission</div>
+                            <div class="badge-status" id="badge-topartist-status">Locked</div>
+                        </div>
+                        <div class="badge-card" id="badge-c9regular">
+                            <div class="badge-icon">📡</div>
+                            <div class="badge-name">Radio Regular</div>
+                            <div class="badge-req">5 hours on Cloud 9 Radio</div>
+                            <div class="badge-status" id="badge-c9regular-status">Locked</div>
+                        </div>
+                        <div class="badge-card" id="badge-ogsupporter">
+                            <div class="badge-icon">🌅</div>
+                            <div class="badge-name">OG Supporter</div>
+                            <div class="badge-req">Early access member</div>
+                            <div class="badge-status" id="badge-ogsupporter-status">Locked</div>
+                        </div>
                 </div>
             </div>
         </section>
 
 
+<!-- ═══════════════════════════════════════════════════════════════
+     CLOUD 9 RADIO SECTION
+════════════════════════════════════════════════════════════════ -->
+        <section id="cloud9" class="tab-content">
+            <div class="container">
+
+                <!-- HEADER -->
+                <h2 class="section-title">📻 Cloud 9 Radio</h2>
+                <p class="section-subtitle">Original music by independent artists — no rips, no platforms, just music people made themselves. Powered by Kurrasch Systems.</p>
+
+                <!-- NOW PLAYING CARD -->
+                <div id="c9-now-playing-card" style="background:linear-gradient(135deg,rgba(155,89,182,0.15),rgba(155,89,182,0.05));border:1px solid rgba(155,89,182,0.4);border-radius:16px;padding:28px 32px;margin-bottom:36px;">
+                    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;">
+                        <div style="display:flex;align-items:center;gap:20px;">
+                            <div id="c9-art" style="width:80px;height:80px;border-radius:12px;background:rgba(155,89,182,0.2);display:flex;align-items:center;justify-content:center;font-size:32px;flex-shrink:0;overflow:hidden;">📻</div>
+                            <div>
+                                <div style="font-size:11px;color:#9B59B6;font-weight:700;letter-spacing:2px;margin-bottom:4px;font-family:'DM Mono',monospace;">CLOUD 9 RADIO — BROADCASTING</div>
+                                <div id="c9-track-title" style="font-size:22px;font-weight:800;color:#fff;margin-bottom:4px;">Loading broadcast...</div>
+                                <div id="c9-track-artist" style="font-size:15px;color:rgba(255,255,255,0.6);">—</div>
+                            </div>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+                            <div id="c9-live-dot" style="display:flex;align-items:center;gap:8px;padding:8px 16px;background:rgba(155,89,182,0.2);border:1px solid rgba(155,89,182,0.4);border-radius:20px;">
+                                <span style="width:8px;height:8px;background:#9B59B6;border-radius:50%;animation:pulse 1.5s infinite;display:inline-block;"></span>
+                                <span id="c9-pool-count" style="font-size:13px;color:#9B59B6;font-weight:700;font-family:'DM Mono',monospace;">LIVE</span>
+                            </div>
+                            <button onclick="c9TuneIn()" style="padding:12px 24px;background:linear-gradient(135deg,#9B59B6,#7D3C98);border:none;border-radius:10px;color:#fff;font-weight:800;font-size:14px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">▶ Tune In</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TWO COLUMN LAYOUT -->
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-bottom:36px;" class="c9-grid">
+
+                    <!-- LEFT: TRACK POOL -->
+                    <div style="background:rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:24px;">
+                        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
+                            <h3 style="font-size:18px;font-weight:700;color:#fff;">🎵 Track Pool</h3>
+                            <span id="c9-total-count" style="font-size:12px;color:#555;font-family:'DM Mono',monospace;">Loading...</span>
+                        </div>
+                        <!-- Search -->
+                        <div style="display:flex;gap:8px;margin-bottom:16px;">
+                            <input type="text" id="c9-search-input" placeholder="Search tracks..." oninput="c9FilterTracks()" style="flex:1;padding:10px 14px;background:rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#fff;font-size:13px;outline:none;">
+                        </div>
+                        <!-- Pool List -->
+                        <div id="c9-pool-list" style="max-height:400px;overflow-y:auto;">
+                            <div style="color:#444;font-size:13px;font-family:'DM Mono',monospace;padding:20px 0;text-align:center;">⏳ Loading tracks...</div>
+                        </div>
+                    </div>
+
+                    <!-- RIGHT: SUBMIT YOUR MUSIC -->
+                    <div style="background:rgba(0,0,0,0.4);border:1px solid rgba(155,89,182,0.3);border-radius:14px;padding:24px;">
+                        <h3 style="font-size:18px;font-weight:700;color:#fff;margin-bottom:6px;">📤 Submit Your Music</h3>
+                        <p style="color:#666;font-size:13px;margin-bottom:20px;">Original MP3 or WAV only. Your music — not ripped from YouTube or any platform.</p>
+
+                        <!-- Login prompt shown to guests -->
+                        <div id="c9-submit-login-prompt" style="display:none;background:rgba(155,89,182,0.08);border:1px solid rgba(155,89,182,0.2);border-radius:10px;padding:20px;text-align:center;margin-bottom:16px;">
+                            <div style="font-size:24px;margin-bottom:8px;">🔒</div>
+                            <div style="color:#aaa;font-size:14px;margin-bottom:14px;">Connect Discord to track your submission &amp; earn the <strong style="color:#9B59B6;">Verified Artist</strong> badge</div>
+                            <button onclick="loginDiscord()" style="padding:10px 22px;background:rgba(88,101,242,0.3);border:1px solid rgba(88,101,242,0.5);border-radius:8px;color:#7289DA;font-weight:700;cursor:pointer;font-size:14px;">Connect Discord</button>
+                        </div>
+
+                        <!-- Submission form (always visible) -->
+                        <div id="c9-submit-form">
+                            <div style="display:flex;flex-direction:column;gap:14px;">
+                                <div>
+                                    <label style="color:#00FFD1;font-size:12px;font-weight:700;letter-spacing:1px;display:block;margin-bottom:6px;">ARTIST NAME *</label>
+                                    <input type="text" id="c9-artist-name" placeholder="Your artist name" style="width:100%;padding:11px 14px;background:rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.15);border-radius:8px;color:#fff;font-size:14px;outline:none;box-sizing:border-box;">
+                                </div>
+                                <div>
+                                    <label style="color:#00FFD1;font-size:12px;font-weight:700;letter-spacing:1px;display:block;margin-bottom:6px;">TRACK TITLE *</label>
+                                    <input type="text" id="c9-track-name" placeholder="Track title" style="width:100%;padding:11px 14px;background:rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.15);border-radius:8px;color:#fff;font-size:14px;outline:none;box-sizing:border-box;">
+                                </div>
+                                <div>
+                                    <label style="color:#00FFD1;font-size:12px;font-weight:700;letter-spacing:1px;display:block;margin-bottom:6px;">AUDIO FILE (MP3 or WAV) *</label>
+                                    <div id="c9-drop-zone" onclick="document.getElementById('c9-file-input').click()" ondrop="c9HandleDrop(event)" ondragover="event.preventDefault();this.style.borderColor='#9B59B6'" ondragleave="this.style.borderColor='rgba(155,89,182,0.3)'" style="border:2px dashed rgba(155,89,182,0.3);border-radius:10px;padding:28px;text-align:center;cursor:pointer;transition:border-color 0.2s;">
+                                        <div style="font-size:28px;margin-bottom:8px;">🎵</div>
+                                        <div id="c9-file-label" style="color:#888;font-size:13px;">Drop file here or click to browse</div>
+                                        <div style="color:#555;font-size:11px;margin-top:4px;">MP3 · WAV · Max no limit · Min 30s</div>
+                                    </div>
+                                    <input type="file" id="c9-file-input" accept=".mp3,.wav" style="display:none;" onchange="c9FileSelected(this)">
+                                </div>
+                                <div style="background:rgba(255,215,0,0.06);border:1px solid rgba(255,215,0,0.2);border-radius:8px;padding:12px 14px;">
+                                    <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;">
+                                        <input type="checkbox" id="c9-terms-check" style="margin-top:2px;flex-shrink:0;">
+                                        <span style="color:#aaa;font-size:12px;line-height:1.6;">I confirm this is original music I created or co-created. I have not ripped this from YouTube, SoundCloud, Spotify, or any streaming platform. I grant Cloud 9 Radio the right to broadcast this track.</span>
+                                    </label>
+                                </div>
+                                <div id="c9-submit-progress" style="display:none;">
+                                    <div style="background:rgba(155,89,182,0.1);border-radius:8px;height:6px;overflow:hidden;">
+                                        <div id="c9-submit-bar" style="height:100%;width:0%;background:linear-gradient(90deg,#9B59B6,#7D3C98);border-radius:8px;transition:width 0.3s;"></div>
+                                    </div>
+                                    <div id="c9-submit-status" style="color:#9B59B6;font-size:12px;margin-top:6px;font-family:'DM Mono',monospace;"></div>
+                                </div>
+                                <button onclick="c9SubmitTrack()" id="c9-submit-btn" style="padding:14px;background:linear-gradient(135deg,#9B59B6,#7D3C98);border:none;border-radius:10px;color:#fff;font-weight:800;font-size:15px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">🚀 Submit to Cloud 9 Radio</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SUBMISSION RULES -->
+                <div style="background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:28px;margin-bottom:28px;">
+                    <h3 style="font-size:18px;font-weight:700;color:#00FFD1;margin-bottom:20px;">📋 Submission Guidelines</h3>
+                    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;">
+                        <div style="background:rgba(0,255,136,0.06);border:1px solid rgba(0,255,136,0.2);border-radius:10px;padding:18px;">
+                            <div style="font-size:20px;margin-bottom:8px;">✅</div>
+                            <div style="color:#00FF88;font-size:14px;font-weight:700;margin-bottom:6px;">What We Accept</div>
+                            <ul style="color:#aaa;font-size:13px;line-height:1.8;padding-left:16px;">
+                                <li>Original music you created</li>
+                                <li>MP3 or WAV format</li>
+                                <li>Between 30 seconds and 15 minutes</li>
+                                <li>Clean metadata (no platform tags)</li>
+                            </ul>
+                        </div>
+                        <div style="background:rgba(255,107,107,0.06);border:1px solid rgba(255,107,107,0.2);border-radius:10px;padding:18px;">
+                            <div style="font-size:20px;margin-bottom:8px;">❌</div>
+                            <div style="color:#FF6B6B;font-size:14px;font-weight:700;margin-bottom:6px;">What We Reject</div>
+                            <ul style="color:#aaa;font-size:13px;line-height:1.8;padding-left:16px;">
+                                <li>Rips from YouTube, Spotify, SoundCloud</li>
+                                <li>Music you don't own the rights to</li>
+                                <li>Files with platform metadata/watermarks</li>
+                                <li>Tracks under 30 seconds</li>
+                            </ul>
+                        </div>
+                        <div style="background:rgba(0,255,209,0.06);border:1px solid rgba(0,255,209,0.2);border-radius:10px;padding:18px;">
+                            <div style="font-size:20px;margin-bottom:8px;">🛡️</div>
+                            <div style="color:#00FFD1;font-size:14px;font-weight:700;margin-bottom:6px;">How We Scan</div>
+                            <ul style="color:#aaa;font-size:13px;line-height:1.8;padding-left:16px;">
+                                <li>Audio fingerprint check (custom engine)</li>
+                                <li>Metadata tag scan for platform IDs</li>
+                                <li>Duration validation (30s – 15min)</li>
+                                <li>Auto-approved if scan passes</li>
+                            </ul>
+                        </div>
+                        <div style="background:rgba(255,215,0,0.06);border:1px solid rgba(255,215,0,0.2);border-radius:10px;padding:18px;">
+                            <div style="font-size:20px;margin-bottom:8px;">🎤</div>
+                            <div style="color:#FFD700;font-size:14px;font-weight:700;margin-bottom:6px;">Featured Artists</div>
+                            <ul style="color:#aaa;font-size:13px;line-height:1.8;padding-left:16px;">
+                                <li>Jake Kade — preloaded</li>
+                                <li>Noah Kade — preloaded</li>
+                                <li>Ryder Lane — preloaded</li>
+                                <li>Your music — submitted pool</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     BOT PAGE SECTION
+════════════════════════════════════════════════════════════════ -->
+        <section id="botpage" class="tab-content">
+            <div class="container">
+
+                <!-- HERO -->
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;padding:60px 0 80px;min-height:70vh;" class="botpage-hero-grid">
+                    <div>
+                        <div style="display:inline-flex;align-items:center;gap:8px;padding:6px 16px;background:rgba(0,255,209,0.1);border:1px solid rgba(0,255,209,0.3);border-radius:20px;margin-bottom:24px;">
+                            <span style="width:8px;height:8px;background:#00FF88;border-radius:50%;animation:pulse 1.5s infinite;display:inline-block;"></span>
+                            <span style="font-size:12px;color:#00FFD1;font-weight:700;letter-spacing:1.5px;font-family:'DM Mono',monospace;">BOT IS ONLINE</span>
+                        </div>
+                        <h1 style="font-size:clamp(36px,5vw,64px);font-weight:800;line-height:1.1;margin-bottom:20px;background:linear-gradient(135deg,#ffffff,#00FFD1);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Stan's Beat Bot</h1>
+                        <p style="font-size:18px;color:rgba(255,255,255,0.7);margin-bottom:12px;line-height:1.7;">An independent music bot built from scratch by <strong style="color:#00FFD1;">Kurrasch Systems</strong> — featuring American Dad characters as radio hosts because that's what makes it fun.</p>
+                        <p style="font-size:15px;color:rgba(255,255,255,0.45);margin-bottom:36px;line-height:1.7;">Not affiliated with Fox, Disney, or the show's creators. This is fan-made — a real product built by real people who love both music and American Dad.</p>
+                        <div style="display:flex;gap:16px;flex-wrap:wrap;">
+                            <a href="https://discord.com/oauth2/authorize?client_id=1049861443111112744&permissions=8&response_type=code&redirect_uri=https%3A%2F%2Fstansbeatbot.online%2F&integration_type=0&scope=identify+bot+guilds" class="btn-primary" target="_blank" style="font-size:18px;padding:16px 36px;">Add to Discord</a>
+                            <a href="#premium" class="btn-secondary" style="font-size:16px;padding:16px 28px;">Go Premium</a>
+                        </div>
+                    </div>
+                    <div style="display:flex;justify-content:center;align-items:center;">
+                        <div style="position:relative;width:320px;height:320px;">
+                            <div style="position:absolute;inset:-20px;border-radius:50%;background:radial-gradient(circle,rgba(0,255,209,0.15),transparent 70%);filter:blur(20px);animation:sbbGlowPulse 3s ease-in-out infinite;"></div>
+                            <img src="https://static.wixstatic.com/media/b9bfc7_805cceba65204a8c9bf1e106e3f67f3d~mv2.png" alt="Stan's Beat Bot" style="width:100%;height:100%;object-fit:contain;border-radius:20px;position:relative;z-index:1;">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- WHAT YOU'RE PAYING FOR — TRANSPARENCY SECTION -->
+                <div style="background:rgba(0,255,209,0.04);border:2px solid rgba(0,255,209,0.2);border-radius:20px;padding:48px;margin-bottom:60px;">
+                    <div style="text-align:center;margin-bottom:36px;">
+                        <h2 style="font-size:36px;font-weight:800;color:#fff;margin-bottom:12px;">💳 What You're Actually Paying For</h2>
+                        <p style="color:#888;font-size:16px;max-width:700px;margin:0 auto;">We charge for what <strong style="color:#fff;">we built</strong> — not for what someone else created. Full transparency, no exceptions.</p>
+                    </div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:40px;" class="botpage-split-grid">
+                        <div>
+                            <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
+                                <div style="width:40px;height:40px;background:linear-gradient(135deg,#00FFD1,#00CCA5);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">✅</div>
+                                <div style="font-size:18px;font-weight:700;color:#00FFD1;">What premium includes</div>
+                            </div>
+                            <div style="display:flex;flex-direction:column;gap:12px;">
+                                <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:rgba(0,0,0,0.3);border-radius:10px;">
+                                    <span style="font-size:18px;">⚙️</span>
+                                    <div><div style="color:#fff;font-size:14px;font-weight:600;">The Bot Infrastructure</div><div style="color:#555;font-size:12px;">Queue system, server management, uptime, hosting</div></div>
+                                </div>
+                                <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:rgba(0,0,0,0.3);border-radius:10px;">
+                                    <span style="font-size:18px;">🧠</span>
+                                    <div><div style="color:#fff;font-size:14px;font-weight:600;">AI Recommendations Engine</div><div style="color:#555;font-size:12px;">Built from scratch — learns your server's taste</div></div>
+                                </div>
+                                <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:rgba(0,0,0,0.3);border-radius:10px;">
+                                    <span style="font-size:18px;">🎛️</span>
+                                    <div><div style="color:#fff;font-size:14px;font-weight:600;">Audio Processing Features</div><div style="color:#555;font-size:12px;">Bass boost, nightcore, crossfade — all custom built</div></div>
+                                </div>
+                                <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:rgba(0,0,0,0.3);border-radius:10px;">
+                                    <span style="font-size:18px;">🌐</span>
+                                    <div><div style="color:#fff;font-size:14px;font-weight:600;">The Web Player &amp; Site</div><div style="color:#555;font-size:12px;">This entire site + the player you're using right now</div></div>
+                                </div>
+                                <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:rgba(0,0,0,0.3);border-radius:10px;">
+                                    <span style="font-size:18px;">📻</span>
+                                    <div><div style="color:#fff;font-size:14px;font-weight:600;">The Radio Segment Recordings</div><div style="color:#555;font-size:12px;">Custom-produced audio — our creative work, not the show's IP</div></div>
+                                </div>
+                                <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:rgba(0,0,0,0.3);border-radius:10px;">
+                                    <span style="font-size:18px;">🔒</span>
+                                    <div><div style="color:#fff;font-size:14px;font-weight:600;">Nova Frame Security Layer</div><div style="color:#555;font-size:12px;">Kurrasch Systems' own security infrastructure</div></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
+                                <div style="width:40px;height:40px;background:linear-gradient(135deg,#FF6B6B,#FF8E53);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">❌</div>
+                                <div style="font-size:18px;font-weight:700;color:#FF6B6B;">What we never charge for</div>
+                            </div>
+                            <div style="background:rgba(255,107,107,0.06);border:1px solid rgba(255,107,107,0.2);border-radius:14px;padding:24px;">
+                                <p style="color:#aaa;font-size:14px;line-height:1.8;margin-bottom:16px;">We do <strong style="color:#fff;">not</strong> charge for any American Dad characters, audio clips, show references, or related intellectual property. All of that belongs to its rightful owners.</p>
+                                <p style="color:#aaa;font-size:14px;line-height:1.8;margin-bottom:16px;">The radio host characters used in this bot are our <strong style="color:#fff;">own creative productions</strong> — fan-made audio built by Kurrasch Systems specifically for this project. They're not clips from the show.</p>
+                                <p style="color:#aaa;font-size:14px;line-height:1.8;">We're fans building tools for other fans. The premium subscription pays for the engineering, hosting, and production time that keeps the bot running.</p>
+                                <div style="margin-top:20px;padding:14px;background:rgba(0,0,0,0.3);border-radius:10px;border-left:3px solid #FF6B6B;">
+                                    <p style="color:#FF6B6B;font-size:12px;font-weight:700;margin-bottom:4px;">LEGAL NOTICE</p>
+                                    <p style="color:#888;font-size:12px;line-height:1.7;">American Dad, its characters, and all related marks are property of Seth MacFarlane, 20th Television Animation, and The Walt Disney Company. This is an unofficial fan project with no affiliation.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- THE FANBASE -->
+                <div style="text-align:center;margin-bottom:48px;">
+                    <h2 style="font-size:40px;font-weight:800;color:#fff;margin-bottom:16px;">🤝 Built for the Community</h2>
+                    <p style="color:#888;font-size:16px;max-width:700px;margin:0 auto 40px;">We started on another platform with limits we kept hitting. So we built our own — no restrictions, no compromises, built exactly the way we wanted it.</p>
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:24px;margin-bottom:60px;">
+                    <div style="background:rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:28px;text-align:center;">
+                        <div style="font-size:40px;margin-bottom:16px;">🎵</div>
+                        <h3 style="color:#00FFD1;font-size:18px;margin-bottom:10px;">High-Quality Audio</h3>
+                        <p style="color:#888;font-size:14px;line-height:1.7;">320kbps streaming with a custom audio pipeline. No degradation, no buffering, just clean sound.</p>
+                    </div>
+                    <div style="background:rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:28px;text-align:center;">
+                        <div style="font-size:40px;margin-bottom:16px;">🎭</div>
+                        <h3 style="color:#00FFD1;font-size:18px;margin-bottom:10px;">American Dad Radio</h3>
+                        <p style="color:#888;font-size:14px;line-height:1.7;">Custom-produced character commentary between tracks. Stan, Roger, Steve, Francine, Hayley, and Klaus — all hosting your queue.</p>
+                    </div>
+                    <div style="background:rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:28px;text-align:center;">
+                        <div style="font-size:40px;margin-bottom:16px;">📻</div>
+                        <h3 style="color:#00FFD1;font-size:18px;margin-bottom:10px;">Cloud 9 Radio</h3>
+                        <p style="color:#888;font-size:14px;line-height:1.7;">Our own independent radio station. Submit your original music and get on air alongside featured artists.</p>
+                    </div>
+                    <div style="background:rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:28px;text-align:center;">
+                        <div style="font-size:40px;margin-bottom:16px;">🤖</div>
+                        <h3 style="color:#00FFD1;font-size:18px;margin-bottom:10px;">AI-Powered</h3>
+                        <p style="color:#888;font-size:14px;line-height:1.7;">Auto DJ, mood detection, smart recommendations — all built in-house, not a third-party plugin.</p>
+                    </div>
+                    <div style="background:rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:28px;text-align:center;">
+                        <div style="font-size:40px;margin-bottom:16px;">🔒</div>
+                        <h3 style="color:#00FFD1;font-size:18px;margin-bottom:10px;">Nova Frame Security</h3>
+                        <p style="color:#888;font-size:14px;line-height:1.7;">Kurrasch Systems' own security layer. Your server's data stays protected and private.</p>
+                    </div>
+                    <div style="background:rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:28px;text-align:center;">
+                        <div style="font-size:40px;margin-bottom:16px;">🌐</div>
+                        <h3 style="color:#00FFD1;font-size:18px;margin-bottom:10px;">Full Web Player</h3>
+                        <p style="color:#888;font-size:14px;line-height:1.7;">Control the bot from your browser. Search, queue, skip — without opening Discord.</p>
+                    </div>
+                </div>
+
+                <!-- INVITE CTA -->
+                <div style="text-align:center;background:linear-gradient(135deg,rgba(0,255,209,0.08),rgba(0,204,165,0.04));border:1px solid rgba(0,255,209,0.2);border-radius:20px;padding:60px 40px;">
+                    <h2 style="font-size:40px;font-weight:800;color:#fff;margin-bottom:16px;">Ready to add it?</h2>
+                    <p style="color:#888;font-size:16px;max-width:500px;margin:0 auto 32px;">Free to start. Premium unlocks everything we built. No tricks, no paywalled characters — just the bot we worked hard to make.</p>
+                    <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;">
+                        <a href="https://discord.com/oauth2/authorize?client_id=1049861443111112744&permissions=8&response_type=code&redirect_uri=https%3A%2F%2Fstansbeatbot.online%2F&integration_type=0&scope=identify+bot+guilds" class="btn-primary" target="_blank" style="font-size:18px;padding:18px 40px;">Add to Discord — It's Free</a>
+                        <a href="https://discord.gg/AKHnnNrjZN" class="btn-secondary" target="_blank" style="font-size:16px;padding:18px 30px;">Join Support Server</a>
+                    </div>
+                    <p style="color:#555;font-size:13px;margin-top:20px;">Serving <span id="botpage-server-count" style="color:#00FFD1;">—</span> servers · <span id="botpage-user-count" style="color:#00FFD1;">—</span> users · Built by Kurrasch Systems</p>
+                </div>
+
+            </div>
+        </section>
     <footer>
         <div class="container">
             <div class="footer-grid">
@@ -4256,6 +4633,8 @@
                     <p><a href="#premium">Premium</a></p>
                     <p><a href="#gang">Meet The Gang</a></p>
                     <p><a href="#status">Bot Status</a></p>
+                    <p><a href="#cloud9">Cloud 9 Radio</a></p>
+                    <p><a href="#botpage">About the Bot</a></p>
                 </div>
                 <div>
                     <h3>Resources</h3>
@@ -4263,6 +4642,7 @@
                     <p><a href="#" onclick="openLegalModal('subscription-tos'); return false;">Subscription ToS</a></p>
                     <p><a href="#" onclick="openLegalModal('privacy'); return false;">Privacy Policy</a></p>
                     <p><a href="#" onclick="openLegalModal('tos'); return false;">Terms of Service</a></p>
+                    <p><a href="#" onclick="openLegalModal('c9tos'); return false;">Cloud 9 Radio Rules</a></p>
                 </div>
                 <div>
                     <h3>Connect</h3>
@@ -5624,7 +6004,6 @@
                 // Update now playing
                 if (data.current) {
                     var c = data.current;
-                    window._sbbCurrentSong = c;  // expose for YouTube view registration
                     sbbSetTrack(c.title, c.artist || c.channel || c.author || '—', '');
                     sbbSetArt(c.thumbnail);
                     // Sync duration from API (ms → seconds)
@@ -6738,6 +7117,26 @@
                     <p>Questions about these terms? Contact us via the <a href="https://discord.gg/AKHnnNrjZN" target="_blank" style="color:#00FFD1;">Support Server</a>.</p>
                 </div>
             </div>
+
+            <!-- CLOUD 9 RADIO RULES -->
+            <div id="modal-c9tos" class="legal-page" style="display:none;">
+                <h2 style="color:#9B59B6;margin-bottom:8px;">Cloud 9 Radio — Submission Rules</h2>
+                <p style="color:#555;font-size:13px;font-family:'DM Mono',monospace;margin-bottom:28px;">Kurrasch Systems · Cloud 9 Radio</p>
+                <div style="color:#aaa;font-size:14px;line-height:1.8;">
+                    <h4 style="color:#fff;margin:20px 0 8px;">1. Original Music Only</h4>
+                    <p>You may only submit music that you created or co-created. Rips from YouTube, SoundCloud, Spotify, or any other platform are prohibited and will be automatically rejected by our audio fingerprint scanner.</p>
+                    <h4 style="color:#fff;margin:20px 0 8px;">2. Ownership &amp; Rights</h4>
+                    <p>By submitting you confirm you own full rights to the track. You grant Cloud 9 Radio a non-exclusive broadcast license. You retain full ownership of your music.</p>
+                    <h4 style="color:#fff;margin:20px 0 8px;">3. Technical Requirements</h4>
+                    <p>MP3 or WAV only. Between 30 seconds and 15 minutes. No platform metadata tags. Files are scanned on submission — rejection is immediate if requirements are not met.</p>
+                    <h4 style="color:#fff;margin:20px 0 8px;">4. Approval Process</h4>
+                    <p>Tracks are auto-approved if they pass the scan. The station owner receives a notification for every approved submission and reserves the right to remove tracks at any time.</p>
+                    <h4 style="color:#fff;margin:20px 0 8px;">5. No Compensation</h4>
+                    <p>Submission does not entitle artists to monetary compensation. Cloud 9 Radio is a community discovery station, not a commercial distribution platform.</p>
+                    <h4 style="color:#fff;margin:20px 0 8px;">6. Contact</h4>
+                    <p>Questions? <a href="https://discord.gg/AKHnnNrjZN" target="_blank" style="color:#9B59B6;">Support Server</a>.</p>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -6788,72 +7187,6 @@
                 .catch(function() { list.innerHTML = '<span style="color:#FF6B6B;">❌ Could not fetch members</span>'; });
         }
     </script>
-    <!-- Hidden YouTube iframe — loads official embed to register real views for artists -->
-    <div id="yt-view-container" style="position:fixed;width:1px;height:1px;bottom:-9999px;left:-9999px;overflow:hidden;pointer-events:none;opacity:0.01;" aria-hidden="true">
-        <iframe id="yt-view-frame" width="1" height="1" frameborder="0" allow="autoplay" allowfullscreen></iframe>
-    </div>
-
-    <script>
-        // ═══════════════════════════════════════════════════
-        // YOUTUBE VIEW REGISTRATION
-        // Loads the official YouTube embed whenever a new song
-        // starts — registers a real view for the artist.
-        // Iframe is 1x1px hidden off-screen, muted, no audio.
-        // ═══════════════════════════════════════════════════
-        var _ytLastVideoId = null;
-
-        function ytExtractVideoId(urlOrId) {
-            if (!urlOrId) return null;
-            if (/^[a-zA-Z0-9_-]{11}$/.test(urlOrId)) return urlOrId;
-            var m = urlOrId.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/);
-            return m ? m[1] : null;
-        }
-
-        function ytRegisterView(videoId) {
-            if (!videoId || videoId === _ytLastVideoId) return;
-            _ytLastVideoId = videoId;
-            var frame = document.getElementById('yt-view-frame');
-            if (!frame) return;
-            // autoplay=1 triggers the embed — YouTube counts this as a view.
-            // mute=1 so no audio bleeds through. Cleared after 35s.
-            frame.src = 'https://www.youtube.com/embed/' + videoId
-                + '?autoplay=1&mute=1&controls=0&rel=0&modestbranding=1';
-            clearTimeout(frame._clearTimer);
-            frame._clearTimer = setTimeout(function() {
-                if (frame.src.indexOf(videoId) !== -1) frame.src = 'about:blank';
-            }, 35000);
-        }
-
-        // Hook sbbSetArt — called every time a new track starts
-        var _origSbbSetArt = sbbSetArt;
-        sbbSetArt = function(url) {
-            _origSbbSetArt(url);
-            try {
-                var videoId = null;
-                var song = window._sbbCurrentSong;
-                if (song) {
-                    videoId = ytExtractVideoId(song.url)
-                        || ytExtractVideoId(song.webpage_url)
-                        || ytExtractVideoId(song.id);
-                }
-                if (videoId) ytRegisterView(videoId);
-            } catch(e) {}
-        };
-
-        // Also hook web-mode search result plays
-        var _origSbbPlayWebQueueIndex = sbbPlayWebQueueIndex;
-        sbbPlayWebQueueIndex = function(idx) {
-            _origSbbPlayWebQueueIndex(idx);
-            try {
-                var song = SBB.webQueue[idx];
-                if (song) {
-                    var videoId = ytExtractVideoId(song.url) || ytExtractVideoId(song.id);
-                    if (videoId) ytRegisterView(videoId);
-                }
-            } catch(e) {}
-        };
-    </script>
-
     <script>
         function openLegalModal(page) {
             document.querySelectorAll('.legal-page').forEach(function(el) { el.style.display = 'none'; });
@@ -6866,6 +7199,396 @@
             document.getElementById('legal-modal-overlay').style.display = 'none';
             document.body.style.overflow = '';
         }
+    </script>
+
+    <script>
+    // ═══════════════════════════════════════════════════
+    // CLOUD 9 RADIO — SITE ENGINE
+    // ═══════════════════════════════════════════════════
+    var c9Pool = [];
+    var c9PoolFiltered = [];
+    var c9SelectedFile = null;
+
+    // Poll Cloud 9 now-playing status
+    async function c9PollStatus() {
+        var serverId = SBB.serverId || getActiveServerId();
+        if (!serverId) { c9SetIdle(); return; }
+        try {
+            var r = await fetch(API_BASE + '/api/c9/status/' + serverId);
+            if (!r.ok) { c9SetIdle(); return; }
+            var d = await r.json();
+            var titleEl  = document.getElementById('c9-track-title');
+            var artistEl = document.getElementById('c9-track-artist');
+            var artEl    = document.getElementById('c9-art');
+            var countEl  = document.getElementById('c9-pool-count');
+            if (d.active && d.currentSong) {
+                if (titleEl)  titleEl.textContent  = d.currentSong.title  || 'Unknown Track';
+                if (artistEl) artistEl.textContent = d.currentSong.artist || '—';
+                if (countEl)  countEl.textContent  = (d.poolSize || 0) + ' tracks';
+            } else {
+                c9SetIdle();
+            }
+        } catch(e) { c9SetIdle(); }
+    }
+
+    function c9SetIdle() {
+        var titleEl  = document.getElementById('c9-track-title');
+        var artistEl = document.getElementById('c9-track-artist');
+        var countEl  = document.getElementById('c9-pool-count');
+        if (titleEl)  titleEl.textContent  = 'Cloud 9 Radio — Not broadcasting';
+        if (artistEl) artistEl.textContent = 'Start with /c9radio in Discord';
+        if (countEl)  countEl.textContent  = 'OFFLINE';
+    }
+
+    // Tune in — puts it in the main player
+    function c9TuneIn() {
+        sbbSetTrack('Cloud 9 Radio', 'Independent Artist Station', '📻 Cloud 9 Broadcasting');
+        sbbSetMode('discord');
+        document.getElementById('sbb-on-air-text').textContent = 'CLOUD 9';
+        document.getElementById('sbb-on-air').className = 'sbb-on-air';
+        document.getElementById('sbb-on-air').style.background = 'rgba(155,89,182,0.15)';
+        document.getElementById('sbb-on-air').style.borderColor = 'rgba(155,89,182,0.3)';
+        showToast('📻 Tuned into Cloud 9 Radio');
+        // Navigate to radio/player tab
+        navigateTo('radio');
+    }
+
+    // Load track pool from API
+    async function c9LoadPool() {
+        var listEl = document.getElementById('c9-pool-list');
+        var totalEl = document.getElementById('c9-total-count');
+        if (!listEl) return;
+        try {
+            var r = await fetch(API_BASE + '/api/c9/pool');
+            if (!r.ok) throw new Error('Pool unavailable');
+            var d = await r.json();
+            c9Pool = d.tracks || [];
+            c9PoolFiltered = c9Pool.slice();
+            if (totalEl) totalEl.textContent = c9Pool.length + ' tracks in pool';
+            c9RenderPool();
+        } catch(e) {
+            c9Pool = [];
+            c9PoolFiltered = [];
+            if (listEl) listEl.innerHTML = '<div style="color:#444;font-size:13px;text-align:center;padding:40px 0;">No tracks yet — be the first to submit!</div>';
+            if (totalEl) totalEl.textContent = '0 tracks';
+        }
+    }
+
+    function c9RenderPool() {
+        var listEl = document.getElementById('c9-pool-list');
+        if (!listEl) return;
+        if (!c9PoolFiltered.length) {
+            listEl.innerHTML = '<div style="color:#444;font-size:13px;text-align:center;padding:20px 0;">No tracks match your search</div>';
+            return;
+        }
+        var typeColors = { preloaded: '#FFD700', submission: '#9B59B6' };
+        var typeLabels = { preloaded: '⭐ Featured', submission: '📤 Community' };
+        listEl.innerHTML = c9PoolFiltered.map(function(t, i) {
+            var tc = typeColors[t.type] || '#555';
+            var tl = typeLabels[t.type] || t.type;
+            return '<div style="display:flex;align-items:center;gap:12px;padding:10px 6px;border-bottom:1px solid rgba(255,255,255,0.04);transition:background 0.15s;" onmouseover="this.style.background=\'rgba(255,255,255,0.04)\'" onmouseout="this.style.background=\'\'">'+
+                '<span style="font-size:12px;color:#333;width:22px;text-align:center;font-family:\'DM Mono\',monospace;">' + (i+1) + '</span>'+
+                '<div style="flex:1;min-width:0;">'+
+                    '<div style="font-size:13px;color:#ddd;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + htmlEsc(t.title) + '</div>'+
+                    '<div style="font-size:11px;color:#666;">' + htmlEsc(t.artist) + '</div>'+
+                '</div>'+
+                '<span style="font-size:10px;padding:3px 8px;border-radius:10px;background:rgba(0,0,0,0.4);border:1px solid ' + tc + '33;color:' + tc + ';white-space:nowrap;">' + tl + '</span>'+
+                '</div>';
+        }).join('');
+    }
+
+    function c9FilterTracks() {
+        var q = (document.getElementById('c9-search-input').value || '').toLowerCase();
+        if (!q) {
+            c9PoolFiltered = c9Pool.slice();
+        } else {
+            c9PoolFiltered = c9Pool.filter(function(t) {
+                return (t.title || '').toLowerCase().indexOf(q) !== -1 ||
+                       (t.artist || '').toLowerCase().indexOf(q) !== -1;
+            });
+        }
+        c9RenderPool();
+    }
+
+    // File selection
+    function c9FileSelected(input) {
+        var file = input.files[0];
+        if (!file) return;
+        c9SelectedFile = file;
+        var labelEl = document.getElementById('c9-file-label');
+        if (labelEl) {
+            var sizeMB = (file.size / 1024 / 1024).toFixed(1);
+            labelEl.innerHTML = '<span style="color:#00FFD1;">✅ ' + htmlEsc(file.name) + ' (' + sizeMB + ' MB)</span>';
+        }
+        var dropZone = document.getElementById('c9-drop-zone');
+        if (dropZone) dropZone.style.borderColor = '#9B59B6';
+    }
+
+    function c9HandleDrop(event) {
+        event.preventDefault();
+        var dt = event.dataTransfer;
+        if (dt && dt.files && dt.files[0]) {
+            var fakeInput = { files: dt.files };
+            c9FileSelected(fakeInput);
+            c9SelectedFile = dt.files[0];
+        }
+        var dropZone = document.getElementById('c9-drop-zone');
+        if (dropZone) dropZone.style.borderColor = 'rgba(155,89,182,0.3)';
+    }
+
+    // Submit track
+    async function c9SubmitTrack() {
+        var artistName  = (document.getElementById('c9-artist-name').value  || '').trim();
+        var trackName   = (document.getElementById('c9-track-name').value   || '').trim();
+        var termsCheck  = document.getElementById('c9-terms-check').checked;
+        var progressWrap = document.getElementById('c9-submit-progress');
+        var progressBar  = document.getElementById('c9-submit-bar');
+        var progressStat = document.getElementById('c9-submit-status');
+        var submitBtn    = document.getElementById('c9-submit-btn');
+
+        // Validation
+        if (!artistName) { showToast('⚠️ Enter your artist name'); return; }
+        if (!trackName)  { showToast('⚠️ Enter the track title'); return; }
+        if (!c9SelectedFile) { showToast('⚠️ Choose an audio file (MP3 or WAV)'); return; }
+        if (!termsCheck) { showToast('⚠️ Please confirm you own this music'); return; }
+
+        var ext = c9SelectedFile.name.split('.').pop().toLowerCase();
+        if (ext !== 'mp3' && ext !== 'wav') { showToast('❌ Only MP3 and WAV files accepted'); return; }
+
+        // Disable button + show progress
+        if (submitBtn)    submitBtn.disabled = true;
+        if (progressWrap) progressWrap.style.display = 'block';
+        if (progressBar)  progressBar.style.width = '15%';
+        if (progressStat) progressStat.textContent = '📂 Reading file...';
+
+        try {
+            // Read file as base64
+            var base64Data = await new Promise(function(resolve, reject) {
+                var reader = new FileReader();
+                reader.onload = function() { resolve(reader.result.split(',')[1]); };
+                reader.onerror = function() { reject(new Error('Could not read file')); };
+                reader.readAsDataURL(c9SelectedFile);
+            });
+            if (progressBar)  progressBar.style.width = '35%';
+            if (progressStat) progressStat.textContent = '🔍 Scanning for originality...';
+
+            // Build payload
+            var userId   = currentUser ? currentUser.id       : 'web-' + Date.now();
+            var username = currentUser ? currentUser.username  : artistName;
+            var payload  = {
+                userId:     userId,
+                username:   username,
+                fileBase64: base64Data,
+                filename:   trackName.replace(/[^a-z0-9 _-]/gi, '_') + '.' + ext,
+                artistName: artistName,
+                trackTitle: trackName
+            };
+
+            if (progressBar)  progressBar.style.width = '60%';
+            if (progressStat) progressStat.textContent = '📡 Uploading to Cloud 9 Radio...';
+
+            var r = await fetch(API_BASE + '/api/c9/submit', {
+                method:  'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body:    JSON.stringify(payload)
+            });
+
+            if (progressBar) progressBar.style.width = '85%';
+            var result = await r.json();
+
+            if (!r.ok || !result.success) {
+                throw new Error(result.reason || result.error || 'Submission failed');
+            }
+
+            // Success
+            if (progressBar)  { progressBar.style.width = '100%'; progressBar.style.background = 'linear-gradient(90deg,#00FF88,#00CCA5)'; }
+            if (progressStat) progressStat.textContent = '✅ Track approved and added to Cloud 9 Radio!';
+            showToast('🎤 "' + trackName + '" is now on Cloud 9 Radio!');
+
+            // Reset form
+            setTimeout(function() {
+                document.getElementById('c9-artist-name').value = '';
+                document.getElementById('c9-track-name').value  = '';
+                document.getElementById('c9-file-input').value  = '';
+                document.getElementById('c9-terms-check').checked = false;
+                document.getElementById('c9-file-label').innerHTML = 'Drop file here or click to browse';
+                document.getElementById('c9-drop-zone').style.borderColor = 'rgba(155,89,182,0.3)';
+                if (progressBar)  { progressBar.style.width = '0%'; progressBar.style.background = 'linear-gradient(90deg,#9B59B6,#7D3C98)'; }
+                if (progressWrap) progressWrap.style.display = 'none';
+                if (submitBtn)    submitBtn.disabled = false;
+                c9SelectedFile = null;
+                // Reload pool so new track appears
+                c9LoadPool();
+                // Grant C9 contributor badge locally
+                c9UnlockBadge('c9contributor');
+            }, 3000);
+
+        } catch(e) {
+            if (progressBar)  { progressBar.style.width = '100%'; progressBar.style.background = 'linear-gradient(90deg,#FF6B6B,#FF8E53)'; }
+            if (progressStat) progressStat.textContent = '❌ ' + (e.message || 'Submission failed');
+            if (submitBtn)    submitBtn.disabled = false;
+            showToast('❌ ' + (e.message || 'Submission failed'));
+        }
+    }
+
+    // Unlock a C9 badge client-side
+    function c9UnlockBadge(badgeId) {
+        var card   = document.getElementById('badge-' + badgeId);
+        var status = document.getElementById('badge-' + badgeId + '-status');
+        if (card)   card.classList.add('unlocked');
+        if (status) status.textContent = '✅ Earned';
+        // Persist in localStorage so it survives page reload
+        var earned = JSON.parse(localStorage.getItem('sbb_badges') || '[]');
+        if (earned.indexOf(badgeId) === -1) {
+            earned.push(badgeId);
+            localStorage.setItem('sbb_badges', JSON.stringify(earned));
+        }
+    }
+
+    // Show login prompt hint for guests on C9 submit
+    function c9UpdateSubmitLoginHint() {
+        var prompt = document.getElementById('c9-submit-login-prompt');
+        if (!prompt) return;
+        prompt.style.display = currentUser ? 'none' : 'block';
+    }
+
+    // Auto-poll Cloud 9 status when tab is visible
+    function c9StartPolling() {
+        c9PollStatus();
+        c9LoadPool();
+        c9UpdateSubmitLoginHint();
+    }
+
+    // Wire into navigateTo
+    var _origNavigateTo = navigateTo;
+    navigateTo = function(target, doPush) {
+        _origNavigateTo(target, doPush);
+        if (target === 'cloud9')  c9StartPolling();
+        if (target === 'botpage') {
+            // Update live stats on bot page
+            fetch(API_BASE + '/api/stats').then(function(r){ return r.json(); }).then(function(d){
+                var sc = document.getElementById('botpage-server-count');
+                var uc = document.getElementById('botpage-user-count');
+                if (sc) sc.textContent = (d.servers || 0).toLocaleString();
+                if (uc) uc.textContent = (d.users   || 0).toLocaleString();
+            }).catch(function(){});
+        }
+    };
+
+    // Poll Cloud 9 every 10s if the tab is open
+    setInterval(function() {
+        var el = document.getElementById('cloud9');
+        if (el && el.classList.contains('active')) c9PollStatus();
+    }, 10000);
+
+    // ═══════════════════════════════════════════════════
+    // EXTENDED BADGE LOGIC
+    // ═══════════════════════════════════════════════════
+
+    // Restore locally-earned badges from localStorage on page load
+    (function restoreLocalBadges() {
+        var earned = JSON.parse(localStorage.getItem('sbb_badges') || '[]');
+        earned.forEach(function(id) {
+            var card   = document.getElementById('badge-' + id);
+            var status = document.getElementById('badge-' + id + '-status');
+            if (card)   card.classList.add('unlocked');
+            if (status) status.textContent = '✅ Earned';
+        });
+    })();
+
+    // OG Supporter — grant if account was created before a cutoff date
+    // (We use localStorage marker so early users who visit keep it)
+    (function checkOGBadge() {
+        var OG_CUTOFF = new Date('2025-06-01').getTime();
+        var firstVisit = parseInt(localStorage.getItem('sbb_first_visit') || '0');
+        if (!firstVisit) {
+            firstVisit = Date.now();
+            localStorage.setItem('sbb_first_visit', String(firstVisit));
+        }
+        if (firstVisit < OG_CUTOFF) c9UnlockBadge('ogsupporter');
+    })();
+
+    // Extend loadBadges() to also load the new badges from the API
+    var _origLoadBadges = loadBadges;
+    loadBadges = async function() {
+        await _origLoadBadges();
+
+        // Restore locally stored badges
+        var earned = JSON.parse(localStorage.getItem('sbb_badges') || '[]');
+        earned.forEach(function(id) {
+            var card   = document.getElementById('badge-' + id);
+            var status = document.getElementById('badge-' + id + '-status');
+            if (card)   card.classList.add('unlocked');
+            if (status) status.textContent = '✅ Earned';
+        });
+
+        // Try loading extended badges from API
+        if (!currentUser) return;
+        var serverId = SBB.serverId || getActiveServerId();
+        if (!serverId) return;
+        try {
+            var r = await fetch(API_BASE + '/api/badges/' + currentUser.id + '?server=' + serverId);
+            if (!r.ok) return;
+            var d = await r.json();
+
+            var _ub = function(id, condition) {
+                if (!condition) return;
+                var card   = document.getElementById('badge-' + id);
+                var status = document.getElementById('badge-' + id + '-status');
+                if (card)   card.classList.add('unlocked');
+                if (status) status.textContent = '✅ Earned';
+                c9UnlockBadge(id); // persist locally too
+            };
+
+            // Music player extended
+            _ub('streakmaster',   d.streakDays  >= 7);
+            _ub('genreexplorer',  d.genreCount  >= 10);
+            _ub('nightowl',       d.nightOwl);
+            _ub('speedqueuer',    d.speedQueuer);
+            _ub('collabking',     d.collabSessions >= 5);
+            _ub('radiolistener',  d.radioMinutes >= 60);
+            _ub('wrappedpro',     d.wrappedMonths >= 3);
+            _ub('quizmaster',     d.quizWins >= 10);
+
+            // Cloud 9 badges
+            _ub('c9contributor',  d.c9Submissions >= 1);
+            _ub('verifiedartist', d.verifiedArtist);
+            _ub('topartist',      d.c9TopArtist);
+            _ub('c9regular',      d.c9RadioMinutes >= 300);
+        } catch(e) { /* silent */ }
+    };
+
+    // Badge section also needs to show the new sections
+    // Extend section titles for the two new groups
+    var badgesPanel = document.getElementById('badges-panel');
+    if (badgesPanel) {
+        // Inject section labels into the badge grid via DOM
+        window.addEventListener('load', function() {
+            var grid = document.querySelector('.badge-grid');
+            if (!grid) return;
+            // Insert "Music Player" label before streak-master
+            var smCard = document.getElementById('badge-streakmaster');
+            if (smCard && grid.contains(smCard)) {
+                var label1 = document.createElement('div');
+                label1.style.cssText = 'grid-column:1/-1;font-size:11px;color:#444;font-family:\'DM Mono\',monospace;letter-spacing:2px;text-transform:uppercase;padding:10px 0 4px;border-top:1px solid rgba(255,255,255,0.05);margin-top:8px;';
+                label1.textContent = '— Music Player Badges —';
+                grid.insertBefore(label1, smCard);
+            }
+            // Insert "Cloud 9 Radio" label before c9contributor
+            var c9Card = document.getElementById('badge-c9contributor');
+            if (c9Card && grid.contains(c9Card)) {
+                var label2 = document.createElement('div');
+                label2.style.cssText = 'grid-column:1/-1;font-size:11px;color:#9B59B6;font-family:\'DM Mono\',monospace;letter-spacing:2px;text-transform:uppercase;padding:10px 0 4px;border-top:1px solid rgba(155,89,182,0.2);margin-top:8px;';
+                label2.textContent = '— Cloud 9 Radio Badges —';
+                grid.insertBefore(label2, c9Card);
+            }
+        });
+    }
+
+    // PAGE_TITLES extension
+    PAGE_TITLES['cloud9']  = "Stan's Beat Bot — Cloud 9 Radio";
+    PAGE_TITLES['botpage'] = "Stan's Beat Bot — About the Bot";
+
     </script>
 </body>
 </html>
