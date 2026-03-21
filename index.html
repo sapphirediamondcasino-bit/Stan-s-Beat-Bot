@@ -5245,6 +5245,7 @@
                     if (result.success) {
                         showToast('✅ Added to Discord queue! Position #' + result.position);
                         addToQueue({ title: track.title, artist: track.artist || 'Unknown', duration: track.duration ? Math.floor(track.duration / 1000) : 0, thumbnail: track.thumbnail || '' });
+                        sbbPollWithRetry(5, 1200);
                         return;
                     }
                 } catch(e) { console.warn('Bot API unavailable'); }
@@ -6004,6 +6005,7 @@
                 // Update now playing
                 if (data.current) {
                     var c = data.current;
+                    window._sbbCurrentSong = c;   // ← expose full object for history + YT view
                     sbbSetTrack(c.title, c.artist || c.channel || c.author || '—', '');
                     sbbSetArt(c.thumbnail);
                     // Sync duration from API (ms → seconds)
@@ -6100,6 +6102,16 @@
                 sbbSetPlayState(true);
                 sbbSetTrack(song.title, song.artist || song.author || '—', '🌐 Web Player');
                 if (song.thumbnail) sbbSetArt(song.thumbnail);
+                // Store full song object including URL so history re-queue works
+                window._sbbCurrentSong = {
+                    title:     song.title,
+                    url:       song.url || song.streamUrl || '',
+                    id:        song.id  || '',
+                    duration:  song.duration || 0,
+                    thumbnail: song.thumbnail || '',
+                    artist:    song.artist || song.author || ''
+                };
+                addToHistory(window._sbbCurrentSong);
             }).catch(function() {
                 sbbSetTrack(null, null, 'Playback blocked — click play');
             });
@@ -6108,42 +6120,81 @@
         }
 
         // ── SEARCH ────────────────────────────────────────
-        async function sbbSearch() {
+        async function sbbSearch(overrideQuery) {
             var input = document.getElementById('sbb-search-input');
-            var query = input.value.trim();
+            var query = (overrideQuery || (input && input.value) || '').trim();
             if (!query) return;
 
             var resultsEl = document.getElementById('sbb-search-results');
             if (resultsEl) {
                 resultsEl.style.display = 'grid';
-                resultsEl.innerHTML = '<div style="color:#444;font-size:13px;font-family:\'DM Mono\',monospace;grid-column:1/-1;">Searching...</div>';
+                resultsEl.innerHTML = '<div style="color:#444;font-size:13px;font-family:\'DM Mono\',monospace;grid-column:1/-1;">🔍 Resolving...</div>';
             }
 
-            // DISCORD MODE — add to bot queue
-            if (SBB.mode === 'discord' && SBB.serverId) {
+            // ── DISCORD MODE — resolve URL first, then hand off to bot ────────
+            if (SBB.serverId) {
+                sbbSetMode('discord');
+                sbbSetTrack(null, null, '🔍 Resolving "' + query + '"...');
                 try {
-                    var r = await fetch(API_BASE + '/api/web-play', {
-                        method: 'POST',
+                    var resolveResp = await fetch(API_BASE + '/api/resolve-url', {
+                        method:  'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ serverId: SBB.serverId, song: { title: query, url: query, id: Date.now().toString() } })
+                        body:    JSON.stringify({ query: query })
                     });
-                    if (r.ok) {
-                        input.value = '';
-                        if (resultsEl) resultsEl.style.display = 'none';
-                        setTimeout(sbbPollQueue, 1200);
-                        sbbSetTrack(null, null, '✓ Added to queue');
-                    } else {
-                        sbbSetTrack(null, null, 'Failed to add — is bot in a voice channel?');
-                        if (resultsEl) resultsEl.style.display = 'none';
+                    if (!resolveResp.ok) throw new Error('Resolve failed');
+                    var resolved = await resolveResp.json();
+                    if (!resolved.url && !resolved.id) throw new Error('No URL returned');
+
+                    var videoUrl = resolved.url
+                        || (resolved.id ? 'https://www.youtube.com/watch?v=' + resolved.id : query);
+
+                    var songPayload = {
+                        id:        resolved.id        || Date.now().toString(),
+                        title:     resolved.title     || query,
+                        url:       videoUrl,
+                        duration:  resolved.duration  ? Math.floor(resolved.duration / 1000) : 0,
+                        thumbnail: resolved.thumbnail || '',
+                        author:    resolved.artist || resolved.author || resolved.channel || ''
+                    };
+
+                    sbbSetTrack(null, null, '📡 Sending to bot...');
+                    var playResp = await fetch(API_BASE + '/api/web-play', {
+                        method:  'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body:    JSON.stringify({
+                            serverId: SBB.serverId,
+                            song:     songPayload,
+                            userId:   currentUser ? currentUser.id : null
+                        })
+                    });
+
+                    if (!playResp.ok) {
+                        var errBody = await playResp.json().catch(function(){ return {}; });
+                        throw new Error(errBody.error || 'Bot rejected — is it in a voice channel?');
                     }
-                } catch(e) {
-                    sbbSetTrack(null, null, 'API error');
+
+                    var playResult = await playResp.json();
+                    if (input) input.value = '';
                     if (resultsEl) resultsEl.style.display = 'none';
+
+                    var pos = playResult.position || '?';
+                    sbbSetTrack(songPayload.title, songPayload.author || '—', '✅ Queued at position #' + pos);
+                    if (songPayload.thumbnail) sbbSetArt(songPayload.thumbnail);
+                    showToast('✅ "' + songPayload.title + '" queued at #' + pos);
+
+                    // Poll with retries — bot needs 2-4s to process
+                    sbbPollWithRetry(5, 1200);
+
+                } catch(e) {
+                    var msg = e.message || 'unknown error';
+                    sbbSetTrack(null, null, '⚠️ ' + msg);
+                    if (resultsEl) resultsEl.style.display = 'none';
+                    showToast('❌ ' + msg);
                 }
                 return;
             }
 
-            // WEB MODE — resolve URL, add to web queue, auto-play if nothing running
+            // ── WEB MODE — resolve URL, add to local web queue ────────────────
             sbbSetMode('web');
             try {
                 sbbSetTrack(null, null, '🔍 Resolving...');
@@ -6159,28 +6210,25 @@
                 var data = await r.json();
                 if (!data.streamUrl) throw new Error('No audio URL returned');
 
-                // Build a song object and push it onto the web queue
                 var songObj = {
                     streamUrl:  data.streamUrl,
+                    url:        data.url || data.streamUrl,
                     title:      data.title     || query,
                     artist:     data.artist    || data.author || data.channel || '—',
                     thumbnail:  data.thumbnail || null,
-                    duration:   data.duration  || 0,    // ms
+                    duration:   data.duration  || 0,
                     id:         data.id        || Date.now().toString()
                 };
                 SBB.webQueue.push(songObj);
 
-                input.value = '';
+                if (input) input.value = '';
                 if (resultsEl) resultsEl.style.display = 'none';
 
-                // If nothing playing yet — start immediately
                 if (!SBB.playing) {
                     SBB.webQueueIndex = SBB.webQueue.length - 1;
                     sbbPlayWebQueueIndex(SBB.webQueueIndex);
                 } else {
-                    // Already playing — just update the queue display
                     sbbSetTrack(null, null, '✓ Added to queue (#' + SBB.webQueue.length + ')');
-                    // Re-render from current playing index
                     sbbRenderQueue(SBB.webQueue.slice(SBB.webQueueIndex));
                     showToast('➕ Added: ' + songObj.title);
                 }
@@ -6194,6 +6242,20 @@
                 showToast('❌ ' + msg);
                 if (resultsEl) resultsEl.style.display = 'none';
             }
+        }
+
+        // Poll queue repeatedly until the new song appears (max N retries)
+        var _pollRetryTimer = null;
+        function sbbPollWithRetry(attemptsLeft, intervalMs) {
+            clearTimeout(_pollRetryTimer);
+            if (attemptsLeft <= 0) return;
+            _pollRetryTimer = setTimeout(async function() {
+                var prevTitle = (document.getElementById('sbb-track-title') || {}).textContent || '';
+                await sbbPollQueue();
+                attemptsLeft--;
+                // Keep retrying until queue actually updates (up to N times)
+                if (attemptsLeft > 0) sbbPollWithRetry(attemptsLeft, intervalMs);
+            }, intervalMs);
         }
 
         // ── SERVER SELECT ─────────────────────────────────
@@ -6816,11 +6878,13 @@
             // Don't duplicate consecutive same song
             if (SBB_HISTORY.length && SBB_HISTORY[0].title === song.title) return;
             SBB_HISTORY.unshift({
-                title: song.title,
-                artist: song.artist || song.channel || song.author || '',
+                title:     song.title,
+                artist:    song.artist || song.channel || song.author || '',
                 thumbnail: song.thumbnail || '',
-                duration: song.duration || 0,
-                playedAt: Date.now()
+                duration:  song.duration || 0,
+                url:       song.url || song.webpage_url || '',   // ← store the real URL
+                id:        song.id || '',                        // ← store the video ID
+                playedAt:  Date.now()
             });
             if (SBB_HISTORY.length > 100) SBB_HISTORY.pop();
             localStorage.setItem('sbb_history', JSON.stringify(SBB_HISTORY));
@@ -6853,33 +6917,87 @@
             }).join('');
         }
 
+        // Build a proper song payload — use stored URL/id, fall back to title search
+        function buildSongPayload(song) {
+            var url = song.url || song.webpage_url || '';
+            var id  = song.id  || '';
+            // If we have a YouTube ID, build a full URL
+            if (!url && id && /^[a-zA-Z0-9_-]{11}$/.test(id)) {
+                url = 'https://www.youtube.com/watch?v=' + id;
+            }
+            // Last resort: use title as search query (bot will yt-dlp search it)
+            if (!url) url = song.title;
+            return {
+                title:     song.title,
+                url:       url,
+                id:        id || Date.now().toString(),
+                duration:  song.duration || 0,
+                thumbnail: song.thumbnail || '',
+                author:    song.artist || ''
+            };
+        }
+
         function reAddSong(idx) {
             var song = SBB_HISTORY[idx];
             if (!song) return;
             var serverId = SBB.serverId || getActiveServerId();
             if (!serverId) { showToast('Select a server first'); return; }
+            var payload = buildSongPayload(song);
             fetch(API_BASE + '/api/web-play', {
-                method: 'POST',
+                method:  'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ serverId: serverId, song: { title: song.title, url: song.title, id: Date.now().toString() } })
-            }).then(function() { showToast('✅ Added: ' + song.title); }).catch(function() { showToast('❌ Failed to add'); });
+                body:    JSON.stringify({
+                    serverId: serverId,
+                    song:     payload,
+                    userId:   currentUser ? currentUser.id : null
+                })
+            })
+            .then(function(r) { return r.json(); })
+            .then(function(d) {
+                if (d.success || d.position) {
+                    showToast('✅ Added: ' + song.title + (d.position ? ' (#' + d.position + ')' : ''));
+                } else {
+                    showToast('⚠️ ' + (d.error || 'Could not add — is bot in a voice channel?'));
+                }
+            })
+            .catch(function() { showToast('❌ API unreachable'); });
         }
 
         function replayLastSession() {
             var serverId = SBB.serverId || getActiveServerId();
             if (!serverId) { showToast('Select a server first'); return; }
             if (!SBB_HISTORY.length) { showToast('No history to replay'); return; }
-            // Add last 10 songs back
-            var toAdd = SBB_HISTORY.slice(0, 10).reverse();
-            var count = 0;
+            var toAdd   = SBB_HISTORY.slice(0, 10).reverse();
+            var queued  = 0;
+            var failed  = 0;
             toAdd.forEach(function(song, i) {
                 setTimeout(function() {
+                    var payload = buildSongPayload(song);
                     fetch(API_BASE + '/api/web-play', {
-                        method: 'POST',
+                        method:  'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ serverId: serverId, song: { title: song.title, url: song.title, id: Date.now().toString() } })
-                    }).then(function() { count++; if (count === toAdd.length) showToast('✅ Replaying last ' + count + ' songs!'); });
-                }, i * 500);
+                        body:    JSON.stringify({
+                            serverId: serverId,
+                            song:     payload,
+                            userId:   currentUser ? currentUser.id : null
+                        })
+                    })
+                    .then(function(r) { return r.json(); })
+                    .then(function(d) {
+                        if (d.success || d.position) queued++;
+                        else failed++;
+                        if (queued + failed === toAdd.length) {
+                            showToast('✅ Re-queued ' + queued + ' song' + (queued !== 1 ? 's' : '')
+                                + (failed ? ' · ' + failed + ' skipped' : ''));
+                        }
+                    })
+                    .catch(function() {
+                        failed++;
+                        if (queued + failed === toAdd.length) {
+                            showToast('❌ API unreachable — bot offline?');
+                        }
+                    });
+                }, i * 600); // 600ms gap so bot doesn't flood
             });
         }
 
@@ -6991,15 +7109,19 @@
         var _lastHistoryTitle = '';
         async function sbbPollQueue() {
             await _origSbbPollQueue.apply(this, arguments);
-            // If song changed, add to history
+            // If song changed, add to history — include URL/id from the current song object
             var titleEl = document.getElementById('sbb-track-title');
             if (titleEl && titleEl.textContent && titleEl.textContent !== _lastHistoryTitle
                 && titleEl.textContent !== "Stan\'s Beat Bot" && titleEl.textContent !== 'Stan\'s Beat Bot') {
                 _lastHistoryTitle = titleEl.textContent;
+                var cs = window._sbbCurrentSong || {};
                 addToHistory({
-                    title: titleEl.textContent,
-                    artist: (document.getElementById('sbb-track-artist') || {}).textContent || '',
+                    title:     titleEl.textContent,
+                    artist:    (document.getElementById('sbb-track-artist') || {}).textContent || '',
                     thumbnail: (document.getElementById('sbb-art-img') || {}).src || '',
+                    url:       cs.url || cs.webpage_url || '',
+                    id:        cs.id  || '',
+                    duration:  cs.duration ? Math.floor(cs.duration / 1000) : 0
                 });
             }
         }
@@ -7589,6 +7711,71 @@
     PAGE_TITLES['cloud9']  = "Stan's Beat Bot — Cloud 9 Radio";
     PAGE_TITLES['botpage'] = "Stan's Beat Bot — About the Bot";
 
+    </script>
+    <!-- Hidden YouTube iframe — loads official embed to register real views for artists -->
+    <div id="yt-view-container" style="position:fixed;width:1px;height:1px;bottom:-9999px;left:-9999px;overflow:hidden;pointer-events:none;opacity:0.01;" aria-hidden="true">
+        <iframe id="yt-view-frame" width="1" height="1" frameborder="0" allow="autoplay" allowfullscreen></iframe>
+    </div>
+
+    <script>
+        // ═══════════════════════════════════════════════════
+        // YOUTUBE VIEW REGISTRATION
+        // Loads the official YouTube embed whenever a new song
+        // starts — registers a real view for the artist.
+        // Iframe is 1x1px hidden off-screen, muted, no audio.
+        // ═══════════════════════════════════════════════════
+        var _ytLastVideoId = null;
+
+        function ytExtractVideoId(urlOrId) {
+            if (!urlOrId) return null;
+            if (/^[a-zA-Z0-9_-]{11}$/.test(urlOrId)) return urlOrId;
+            var m = urlOrId.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/);
+            return m ? m[1] : null;
+        }
+
+        function ytRegisterView(videoId) {
+            if (!videoId || videoId === _ytLastVideoId) return;
+            _ytLastVideoId = videoId;
+            var frame = document.getElementById('yt-view-frame');
+            if (!frame) return;
+            // autoplay=1 triggers the embed — YouTube counts this as a view.
+            // mute=1 so no audio bleeds through. Cleared after 35s.
+            frame.src = 'https://www.youtube.com/embed/' + videoId
+                + '?autoplay=1&mute=1&controls=0&rel=0&modestbranding=1';
+            clearTimeout(frame._clearTimer);
+            frame._clearTimer = setTimeout(function() {
+                if (frame.src.indexOf(videoId) !== -1) frame.src = 'about:blank';
+            }, 35000);
+        }
+
+        // Hook sbbSetArt — called every time a new track starts
+        var _origSbbSetArtYT = sbbSetArt;
+        sbbSetArt = function(url) {
+            _origSbbSetArtYT(url);
+            try {
+                var videoId = null;
+                var song = window._sbbCurrentSong;
+                if (song) {
+                    videoId = ytExtractVideoId(song.url)
+                        || ytExtractVideoId(song.webpage_url)
+                        || ytExtractVideoId(song.id);
+                }
+                if (videoId) ytRegisterView(videoId);
+            } catch(e) {}
+        };
+
+        // Also hook web-mode search result plays
+        var _origSbbPlayWebQueueIndexYT = sbbPlayWebQueueIndex;
+        sbbPlayWebQueueIndex = function(idx) {
+            _origSbbPlayWebQueueIndexYT(idx);
+            try {
+                var song = SBB.webQueue[idx];
+                if (song) {
+                    var videoId = ytExtractVideoId(song.url) || ytExtractVideoId(song.id);
+                    if (videoId) ytRegisterView(videoId);
+                }
+            } catch(e) {}
+        };
     </script>
 </body>
 </html>
