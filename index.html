@@ -7333,46 +7333,111 @@
 
     // Poll Cloud 9 now-playing status
     async function c9PollStatus() {
+        var titleEl  = document.getElementById('c9-track-title');
+        var artistEl = document.getElementById('c9-track-artist');
+        var countEl  = document.getElementById('c9-pool-count');
+
+        // Try server-specific status first (users in a server get live data)
         var serverId = SBB.serverId || getActiveServerId();
-        if (!serverId) { c9SetIdle(); return; }
+        var endpoint = serverId
+            ? API_BASE + '/api/c9/status/' + serverId
+            : API_BASE + '/api/c9/global-status';   // ← no server needed
+
         try {
-            var r = await fetch(API_BASE + '/api/c9/status/' + serverId);
+            var r = await fetch(endpoint);
             if (!r.ok) { c9SetIdle(); return; }
             var d = await r.json();
-            var titleEl  = document.getElementById('c9-track-title');
-            var artistEl = document.getElementById('c9-track-artist');
-            var artEl    = document.getElementById('c9-art');
-            var countEl  = document.getElementById('c9-pool-count');
+
             if (d.active && d.currentSong) {
                 if (titleEl)  titleEl.textContent  = d.currentSong.title  || 'Unknown Track';
                 if (artistEl) artistEl.textContent = d.currentSong.artist || '—';
                 if (countEl)  countEl.textContent  = (d.poolSize || 0) + ' tracks';
+                // Store current song globally so Tune In can use it
+                window._c9CurrentSong = d.currentSong;
+                window._c9Active = true;
+                // Update art if thumbnail available
+                var artEl = document.getElementById('c9-art');
+                if (artEl && d.currentSong.thumbnail) {
+                    artEl.innerHTML = '<img src="' + htmlEsc(d.currentSong.thumbnail) + '" style="width:100%;height:100%;object-fit:cover;border-radius:12px;">';
+                }
+                // Update live dot to show online
+                var dotEl = document.getElementById('c9-live-dot');
+                if (dotEl) dotEl.style.background = 'rgba(155,89,182,0.2)';
             } else {
+                window._c9Active = false;
                 c9SetIdle();
             }
-        } catch(e) { c9SetIdle(); }
+        } catch(e) {
+            window._c9Active = false;
+            c9SetIdle();
+        }
     }
 
     function c9SetIdle() {
         var titleEl  = document.getElementById('c9-track-title');
         var artistEl = document.getElementById('c9-track-artist');
         var countEl  = document.getElementById('c9-pool-count');
-        if (titleEl)  titleEl.textContent  = 'Cloud 9 Radio — Not broadcasting';
-        if (artistEl) artistEl.textContent = 'Start with /c9radio in Discord';
+        // Show idle — but still let user browse the pool and submit
+        if (titleEl)  titleEl.textContent  = 'Cloud 9 Radio';
+        if (artistEl) artistEl.textContent = 'Not broadcasting right now';
         if (countEl)  countEl.textContent  = 'OFFLINE';
+        // Update live dot
+        var dotEl = document.getElementById('c9-live-dot');
+        if (dotEl) {
+            dotEl.style.background = 'rgba(100,100,100,0.2)';
+            var span = dotEl.querySelector('span:first-child');
+            if (span) span.style.background = '#555';
+        }
     }
 
-    // Tune in — puts it in the main player
-    function c9TuneIn() {
-        sbbSetTrack('Cloud 9 Radio', 'Independent Artist Station', '📻 Cloud 9 Broadcasting');
-        sbbSetMode('discord');
-        document.getElementById('sbb-on-air-text').textContent = 'CLOUD 9';
-        document.getElementById('sbb-on-air').className = 'sbb-on-air';
-        document.getElementById('sbb-on-air').style.background = 'rgba(155,89,182,0.15)';
-        document.getElementById('sbb-on-air').style.borderColor = 'rgba(155,89,182,0.3)';
-        showToast('📻 Tuned into Cloud 9 Radio');
-        // Navigate to radio/player tab
-        navigateTo('radio');
+    // Tune In — plays Cloud 9 audio stream directly in the browser
+    async function c9TuneIn() {
+        var tuneBtn = document.querySelector('[onclick="c9TuneIn()"]');
+        if (tuneBtn) { tuneBtn.textContent = '⏳ Connecting...'; tuneBtn.disabled = true; }
+
+        try {
+            // Ask the bot for a direct stream URL for Cloud 9
+            var r = await fetch(API_BASE + '/api/c9/stream-url');
+            var streamData = r.ok ? await r.json() : null;
+            var streamUrl  = streamData && streamData.url ? streamData.url : null;
+
+            var song = window._c9CurrentSong || {};
+            var title  = song.title  || 'Cloud 9 Radio';
+            var artist = song.artist || 'Independent Artist Station';
+            var thumb  = song.thumbnail || null;
+
+            if (streamUrl) {
+                // ── Real audio stream available ─────────────────────────────
+                SBB.audio.pause();
+                SBB.audio.src = streamUrl;
+                SBB.audio.load();
+
+                await SBB.audio.play();
+                sbbSetMode('web');
+                sbbSetPlayState(true);
+                sbbSetTrack(title, artist, '📻 Cloud 9 Radio — Live');
+                if (thumb) sbbSetArt(thumb);
+                document.getElementById('sbb-on-air-text').textContent = 'CLOUD 9';
+                document.getElementById('sbb-on-air').style.cssText += ';background:rgba(155,89,182,0.15);border-color:rgba(155,89,182,0.3);';
+                showToast('📻 Tuned into Cloud 9 Radio!');
+            } else {
+                // ── No direct stream — fall back to syncing via bot ─────────
+                sbbSetTrack(title, artist, '📻 Cloud 9 Radio — syncing via bot...');
+                if (thumb) sbbSetArt(thumb);
+                sbbSetMode('discord');
+                document.getElementById('sbb-on-air-text').textContent = 'CLOUD 9';
+                document.getElementById('sbb-on-air').style.cssText += ';background:rgba(155,89,182,0.15);border-color:rgba(155,89,182,0.3);';
+                showToast('📻 Cloud 9 Radio — no direct stream yet. Use /c9radio in Discord to start one.');
+            }
+
+            // Navigate to the player
+            navigateTo('radio');
+
+        } catch(e) {
+            showToast('❌ Could not connect to Cloud 9 stream: ' + (e.message || 'unknown error'));
+        } finally {
+            if (tuneBtn) { tuneBtn.textContent = '▶ Tune In'; tuneBtn.disabled = false; }
+        }
     }
 
     // Load track pool from API
