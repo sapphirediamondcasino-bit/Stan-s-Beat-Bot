@@ -5406,9 +5406,10 @@
         }
 
         function reAddSong_server(title) {
-            var serverId = (window.SBB && window.SBB.serverId) || localStorage.getItem('sbb_active_server') || '';
-            if (!serverId) { showToast('Select a server first'); return; }
-            sbbSearch(title);
+            // If bot is active in a VC — send to Discord bot
+            // If user is in web player mode — add to web queue
+            // Either way, the song plays. No "select a server first" dead end.
+            queueSongAnywhere({ title: title });
         }
 
         function viewAllHistory() { switchPlayerView('history'); }
@@ -6940,64 +6941,120 @@
         function reAddSong(idx) {
             var song = SBB_HISTORY[idx];
             if (!song) return;
+            queueSongAnywhere(song);
+        }
+
+        // ── queueSongAnywhere ─────────────────────────────────────────────────
+        // The single routing function for ALL history re-queues.
+        // Logic:
+        //   1. Bot is in a VC on the selected server → send to Discord bot
+        //   2. Otherwise → add to the site web player queue directly
+        // No "select a server" dead ends. Song always goes somewhere.
+        async function queueSongAnywhere(song) {
+            var title    = song.title || '';
             var serverId = SBB.serverId || getActiveServerId();
-            if (!serverId) { showToast('Select a server first'); return; }
-            var payload = buildSongPayload(song);
-            fetch(API_BASE + '/api/web-play', {
-                method:  'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body:    JSON.stringify({
-                    serverId: serverId,
-                    song:     payload,
-                    userId:   currentUser ? currentUser.id : null
-                })
-            })
-            .then(function(r) { return r.json(); })
-            .then(function(d) {
-                if (d.success || d.position) {
-                    showToast('✅ Added: ' + song.title + (d.position ? ' (#' + d.position + ')' : ''));
-                } else {
-                    showToast('⚠️ ' + (d.error || 'Could not add — is bot in a voice channel?'));
+
+            // ── Route 1: bot is active in a VC ───────────────────────────────
+            if (serverId) {
+                // Check if bot is actually playing / in a VC before trying
+                try {
+                    var statusResp = await fetch(API_BASE + '/api/queue/' + serverId);
+                    var statusData = statusResp.ok ? await statusResp.json() : null;
+                    var botActive  = statusData && (statusData.playing || (statusData.songs && statusData.songs.length > 0) || statusData.current);
+
+                    if (botActive) {
+                        // Bot is live — resolve then send
+                        showToast('🔍 Resolving "' + title + '"...');
+                        var resolveResp = await fetch(API_BASE + '/api/resolve-url', {
+                            method:  'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body:    JSON.stringify({ query: song.url && song.url.startsWith('http') ? song.url : title })
+                        });
+                        if (!resolveResp.ok) throw new Error('Resolve failed');
+                        var resolved = await resolveResp.json();
+
+                        var payload = {
+                            id:        resolved.id        || song.id || Date.now().toString(),
+                            title:     resolved.title     || title,
+                            url:       resolved.url       || resolved.videoUrl || song.url || title,
+                            duration:  resolved.duration  ? Math.floor(resolved.duration / 1000) : (song.duration || 0),
+                            thumbnail: resolved.thumbnail || song.thumbnail || '',
+                            author:    resolved.artist    || resolved.author || song.artist || ''
+                        };
+
+                        var playResp = await fetch(API_BASE + '/api/web-play', {
+                            method:  'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body:    JSON.stringify({
+                                serverId: serverId,
+                                song:     payload,
+                                userId:   currentUser ? currentUser.id : null
+                            })
+                        });
+                        var playResult = await playResp.json();
+                        if (playResult.success || playResult.position) {
+                            showToast('✅ Queued on Discord: ' + (resolved.title || title) + (playResult.position ? ' (#' + playResult.position + ')' : ''));
+                            sbbPollWithRetry(5, 1200);
+                            return;
+                        }
+                        // Bot rejected it — fall through to web player
+                    }
+                } catch(e) {
+                    // API error — fall through to web player
                 }
-            })
-            .catch(function() { showToast('❌ API unreachable'); });
+            }
+
+            // ── Route 2: no bot / bot not active → web player ─────────────────
+            showToast('🔍 Loading "' + title + '" in web player...');
+            sbbSetMode('web');
+            sbbSetTrack(null, null, '🔍 Resolving...');
+            try {
+                var query = (song.url && song.url.startsWith('http')) ? song.url : title;
+                var r = await fetch(API_BASE + '/api/resolve-url', {
+                    method:  'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body:    JSON.stringify({ query: query })
+                });
+                if (!r.ok) throw new Error('Could not resolve audio');
+                var data = await r.json();
+                if (!data.streamUrl) throw new Error('No audio stream returned');
+
+                var songObj = {
+                    streamUrl:  data.streamUrl,
+                    url:        data.url || data.streamUrl,
+                    title:      data.title     || title,
+                    artist:     data.artist    || data.author || data.channel || song.artist || '—',
+                    thumbnail:  data.thumbnail || song.thumbnail || null,
+                    duration:   data.duration  || 0,
+                    id:         data.id        || song.id || Date.now().toString()
+                };
+                SBB.webQueue.push(songObj);
+
+                if (!SBB.playing) {
+                    SBB.webQueueIndex = SBB.webQueue.length - 1;
+                    sbbPlayWebQueueIndex(SBB.webQueueIndex);
+                } else {
+                    sbbSetTrack(null, null, '✓ Added to web queue (#' + SBB.webQueue.length + ')');
+                    sbbRenderQueue(SBB.webQueue.slice(SBB.webQueueIndex));
+                    showToast('➕ Added to web player: ' + songObj.title);
+                }
+            } catch(e) {
+                sbbSetTrack(null, null, '⚠️ ' + (e.message || 'Could not load song'));
+                showToast('❌ ' + (e.message || 'Could not load song'));
+            }
         }
 
         function replayLastSession() {
-            var serverId = SBB.serverId || getActiveServerId();
-            if (!serverId) { showToast('Select a server first'); return; }
             if (!SBB_HISTORY.length) { showToast('No history to replay'); return; }
-            var toAdd   = SBB_HISTORY.slice(0, 10).reverse();
-            var queued  = 0;
-            var failed  = 0;
+            var toAdd  = SBB_HISTORY.slice(0, 10).reverse();
+            var done   = 0;
             toAdd.forEach(function(song, i) {
                 setTimeout(function() {
-                    var payload = buildSongPayload(song);
-                    fetch(API_BASE + '/api/web-play', {
-                        method:  'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body:    JSON.stringify({
-                            serverId: serverId,
-                            song:     payload,
-                            userId:   currentUser ? currentUser.id : null
-                        })
-                    })
-                    .then(function(r) { return r.json(); })
-                    .then(function(d) {
-                        if (d.success || d.position) queued++;
-                        else failed++;
-                        if (queued + failed === toAdd.length) {
-                            showToast('✅ Re-queued ' + queued + ' song' + (queued !== 1 ? 's' : '')
-                                + (failed ? ' · ' + failed + ' skipped' : ''));
-                        }
-                    })
-                    .catch(function() {
-                        failed++;
-                        if (queued + failed === toAdd.length) {
-                            showToast('❌ API unreachable — bot offline?');
-                        }
-                    });
-                }, i * 600); // 600ms gap so bot doesn't flood
+                    queueSongAnywhere(song).then(function() {
+                        done++;
+                        if (done === toAdd.length) showToast('✅ Replaying last ' + done + ' songs!');
+                    }).catch(function() { done++; });
+                }, i * 800);
             });
         }
 
