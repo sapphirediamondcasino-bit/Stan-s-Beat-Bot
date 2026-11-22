@@ -2881,7 +2881,48 @@
         .badge-req { font-size: 11px; color: #555; margin-bottom: 10px; font-family: 'DM Mono', monospace; }
         .badge-status { font-size: 12px; color: #333; font-weight: 700; }
 
+    
+        /* ───────── Control Center (inside the site) ───────── */
+        #control { --c-panel:#0f141b; --c-panel2:#141b24; --c-line:#1f2a36; --c-dim:#8b98a8; --c-ok:#00e08a; --c-warn:#ffc23d; --c-bad:#ff5d6c; }
+        #control .ctl-bar { display:flex; align-items:center; gap:12px; justify-content:flex-end; margin-bottom:14px; color:var(--c-dim); font-size:14px; }
+        #control .ctl-wrap { display:flex; gap:20px; align-items:flex-start; }
+        #control .ctl-nav { width:180px; flex-shrink:0; background:var(--c-panel); border:1px solid var(--c-line); border-radius:12px; padding:8px; }
+        #control .ctl-nav button { display:block; width:100%; text-align:left; margin:2px 0; padding:10px 12px; border:0; border-radius:8px; background:none; color:var(--c-dim); font:inherit; cursor:pointer; }
+        #control .ctl-nav button:hover { background:var(--c-panel2); color:#fff; }
+        #control .ctl-nav button.on { background:rgba(0,255,209,.1); color:#00FFD1; }
+        #control .ctl-view { flex:1; min-width:0; }
+        #control .ctl-card { background:var(--c-panel); border:1px solid var(--c-line); border-radius:12px; padding:18px; margin-bottom:18px; }
+        #control .ctl-card h3 { font-size:16px; margin:0 0 12px; color:#fff; }
+        #control .ctl-h2 { font-size:22px; margin:0 0 16px; color:#fff; }
+        #control .ctl-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin-bottom:18px; }
+        #control .ctl-stat { background:var(--c-panel); border:1px solid var(--c-line); border-radius:12px; padding:14px; }
+        #control .ctl-stat small { color:var(--c-dim); }
+        #control .ctl-stat b { display:block; font-size:22px; margin-top:6px; color:#fff; }
+        #control .ctl-pill { display:inline-block; padding:2px 10px; border-radius:99px; font-size:12px; border:1px solid var(--c-line); }
+        #control .ctl-pill.ok { color:var(--c-ok); border-color:rgba(0,224,138,.4); }
+        #control .ctl-pill.warn { color:var(--c-warn); border-color:rgba(255,194,61,.4); }
+        #control .ctl-pill.bad { color:var(--c-bad); border-color:rgba(255,93,108,.4); }
+        #control table { width:100%; border-collapse:collapse; }
+        #control th, #control td { text-align:left; padding:9px 8px; border-bottom:1px solid var(--c-line); vertical-align:top; }
+        #control th { color:var(--c-dim); font-weight:500; font-size:12px; text-transform:uppercase; letter-spacing:.6px; }
+        #control .ctl-scroll { overflow-x:auto; }
+        #control input, #control select, #control textarea { background:#0a0e13; border:1px solid var(--c-line); color:#e6edf3; border-radius:8px; padding:8px 10px; font:inherit; max-width:100%; }
+        #control textarea { width:100%; min-height:90px; resize:vertical; box-sizing:border-box; }
+        #control .ctl-btn { background:#00FFD1; color:#04120f; border:0; border-radius:8px; padding:9px 16px; font:inherit; font-weight:600; cursor:pointer; }
+        #control .ctl-btn.ghost { background:none; color:#e6edf3; border:1px solid var(--c-line); }
+        #control .ctl-btn.danger { background:var(--c-bad); color:#fff; }
+        #control .ctl-btn.sm { padding:5px 10px; font-size:12px; }
+        #control .ctl-btn:disabled { opacity:.5; cursor:default; }
+        #control .ctl-row { display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:10px; }
+        #control .ctl-note { color:var(--c-dim); font-size:13px; line-height:1.5; }
+        #control .ctl-center { max-width:460px; margin:30px auto; text-align:center; }
+        #control .ctl-center p { color:var(--c-dim); line-height:1.6; margin-bottom:20px; }
+        #control .ctl-log { font-family:'DM Mono',monospace; font-size:12px; color:var(--c-dim); max-height:240px; overflow:auto; white-space:pre-wrap; margin-top:10px; }
+        #ctl-toast { position:fixed; right:18px; bottom:18px; background:#141b24; border:1px solid #1f2a36; color:#e6edf3; padding:12px 16px; border-radius:10px; display:none; max-width:360px; z-index:9999; }
+        #ctl-toast.bad { border-color:#ff5d6c; }
+        @media (max-width:760px) { #control .ctl-wrap { flex-direction:column; } #control .ctl-nav { width:100%; display:flex; overflow-x:auto; box-sizing:border-box; } #control .ctl-nav button { white-space:nowrap; width:auto; } }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 </head>
 <body>
     <div id="root"></div>
@@ -2907,6 +2948,7 @@
                 <a href="#premium">Premium</a>
                 <a href="#gang">The Gang</a>
                 <a href="#admin">Admin</a>
+                <a href="#control" id="nav-control" style="display:none">Control</a>
                 <a href="#featured">Artists</a>
                 <a href="#sessions">Sessions</a>
                 <a href="#analytics">Analytics</a>
@@ -2970,6 +3012,15 @@
                         <div class="hero-image-placeholder">
                             <img src="https://static.wixstatic.com/media/b9bfc7_805cceba65204a8c9bf1e106e3f67f3d~mv2.png" alt="Stan's Beat Bot" style="max-width: 100%; border-radius: 20px;">
                         </div>
+                    </div>
+                </div>
+
+                <div class="network-strip" style="margin-top:48px;text-align:center;">
+                    <p style="color:#888;font-size:14px;letter-spacing:1px;text-transform:uppercase;margin-bottom:16px;">More from Kurrasch Systems</p>
+                    <div class="hero-buttons" style="justify-content:center;">
+                        <a href="https://goodartiestsnews.com/" class="btn-secondary" target="_blank" rel="noopener noreferrer">Good Artists News</a>
+                        <a href="https://novaframeio.com/" class="btn-secondary" target="_blank" rel="noopener noreferrer">Nova Frame</a>
+                        <a href="https://midwestweather.online/" class="btn-secondary" target="_blank" rel="noopener noreferrer">Midwest Weather</a>
                     </div>
                 </div>
             </div>
@@ -3885,6 +3936,15 @@
     </div>
 
         <!-- Featured Artists Section -->
+        <!-- Control Center (staff and owner; access enforced by Supabase roles) -->
+        <section id="control" class="tab-content">
+            <div class="container">
+                <h2 class="section-title">🎛️ Control Center</h2>
+                <p class="section-subtitle">Staff and owner tools. Your role is checked on the server, not in this page.</p>
+                <div id="ctl-root"></div>
+            </div>
+        </section>
+
         <section id="featured" class="tab-content">
             <div class="container">
                 <h2 class="section-title">🎤 Featured Artists</h2>
@@ -4648,6 +4708,9 @@
                     <h3>Connect</h3>
                     <p><a href="https://discord.gg/AKHnnNrjZN" target="_blank">Discord</a></p>
                     <p><a href="https://x.com/lamaswithhats1" target="_blank">Twitter</a></p>
+                    <p><a href="https://goodartiestsnews.com/" target="_blank" rel="noopener noreferrer">Good Artists News</a></p>
+                    <p><a href="https://novaframeio.com/" target="_blank" rel="noopener noreferrer">Nova Frame</a></p>
+                    <p><a href="https://midwestweather.online/" target="_blank" rel="noopener noreferrer">Midwest Weather</a></p>
                     <p><a href="/cdn-cgi/l/email-protection#cdbeb8bdbda2bfb98da6b8bfbfacbeaea5beb4beb9a8a0bee3aea2a0">Email Support</a></p>
                 </div>
             </div>
@@ -4737,6 +4800,26 @@
         // API CONFIGURATION
         // ============================================
         const API_BASE = 'https://api.stansbeatbot.online:3006';
+
+        // Send the signed-in Discord token on admin calls so the server can verify who is asking
+        (function () {
+            var _fetch = window.fetch;
+            window.fetch = function (input, init) {
+                try {
+                    var url = typeof input === 'string' ? input : (input && input.url) || '';
+                    if (url.indexOf(API_BASE + '/api/admin/') === 0 || url.indexOf(API_BASE + '/api/featured/update') === 0) {
+                        var token = localStorage.getItem('discord_token');
+                        if (token) {
+                            init = init || {};
+                            var hd = new Headers(init.headers || {});
+                            hd.set('Authorization', 'Bearer ' + token);
+                            init.headers = hd;
+                        }
+                    }
+                } catch (e) {}
+                return _fetch.call(this, input, init);
+            };
+        })();
 
         // ============================================
         // PLAYER STATE
@@ -4867,7 +4950,8 @@
             'premium':   "Stan's Beat Bot — Premium",
             'commands':  "Stan's Beat Bot — Commands",
             'status':    "Stan's Beat Bot — Status",
-            'admin':     "Stan's Beat Bot — Admin Panel"
+            'admin':     "Stan's Beat Bot — Admin Panel",
+            'control':   "Stan's Beat Bot — Control Center"
         };
 
         function navigateTo(target, doPush) {
@@ -4888,6 +4972,7 @@
                 if (target === 'analytics') loadAnalytics();
                 if (target === 'history')   { renderHistory(); loadServerHistory(); }
                 if (target === 'badges')    loadBadges();
+                if (target === 'control')   { if (window.ctlEnter) window.ctlEnter(); }
             }
             document.querySelectorAll('nav a').forEach(function(a) { a.classList.remove('active'); });
             document.querySelectorAll('nav a[href="#' + target + '"]').forEach(function(a) { a.classList.add('active'); });
@@ -4901,7 +4986,7 @@
 
         // Deep-link on page load — e.g. stansbeatbot.online/#history goes straight there
         (function() {
-            var validTabs = ['home','search','featured','history','sessions','analytics','badges','premium','commands','status','admin'];
+            var validTabs = ['home','search','featured','history','sessions','analytics','badges','premium','commands','status','admin','control'];
             var hash = window.location.hash ? window.location.hash.substring(1) : '';
             if (hash && validTabs.indexOf(hash) !== -1) {
                 setTimeout(function() { navigateTo(hash, false); }, 150);
@@ -5469,7 +5554,7 @@
             if (_oauthHandled) return;
             var urlParams = new URLSearchParams(window.location.search);
             var code = urlParams.get('code');
-            if (code) {
+            if (code && sessionStorage.getItem('ctl_oauth') !== '1') {
                 _oauthHandled = true;
                 try {
                     var response = await fetch(API_BASE + '/api/auth/discord', {
@@ -5618,10 +5703,10 @@
             var result = document.getElementById('prem-user-result');
             if (!userId) { result.textContent = '⚠️ Enter a user ID'; return; }
             try {
-                var r = await fetch(API_BASE + '/api/premium/activate', {
+                var r = await fetch(API_BASE + '/api/admin/grant-premium', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ userId, subscriptionId: 'admin-grant-' + Date.now(), tier })
+                    body: JSON.stringify({ userId, plan: tier })
                 });
                 var d = await r.json();
                 result.textContent = r.ok ? '✅ Premium ' + tier + ' granted to ' + userId : '❌ ' + (d.error || 'Failed');
@@ -5633,9 +5718,16 @@
             var userId = document.getElementById('prem-user-id').value.trim();
             var result = document.getElementById('prem-user-result');
             if (!userId) { result.textContent = '⚠️ Enter a user ID'; return; }
-            // Revoke endpoint — wire up when bot-side endpoint exists
-            result.textContent = '⚠️ Revoke endpoint needs wiring on bot side (POST /api/premium/revoke)';
-            result.style.color = '#FFD700';
+            try {
+                var r = await fetch(API_BASE + '/api/admin/revoke-premium', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId })
+                });
+                var d = await r.json();
+                result.textContent = r.ok ? '✅ Premium revoked from ' + userId : '❌ ' + (d.error || 'Failed');
+                result.style.color = r.ok ? '#00FF88' : '#FF6B6B';
+            } catch (e) { result.textContent = '❌ Request failed'; result.style.color = '#FF6B6B'; }
         }
 
         var STAFF_LIST = JSON.parse(localStorage.getItem('sbb_staff_list') || '[]');
@@ -7894,5 +7986,450 @@
             } catch(e) {}
         };
     </script>
+<script>
+(function () {
+'use strict';
+if (!window.supabase) { window.ctlEnter = function () { var r = document.getElementById('ctl-root'); if (r) r.innerHTML = '<p style="color:#ff5d6c">The sign-in library did not load. Check your connection and reload.</p>'; }; return; }
+
+// Public by design. Row Level Security in Supabase is what protects the data.
+var SUPABASE_URL = 'https://pcbxusgmjbixjaghvich.supabase.co';
+var SUPABASE_KEY = 'sb_publishable_Mtj8hsNDsRGwFdI7vmzGOw_EMMz7egb';
+var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+  auth: { flowType: 'pkce', persistSession: true, detectSessionInUrl: false, autoRefreshToken: true }
+});
+
+var RANK = { user: 0, moderator: 1, staff: 2, owner: 3 };
+var me = null, current = 'overview', pollTimer = null, pendingMsg = '';
+
+function $(s) { return document.querySelector(s); }
+function esc(v) { return String(v == null ? '' : v).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+function ago(ts) {
+  if (!ts) return 'never';
+  var s = Math.max(0, Math.round((Date.now() - new Date(ts).getTime()) / 1000));
+  if (s < 60) return s + 's ago';
+  if (s < 3600) return Math.floor(s / 60) + 'm ago';
+  if (s < 86400) return Math.floor(s / 3600) + 'h ago';
+  return Math.floor(s / 86400) + 'd ago';
+}
+function can(min) { return me && RANK[me.role] >= RANK[min]; }
+function toast(msg, bad) {
+  var t = $('#ctl-toast');
+  if (!t) { t = document.createElement('div'); t.id = 'ctl-toast'; document.body.appendChild(t); }
+  t.textContent = msg; t.className = bad ? 'bad' : ''; t.style.display = 'block';
+  clearTimeout(toast._t); toast._t = setTimeout(function () { t.style.display = 'none'; }, 4200);
+}
+function pill(text, cls) { return '<span class="ctl-pill ' + cls + '">' + esc(text) + '</span>'; }
+function table(cols, rows) {
+  if (!rows.length) return '<p class="ctl-note">Nothing here yet.</p>';
+  return '<div class="ctl-scroll"><table><thead><tr>' + cols.map(function (c) { return '<th>' + esc(c) + '</th>'; }).join('') +
+    '</tr></thead><tbody>' + rows.map(function (r) { return '<tr>' + r.map(function (c) { return '<td>' + c + '</td>'; }).join('') + '</tr>'; }).join('') + '</tbody></table></div>';
+}
+function setView(html) { var v = $('#ctl-view'); if (v) v.innerHTML = html; }
+function fail(e) { setView('<div class="ctl-card"><h3>Something went wrong</h3><p class="ctl-note">' + esc(e && e.message ? e.message : e) + '</p></div>'); }
+
+// ───────────── sign-in and role gate ─────────────
+function setNavLink(show) { var a = document.getElementById('nav-control'); if (a) a.style.display = show ? '' : 'none'; }
+function showLogin(msg) {
+  setNavLink(false);
+  $('#ctl-root').innerHTML = '<div class="ctl-card ctl-center"><h3 style="font-size:22px">Staff sign-in</h3><p>' +
+    esc(msg || 'Sign in with Discord. What you can do depends on your role.') + '</p><button class="ctl-btn" id="ctl-login">Sign in with Discord</button></div>';
+  $('#ctl-login').onclick = function () {
+    sessionStorage.setItem('ctl_oauth', '1');
+    sb.auth.signInWithOAuth({ provider: 'discord', options: { redirectTo: location.origin + location.pathname } });
+  };
+}
+async function loadMe() {
+  var s = await sb.auth.getSession();
+  var session = s.data && s.data.session;
+  if (!session) return null;
+  var p = await sb.from('profiles').select('id, username, role').eq('id', session.user.id).maybeSingle();
+  var prof = p.data || { id: session.user.id, username: null, role: 'user' };
+  var meta = session.user.user_metadata || {};
+  return { id: prof.id, role: prof.role, username: prof.username || meta.full_name || meta.name || 'signed in' };
+}
+async function boot() {
+  try {
+    me = await loadMe();
+    if (!me) { showLogin(pendingMsg); pendingMsg = ''; return; }
+    setNavLink(can('staff'));
+    if (!can('staff')) {
+      $('#ctl-root').innerHTML = '<div class="ctl-card ctl-center"><h3 style="font-size:22px">No access</h3><p>' + esc(me.username) +
+        ' is signed in, but does not have a staff or owner role. Ask the owner to grant access.</p><button class="ctl-btn ghost" id="ctl-signout">Sign out</button></div>';
+      $('#ctl-signout').onclick = signOut; return;
+    }
+    buildShell(); go(current);
+  } catch (e) { showLogin('Sign-in error: ' + (e.message || e)); }
+}
+async function signOut() { await sb.auth.signOut(); me = null; clearInterval(pollTimer); setNavLink(false); showLogin(); }
+
+// ───────────── shell and navigation ─────────────
+var TABS = [
+  { id: 'overview', label: 'Overview', min: 'staff' },
+  { id: 'bot', label: 'Bot control', min: 'owner' },
+  { id: 'settings', label: 'Bot settings', min: 'owner' },
+  { id: 'radio', label: 'Radio', min: 'staff' },
+  { id: 'sites', label: 'Linked sites', min: 'staff' },
+  { id: 'servers', label: 'Servers', min: 'staff' },
+  { id: 'audit', label: 'Audit log', min: 'staff' }
+];
+function buildShell() {
+  $('#ctl-root').innerHTML = '<div class="ctl-bar"><span>' + esc(me.username) + ' · ' + esc(me.role) +
+    '</span><button class="ctl-btn ghost sm" id="ctl-signout">Sign out</button></div><div class="ctl-wrap"><div class="ctl-nav" id="ctl-nav"></div><div class="ctl-view" id="ctl-view"></div></div>';
+  $('#ctl-signout').onclick = signOut;
+  $('#ctl-nav').innerHTML = TABS.filter(function (t) { return can(t.min); })
+    .map(function (t) { return '<button data-tab="' + t.id + '">' + esc(t.label) + '</button>'; }).join('');
+  $('#ctl-nav').onclick = function (e) { var b = e.target.closest('[data-tab]'); if (b) go(b.dataset.tab); };
+  $('#ctl-view').addEventListener('click', onAct);
+}
+function go(id) {
+  var tab = TABS.filter(function (t) { return t.id === id && can(t.min); })[0] || TABS[0];
+  current = tab.id;
+  clearInterval(pollTimer);
+  Array.prototype.forEach.call(document.querySelectorAll('#ctl-nav button'), function (b) { b.classList.toggle('on', b.dataset.tab === current); });
+  setView('<p class="ctl-note">Loading…</p>');
+  views[current]().catch(fail);
+}
+
+// ───────────── views ─────────────
+var views = {};
+
+views.overview = async function () {
+  var r = await Promise.all([
+    sb.from('bot_heartbeats').select('*'),
+    sb.from('audit_log').select('created_at, action, target, detail').order('created_at', { ascending: false }).limit(8)
+  ]);
+  if (r[0].error) throw r[0].error;
+  var gw = (r[0].data || []).filter(function (x) { return x.runtime === 'discord-gateway'; })[0];
+  var fresh = gw && (Date.now() - new Date(gw.last_seen).getTime() < 90000);
+  var state = !gw ? pill('no data yet', 'warn') : !fresh ? pill('offline', 'bad') : gw.status === 'maintenance' ? pill('maintenance', 'warn') : pill('online', 'ok');
+  setView('<h3 class="ctl-h2">Overview</h3><div class="ctl-grid">' +
+    '<div class="ctl-stat"><small>Discord bot</small><b>' + state + '</b></div>' +
+    '<div class="ctl-stat"><small>Servers</small><b>' + esc(gw ? gw.guild_count : '–') + '</b></div>' +
+    '<div class="ctl-stat"><small>Gateway latency</small><b>' + esc(gw && gw.latency_ms != null ? gw.latency_ms + ' ms' : '–') + '</b></div>' +
+    '<div class="ctl-stat"><small>Version</small><b>' + esc(gw ? gw.version || '–' : '–') + '</b></div>' +
+    '<div class="ctl-stat"><small>Last heartbeat</small><b style="font-size:16px">' + esc(gw ? ago(gw.last_seen) : 'never') + '</b></div></div>' +
+    (gw ? '' : '<div class="ctl-card"><p class="ctl-note">No heartbeat yet. Add SUPABASE_URL and SUPABASE_SECRET_KEY to the bot\'s .env and restart it.</p></div>') +
+    '<div class="ctl-card"><h3>Recent activity</h3>' +
+    table(['When', 'Action', 'Target', 'Detail'], (r[1].data || []).map(function (a) {
+      return [esc(ago(a.created_at)), esc(a.action), esc(a.target || ''), esc(a.detail ? JSON.stringify(a.detail) : '')];
+    })) + '</div>');
+  pollTimer = setInterval(function () { if (current === 'overview') views.overview().catch(function () {}); }, 15000);
+};
+
+views.bot = async function () {
+  setView('<h3 class="ctl-h2">Bot control</h3><div class="ctl-card"><h3>Actions</h3><div class="ctl-row">' +
+    '<button class="ctl-btn ghost" data-act="send" data-a="reload_config">Reload settings and sync radio</button>' +
+    '<button class="ctl-btn ghost" data-act="send" data-a="maintenance_on">Maintenance ON</button>' +
+    '<button class="ctl-btn ghost" data-act="send" data-a="maintenance_off">Maintenance OFF</button>' +
+    '<button class="ctl-btn danger" data-act="send" data-a="restart" data-confirm="Restart the bot? Music stops for a moment.">Restart</button>' +
+    '<button class="ctl-btn danger" data-act="send" data-a="stop" data-confirm="Stop the bot? It can only be started again from the host machine.">Stop</button></div>' +
+    '<p class="ctl-note">Restart only brings the bot back if it was started with start3.bat or a process manager. The bot picks up an action within about 10 seconds. Every action is written to the audit log.</p></div>' +
+    '<div class="ctl-card"><h3>Recent actions</h3><div id="ctl-actions"></div></div>');
+  await loadActions();
+  pollTimer = setInterval(function () { if (current === 'bot') loadActions().catch(function () {}); }, 4000);
+};
+async function loadActions() {
+  var r = await sb.from('control_actions').select('*').order('id', { ascending: false }).limit(15);
+  if (r.error) throw r.error;
+  var el = $('#ctl-actions'); if (!el) return;
+  el.innerHTML = table(['#', 'Action', 'Status', 'Result', 'When'], (r.data || []).map(function (a) {
+    var cls = a.status === 'done' ? 'ok' : a.status === 'failed' ? 'bad' : 'warn';
+    return [esc(a.id), esc(a.action), pill(a.status, cls), esc(a.result || ''), esc(ago(a.created_at))];
+  }));
+}
+async function sendAction(action) {
+  var r = await sb.from('control_actions').insert({ action: action, requested_by: me.id });
+  if (r.error) return toast(r.error.message, true);
+  toast('Sent: ' + action);
+  if (current === 'bot') loadActions().catch(function () {});
+}
+
+views.settings = async function () {
+  var r = await sb.from('bot_config').select('*').order('key');
+  if (r.error) throw r.error;
+  setView('<h3 class="ctl-h2">Bot settings</h3><div class="ctl-card"><p class="ctl-note">Non-secret settings only. Tokens and API keys are never stored or shown here. Saving sends a reload to the bot. Values are JSON (true, 50, "text").</p>' +
+    table(['Setting', 'Value', 'What it does', ''], (r.data || []).map(function (c) {
+      return [esc(c.key), '<input data-val="' + esc(c.key) + '" value="' + esc(JSON.stringify(c.value)) + '" size="12">', esc(c.description || ''),
+        '<button class="ctl-btn sm" data-act="saveCfg" data-key="' + esc(c.key) + '">Save</button>'];
+    })) + '</div>');
+};
+
+views.radio = async function () {
+  var r = await Promise.all([
+    sb.from('radio_tracks').select('id, title, source, status, created_at, radio_artists(name)').order('created_at', { ascending: false }).limit(200),
+    sb.from('radio_segments').select('character, kind'),
+    sb.from('radio_specials').select('*').order('created_at', { ascending: false }),
+    sb.from('linked_sites').select('key, name').order('sort_order'),
+    sb.from('radio_artists').select('id, name, folder, is_owner, is_managed').order('name')
+  ]);
+  for (var i = 0; i < r.length; i++) if (r[i].error) throw r[i].error;
+  var tracks = r[0].data || [], segs = r[1].data || [], specials = r[2].data || [], sites = r[3].data || [], artists = r[4].data || [];
+  var counts = {}; segs.forEach(function (s) { counts[s.character] = (counts[s.character] || 0) + 1; });
+  var by = { approved: 0, pending: 0, rejected: 0 }; tracks.forEach(function (t) { by[t.status] = (by[t.status] || 0) + 1; });
+  var siteOpts = '<option value="">No linked site</option>' + sites.map(function (s) { return '<option value="' + esc(s.key) + '">' + esc(s.name) + '</option>'; }).join('');
+  var artistOpts = '<option value="">New artist…</option>' + artists.filter(function (a) { return a.folder; }).map(function (a) { return '<option value="' + esc(a.folder) + '">' + esc(a.name) + '</option>'; }).join('');
+  var chars = ['stan', 'roger', 'steve', 'francine', 'klaus', 'hayley'];
+
+  setView('<h3 class="ctl-h2">Radio</h3>' +
+    '<div class="ctl-grid"><div class="ctl-stat"><small>Approved tracks</small><b>' + by.approved + '</b></div>' +
+    '<div class="ctl-stat"><small>Pending review</small><b>' + by.pending + '</b></div>' +
+    '<div class="ctl-stat"><small>Character clips</small><b>' + segs.length + '</b></div></div>' +
+
+    '<div class="ctl-card"><h3>Upload music</h3><p class="ctl-note">MP3 or WAV, up to 50 MB each. Files go straight to your private Supabase storage and the bot picks them up on its next sync (or press "Reload settings and sync radio" in Bot control).</p>' +
+    '<div class="ctl-row"><select id="ctl-up-artist">' + artistOpts + '</select><input id="ctl-up-newname" placeholder="New artist name" size="22">' +
+    '<select id="ctl-up-rights"><option value="owned">I own this music</option><option value="licensed">Licensed (I manage the artist)</option></select></div>' +
+    '<div class="ctl-row"><input id="ctl-up-files" type="file" multiple accept=".mp3,.wav,audio/mpeg,audio/wav"><button class="ctl-btn" data-act="uploadMusic">Upload</button></div></div>' +
+
+    '<div class="ctl-card"><h3>Upload character clips</h3><div class="ctl-row"><select id="ctl-up-char">' +
+    chars.map(function (c) { return '<option value="' + c + '">' + c + '</option>'; }).join('') + '</select>' +
+    '<input id="ctl-up-segfiles" type="file" multiple accept=".mp3,.wav,.ogg,.m4a,.mp4,audio/*"><button class="ctl-btn" data-act="uploadSegs">Upload</button></div>' +
+    '<p class="ctl-note">Names with "greet", "intro" or "react" in them are sorted automatically. ' + (Object.keys(counts).length ? 'Clips so far: ' + Object.keys(counts).sort().map(function (k) { return esc(k) + ' ' + counts[k]; }).join(', ') + '.' : 'None yet.') + '</p></div>' +
+
+    '<div class="ctl-card"><h3>Upload your whole audio folder</h3><p class="ctl-note">Pick the <b>audio</b> folder from your bot project. Files in cloud9/&lt;artist&gt;/ become music and files in segments/&lt;character&gt;/ become clips. The submissions folder is ignored.</p>' +
+    '<div class="ctl-row"><select id="ctl-up-folderrights"><option value="licensed">New artists are licensed (I manage them)</option><option value="owned">New artists are mine</option></select>' +
+    '<input id="ctl-up-folder" type="file" webkitdirectory multiple><button class="ctl-btn" data-act="uploadFolder">Upload folder</button></div>' +
+    '<div class="ctl-log" id="ctl-uplog"></div></div>' +
+
+    '<div class="ctl-card"><h3>Artists</h3>' +
+    table(['Artist', 'Folder', 'Mine', 'Licensed', ''], artists.map(function (a) {
+      return [esc(a.name), esc(a.folder || '–'),
+        '<input type="checkbox" data-aown="' + a.id + '"' + (a.is_owner ? ' checked' : '') + '>',
+        '<input type="checkbox" data-aman="' + a.id + '"' + (a.is_managed ? ' checked' : '') + '>',
+        '<button class="ctl-btn sm" data-act="saveArtist" data-id="' + a.id + '">Save</button>'];
+    })) + '</div>' +
+
+    '<div class="ctl-card"><h3>Radio specials</h3><p class="ctl-note">Posted by the bot to each server\'s announce channel (set with /settings announcechannel). Repeating specials post on schedule; one-time specials post once.</p>' +
+    '<div class="ctl-row"><input id="ctl-sp-title" placeholder="Title" size="28"><select id="ctl-sp-site">' + siteOpts + '</select>' +
+    '<input id="ctl-sp-start" type="datetime-local"><select id="ctl-sp-repeat"><option value="">One time</option><option value="hourly">Hourly</option><option value="daily">Daily</option><option value="weekly">Weekly</option></select></div>' +
+    '<textarea id="ctl-sp-body" placeholder="What the bot should say…"></textarea>' +
+    '<div class="ctl-row" style="margin-top:10px"><button class="ctl-btn" data-act="addSpecial">Add special</button></div>' +
+    table(['Title', 'Repeat', 'Last posted', 'On', ''], specials.map(function (s) {
+      return [esc(s.title), esc(s.repeat_rule || 'once'), esc(s.last_posted ? ago(s.last_posted) : 'not yet'), s.enabled ? pill('on', 'ok') : pill('off', 'warn'),
+        '<button class="ctl-btn ghost sm" data-act="toggleSpecial" data-id="' + s.id + '" data-on="' + (s.enabled ? 1 : 0) + '">' + (s.enabled ? 'Pause' : 'Enable') + '</button> ' +
+        '<button class="ctl-btn ghost sm" data-act="rerunSpecial" data-id="' + s.id + '">Post again</button> ' +
+        '<button class="ctl-btn danger sm" data-act="delSpecial" data-id="' + s.id + '" data-confirm="Delete this special?">Delete</button>'];
+    })) + '</div>' +
+
+    '<div class="ctl-card"><h3>Tracks</h3>' +
+    table(['Artist', 'Title', 'Source', 'Status', ''], tracks.map(function (t) {
+      var cls = t.status === 'approved' ? 'ok' : t.status === 'rejected' ? 'bad' : 'warn';
+      return [esc(t.radio_artists ? t.radio_artists.name : '–'), esc(t.title), esc(t.source), pill(t.status, cls),
+        (t.status !== 'approved' ? '<button class="ctl-btn sm" data-act="setTrack" data-id="' + t.id + '" data-s="approved">Approve</button> ' : '') +
+        (t.status !== 'rejected' ? '<button class="ctl-btn ghost sm" data-act="setTrack" data-id="' + t.id + '" data-s="rejected">Reject</button>' : '')];
+    })) + '</div>');
+};
+
+views.sites = async function () {
+  var r = await sb.from('linked_sites').select('*').order('sort_order');
+  if (r.error) throw r.error;
+  setView('<h3 class="ctl-h2">Linked sites</h3><div class="ctl-card">' +
+    table(['Name', 'URL', 'Order', 'On', ''], (r.data || []).map(function (s) {
+      return ['<input data-f="name" data-k="' + esc(s.key) + '" value="' + esc(s.name) + '">',
+        '<input data-f="url" data-k="' + esc(s.key) + '" value="' + esc(s.url) + '" size="30">',
+        '<input data-f="sort_order" data-k="' + esc(s.key) + '" value="' + esc(s.sort_order) + '" size="3">',
+        '<input type="checkbox" data-f="enabled" data-k="' + esc(s.key) + '"' + (s.enabled ? ' checked' : '') + '>',
+        '<button class="ctl-btn sm" data-act="saveSite" data-k="' + esc(s.key) + '">Save</button>'];
+    })) + '</div>');
+};
+
+views.servers = async function () {
+  var r = await sb.from('guilds').select('id, name, guild_settings(default_volume, autoplay, announce_channel_id)').order('name');
+  if (r.error) throw r.error;
+  setView('<h3 class="ctl-h2">Servers</h3><div class="ctl-card"><p class="ctl-note">Mirrored from the bot every hour. Read only.</p>' +
+    table(['Server', 'Volume', 'Autoplay', 'Announce channel'], (r.data || []).map(function (g) {
+      var s = Array.isArray(g.guild_settings) ? g.guild_settings[0] : g.guild_settings;
+      return [esc(g.name || g.id), esc(s ? s.default_volume + '%' : '–'), esc(s ? (s.autoplay ? 'on' : 'off') : '–'), esc(s && s.announce_channel_id ? s.announce_channel_id : 'not set')];
+    })) + '</div>');
+};
+
+views.audit = async function () {
+  var r = await sb.from('audit_log').select('created_at, action, target, detail').order('created_at', { ascending: false }).limit(100);
+  if (r.error) throw r.error;
+  setView('<h3 class="ctl-h2">Audit log</h3><div class="ctl-card">' +
+    table(['When', 'Action', 'Target', 'Detail'], (r.data || []).map(function (a) {
+      return [esc(new Date(a.created_at).toLocaleString()), esc(a.action), esc(a.target || ''), esc(a.detail ? JSON.stringify(a.detail) : '')];
+    })) + '</div>');
+};
+
+// ───────────── uploads (browser straight to Supabase Storage) ─────────────
+function safeName(s) { return s.replace(/[^A-Za-z0-9._-]/g, '_'); }
+function titleCase(s) { return s.replace(/[_-]+/g, ' ').replace(/\b\w/g, function (c) { return c.toUpperCase(); }); }
+function slug(s) { return s.trim().toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, ''); }
+function segKind(n) { n = n.toLowerCase(); if (n.indexOf('greet') > -1 || n.indexOf('gretting') > -1) return 'greeting'; if (n.indexOf('intro') > -1) return 'intro'; if (n.indexOf('react') > -1) return 'reaction'; return 'other'; }
+function ext(n) { var m = /\.([A-Za-z0-9]+)$/.exec(n); return m ? m[1].toLowerCase() : ''; }
+function mime(n) { var e = ext(n); return e === 'wav' ? 'audio/wav' : e === 'ogg' ? 'audio/ogg' : e === 'm4a' ? 'audio/mp4' : e === 'mp4' ? 'video/mp4' : 'audio/mpeg'; }
+function audioDuration(file) {
+  return new Promise(function (res) {
+    var a = new Audio(), u = URL.createObjectURL(file), done = false;
+    function fin(v) { if (done) return; done = true; URL.revokeObjectURL(u); res(v); }
+    a.preload = 'metadata';
+    a.onloadedmetadata = function () { fin(isFinite(a.duration) ? Math.round(a.duration) : null); };
+    a.onerror = function () { fin(null); };
+    setTimeout(function () { fin(null); }, 6000);
+    a.src = u;
+  });
+}
+function logLine(t) { var el = $('#ctl-uplog'); if (!el) return; el.textContent += t + '\n'; el.scrollTop = el.scrollHeight; }
+
+var artistCache = {};
+async function ensureArtist(folder, displayName, owned) {
+  if (artistCache[folder]) return artistCache[folder];
+  var f = await sb.from('radio_artists').select('id').eq('folder', folder).maybeSingle();
+  var id = f.data && f.data.id;
+  if (!id) {
+    var name = displayName || titleCase(folder);
+    var n = await sb.from('radio_artists').select('id').eq('name', name).maybeSingle();
+    if (n.data) { id = n.data.id; await sb.from('radio_artists').update({ folder: folder }).eq('id', id); }
+    else {
+      var ins = await sb.from('radio_artists').insert({ name: name, folder: folder, is_owner: !!owned, is_managed: !owned }).select('id').single();
+      if (ins.error) throw ins.error;
+      id = ins.data.id;
+    }
+  }
+  artistCache[folder] = id;
+  return id;
+}
+async function artistSource(id) {
+  var a = await sb.from('radio_artists').select('is_owner').eq('id', id).single();
+  return a.data && a.data.is_owner ? 'owned' : 'licensed';
+}
+
+// items: { file, type: 'music' | 'segment', folder (artist folder or character), displayName, owned }
+async function uploadItems(items) {
+  var ok = 0, skipped = 0, failed = 0;
+  artistCache = {};
+  for (var i = 0; i < items.length; i++) {
+    var it = items[i], file = it.file, label = it.folder + ' / ' + file.name;
+    try {
+      var e = ext(file.name);
+      var allowed = it.type === 'music' ? ['mp3', 'wav'] : ['mp3', 'wav', 'ogg', 'm4a', 'mp4'];
+      if (allowed.indexOf(e) < 0) { logLine('skip   ' + label + ' (type not allowed)'); skipped++; continue; }
+      if (file.size > 50 * 1024 * 1024) { logLine('skip   ' + label + ' (over 50 MB)'); skipped++; continue; }
+      var bucket = it.type === 'music' ? 'radio-music' : 'radio-segments';
+      var key = it.type === 'music' ? 'cloud9/' + it.folder + '/' + safeName(file.name) : it.folder + '/' + safeName(file.name);
+      var table_ = it.type === 'music' ? 'radio_tracks' : 'radio_segments';
+      var ex = await sb.from(table_).select('id').eq('storage_bucket', bucket).eq('storage_path', key).maybeSingle();
+      if (ex.data) { logLine('exists ' + label); skipped++; continue; }
+      var up = await sb.storage.from(bucket).upload(key, file, { upsert: true, contentType: mime(file.name) });
+      if (up.error) throw up.error;
+      var dur = await audioDuration(file), row;
+      if (it.type === 'music') {
+        var aid = await ensureArtist(it.folder, it.displayName, it.owned);
+        row = await sb.from('radio_tracks').upsert({
+          artist_id: aid, title: file.name.replace(/\.[^.]+$/, ''), storage_bucket: bucket, storage_path: key, original_filename: file.name,
+          duration_seconds: dur, source: await artistSource(aid), status: 'approved'
+        }, { onConflict: 'storage_bucket,storage_path' });
+      } else {
+        row = await sb.from('radio_segments').upsert({
+          character: it.folder, kind: segKind(file.name), storage_bucket: bucket, storage_path: key, original_filename: file.name, duration_seconds: dur
+        }, { onConflict: 'storage_bucket,storage_path' });
+      }
+      if (row.error) throw row.error;
+      logLine('done   ' + label); ok++;
+    } catch (err) { logLine('FAILED ' + label + ': ' + (err.message || err)); failed++; }
+  }
+  logLine('Finished: ' + ok + ' uploaded, ' + skipped + ' skipped, ' + failed + ' failed. Press "Reload settings and sync radio" in Bot control to push it to the bot now.');
+  toast(ok + ' uploaded' + (failed ? ', ' + failed + ' failed' : ''), failed > 0);
+}
+
+// ───────────── click handlers ─────────────
+var acts = {
+  send: function (d) { return sendAction(d.a); },
+  saveCfg: async function (d) {
+    var input = document.querySelector('[data-val="' + d.key.replace(/"/g, '') + '"]');
+    var raw = input.value.trim(), val;
+    try { val = JSON.parse(raw); } catch (e) { val = raw; }
+    var r = await sb.from('bot_config').update({ value: val, updated_by: me.id, updated_at: new Date().toISOString() }).eq('key', d.key);
+    if (r.error) return toast(r.error.message, true);
+    await sb.from('control_actions').insert({ action: 'reload_config', requested_by: me.id });
+    toast('Saved ' + d.key + '. The bot will reload it shortly.');
+  },
+  uploadMusic: function () {
+    var files = $('#ctl-up-files').files; if (!files.length) return toast('Choose some files first', true);
+    var folder = $('#ctl-up-artist').value, name = $('#ctl-up-newname').value.trim();
+    if (!folder) { if (!name) return toast('Pick an artist or type a new artist name', true); folder = slug(name); if (!folder) return toast('That artist name has no usable letters', true); }
+    var owned = $('#ctl-up-rights').value === 'owned';
+    var items = Array.prototype.map.call(files, function (f) { return { file: f, type: 'music', folder: folder, displayName: name || null, owned: owned }; });
+    $('#ctl-uplog').textContent = ''; return uploadItems(items);
+  },
+  uploadSegs: function () {
+    var files = $('#ctl-up-segfiles').files; if (!files.length) return toast('Choose some files first', true);
+    var ch = $('#ctl-up-char').value;
+    var items = Array.prototype.map.call(files, function (f) { return { file: f, type: 'segment', folder: ch }; });
+    $('#ctl-uplog').textContent = ''; return uploadItems(items);
+  },
+  uploadFolder: function () {
+    var files = $('#ctl-up-folder').files; if (!files.length) return toast('Pick the audio folder first', true);
+    var owned = $('#ctl-up-folderrights').value === 'owned', items = [], ignored = 0;
+    Array.prototype.forEach.call(files, function (f) {
+      var parts = (f.webkitRelativePath || '').split('/'), i = parts.indexOf('cloud9');
+      if (i >= 0 && parts.length > i + 2) { items.push({ file: f, type: 'music', folder: parts[i + 1], owned: owned }); return; }
+      i = parts.indexOf('segments');
+      if (i >= 0 && parts.length > i + 2) { items.push({ file: f, type: 'segment', folder: parts[i + 1].toLowerCase() }); return; }
+      ignored++;
+    });
+    $('#ctl-uplog').textContent = 'Found ' + items.length + ' files to upload' + (ignored ? ' (' + ignored + ' other files ignored)' : '') + '\n';
+    if (!items.length) return;
+    return uploadItems(items);
+  },
+  saveArtist: async function (d) {
+    var own = document.querySelector('[data-aown="' + d.id + '"]').checked, man = document.querySelector('[data-aman="' + d.id + '"]').checked;
+    var r = await sb.from('radio_artists').update({ is_owner: own, is_managed: man }).eq('id', d.id);
+    if (r.error) return toast(r.error.message, true);
+    await sb.from('radio_tracks').update({ source: own ? 'owned' : 'licensed' }).eq('artist_id', d.id).neq('source', 'submission');
+    toast('Artist saved');
+  },
+  addSpecial: async function () {
+    var title = $('#ctl-sp-title').value.trim(), body = $('#ctl-sp-body').value.trim();
+    if (!title || !body) return toast('Title and message are required', true);
+    var start = $('#ctl-sp-start').value;
+    var r = await sb.from('radio_specials').insert({
+      title: title, body: body, site_key: $('#ctl-sp-site').value || null,
+      starts_at: start ? new Date(start).toISOString() : null, repeat_rule: $('#ctl-sp-repeat').value || null, enabled: true
+    });
+    if (r.error) return toast(r.error.message, true);
+    toast('Special added'); go('radio');
+  },
+  toggleSpecial: async function (d) { var r = await sb.from('radio_specials').update({ enabled: d.on !== '1' }).eq('id', d.id); if (r.error) return toast(r.error.message, true); go('radio'); },
+  rerunSpecial: async function (d) { var r = await sb.from('radio_specials').update({ last_posted: null }).eq('id', d.id); if (r.error) return toast(r.error.message, true); toast('Queued. The bot posts it within a minute.'); go('radio'); },
+  delSpecial: async function (d) { var r = await sb.from('radio_specials').delete().eq('id', d.id); if (r.error) return toast(r.error.message, true); go('radio'); },
+  setTrack: async function (d) { var r = await sb.from('radio_tracks').update({ status: d.s }).eq('id', d.id); if (r.error) return toast(r.error.message, true); go('radio'); },
+  saveSite: async function (d) {
+    var q = function (f) { return document.querySelector('[data-f="' + f + '"][data-k="' + d.k.replace(/"/g, '') + '"]'); };
+    var url = q('url').value.trim();
+    if (!/^https:\/\//i.test(url)) return toast('URL must start with https://', true);
+    var r = await sb.from('linked_sites').update({ name: q('name').value.trim(), url: url, sort_order: parseInt(q('sort_order').value, 10) || 0, enabled: q('enabled').checked }).eq('key', d.k);
+    if (r.error) return toast(r.error.message, true); toast('Saved');
+  }
+};
+function onAct(e) {
+  var b = e.target.closest('[data-act]'); if (!b || b.disabled) return;
+  if (b.dataset.confirm && !window.confirm(b.dataset.confirm)) return;
+  var fn = acts[b.dataset.act]; if (!fn) return;
+  b.disabled = true;
+  Promise.resolve(fn(b.dataset)).catch(function (err) { toast(err.message || String(err), true); }).then(function () { b.disabled = false; });
+}
+
+// ───────────── page hooks ─────────────
+window.ctlEnter = function () { boot(); };
+
+// Returning from Discord sign-in: finish the exchange, then open the Control tab
+(async function init() {
+  try {
+    var code = new URLSearchParams(location.search).get('code');
+    if (!code && sessionStorage.getItem('ctl_oauth') === '1') sessionStorage.removeItem('ctl_oauth');
+    if (code && sessionStorage.getItem('ctl_oauth') === '1') {
+      sessionStorage.removeItem('ctl_oauth');
+      try { var ex = await sb.auth.exchangeCodeForSession(code); if (ex.error) throw ex.error; }
+      catch (e) { pendingMsg = 'Sign-in failed: ' + (e.message || e); }
+      history.replaceState({}, document.title, location.pathname);
+      if (typeof navigateTo === 'function') navigateTo('control');
+    }
+    me = await loadMe();
+    setNavLink(!!me && can('staff'));
+  } catch (e) { /* the Control tab shows its own errors */ }
+})();
+})();
+</script>
 </body>
 </html>
