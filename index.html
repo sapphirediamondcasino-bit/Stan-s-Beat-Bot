@@ -2923,6 +2923,67 @@
         @media (max-width:760px) { #control .ctl-wrap { flex-direction:column; } #control .ctl-nav { width:100%; display:flex; overflow-x:auto; box-sizing:border-box; } #control .ctl-nav button { white-space:nowrap; width:auto; } }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+    <script>
+    /* The site's backend is Supabase. Public data (stats, featured artists, radio status, premium status)
+       is read from Supabase. If Supabase has nothing fresh, the original request goes to the bot as before. */
+    (function () {
+        if (!window.supabase) return;
+        var SB_URL = 'https://pcbxusgmjbixjaghvich.supabase.co';
+        var SB_KEY = 'sb_publishable_Mtj8hsNDsRGwFdI7vmzGOw_EMMz7egb';
+        var sb = window.__sb = window.supabase.createClient(SB_URL, SB_KEY, {
+            auth: { flowType: 'pkce', persistSession: true, detectSessionInUrl: false, autoRefreshToken: true }
+        });
+        var realFetch = window.fetch;
+
+        function reply(obj) {
+            return new Response(JSON.stringify(obj), { status: 200, headers: { 'Content-Type': 'application/json' } });
+        }
+        async function cached(key, maxAge) {
+            var r = await sb.from('site_cache').select('data, updated_at').eq('key', key).maybeSingle();
+            if (r.error || !r.data) return null;
+            var age = (Date.now() - new Date(r.data.updated_at).getTime()) / 1000;
+            if (age > maxAge) return null;               // the bot has gone quiet: let the normal call show the normal offline state
+            return { data: r.data.data, age: age };
+        }
+        async function handle(path) {
+            var m, c;
+            if (path === '/api/stats') {
+                c = await cached('stats', 90); if (!c) return null;
+                var s = Object.assign({}, c.data); s.uptime = (s.uptime || 0) + c.age; return reply(s);
+            }
+            if (path === '/api/health') { c = await cached('stats', 90); return c ? reply({ status: 'ok', timestamp: Date.now() }) : null; }
+            if (path === '/api/featured') { c = await cached('featured', 900); return c ? reply(c.data) : null; }
+            if (path === '/api/c9/pool') { c = await cached('c9_pool', 900); return c ? reply(c.data) : null; }
+            if (path === '/api/c9/global-status') { c = await cached('c9_global', 90); return c ? reply(c.data) : null; }
+            if ((m = /^\/api\/c9\/status\/([^\/]+)$/.exec(path))) {
+                c = await cached('c9_guilds', 90); if (!c) return null;
+                return reply(c.data[decodeURIComponent(m[1])] || { active: false });
+            }
+            if ((m = /^\/api\/premium\/(\d{5,25})$/.exec(path))) {
+                var p = await sb.rpc('premium_status', { p_discord_id: m[1] });
+                return p.error || !p.data ? null : reply(p.data);
+            }
+            if ((m = /^\/api\/admin\/check\/(\d{5,25})$/.exec(path))) {
+                var a = await sb.rpc('premium_status', { p_discord_id: m[1] });
+                return a.error || !a.data ? null : reply({ isAdmin: !!a.data.isAdmin, userId: m[1] });
+            }
+            return null;
+        }
+        window.fetch = function (input, init) {
+            var self = this, args = arguments;
+            try {
+                var url = typeof input === 'string' ? input : (input && input.url) || '';
+                var method = String((init && init.method) || (typeof input !== 'string' && input && input.method) || 'GET').toUpperCase();
+                if (method === 'GET' && typeof API_BASE !== 'undefined' && url.indexOf(API_BASE + '/api/') === 0) {
+                    var path = url.slice(API_BASE.length).split('?')[0];
+                    return handle(path).then(function (resp) { return resp || realFetch.apply(self, args); },
+                                             function () { return realFetch.apply(self, args); });
+                }
+            } catch (e) {}
+            return realFetch.apply(self, args);
+        };
+    })();
+    </script>
 </head>
 <body>
     <div id="root"></div>
@@ -7994,7 +8055,7 @@ if (!window.supabase) { window.ctlEnter = function () { var r = document.getElem
 // Public by design. Row Level Security in Supabase is what protects the data.
 var SUPABASE_URL = 'https://pcbxusgmjbixjaghvich.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_Mtj8hsNDsRGwFdI7vmzGOw_EMMz7egb';
-var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+var sb = window.__sb || window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
   auth: { flowType: 'pkce', persistSession: true, detectSessionInUrl: false, autoRefreshToken: true }
 });
 
