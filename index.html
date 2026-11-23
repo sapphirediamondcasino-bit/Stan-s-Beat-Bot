@@ -1,6 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script>
+/* Some sandboxed previews block browser storage. If so, keep the page working with in-memory storage instead of crashing. */
+(function () {
+    function mem() {
+        var d = {};
+        return {
+            getItem: function (k) { return Object.prototype.hasOwnProperty.call(d, k) ? d[k] : null; },
+            setItem: function (k, v) { d[k] = String(v); },
+            removeItem: function (k) { delete d[k]; },
+            clear: function () { d = {}; },
+            key: function (i) { return Object.keys(d)[i] || null; },
+            get length() { return Object.keys(d).length; }
+        };
+    }
+    ['localStorage', 'sessionStorage'].forEach(function (n) {
+        try { window[n].getItem('__probe'); }
+        catch (e) { try { Object.defineProperty(window, n, { value: mem(), configurable: true }); } catch (e2) {} }
+    });
+})();
+</script>
     <meta charset="UTF-8">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -2922,68 +2942,219 @@
         #ctl-toast.bad { border-color:#ff5d6c; }
         @media (max-width:760px) { #control .ctl-wrap { flex-direction:column; } #control .ctl-nav { width:100%; display:flex; overflow-x:auto; box-sizing:border-box; } #control .ctl-nav button { white-space:nowrap; width:auto; } }
     </style>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
     <script>
-    /* The site's backend is Supabase. Public data (stats, featured artists, radio status, premium status)
-       is read from Supabase. If Supabase has nothing fresh, the original request goes to the bot as before. */
-    (function () {
-        if (!window.supabase) return;
-        var SB_URL = 'https://pcbxusgmjbixjaghvich.supabase.co';
-        var SB_KEY = 'sb_publishable_Mtj8hsNDsRGwFdI7vmzGOw_EMMz7egb';
-        var sb = window.__sb = window.supabase.createClient(SB_URL, SB_KEY, {
-            auth: { flowType: 'pkce', persistSession: true, detectSessionInUrl: false, autoRefreshToken: true }
-        });
-        var realFetch = window.fetch;
+/* The site's backend is Supabase. The sign-in library loads AFTER the page has finished loading, so a slow or
+   blocked CDN can never hold up the site's own buttons. Public data (stats, featured artists, radio status,
+   premium status) comes from Supabase; if anything is missing or slow, the original request goes to the bot as before. */
+(function () {
+    var SB_URL = 'https://pcbxusgmjbixjaghvich.supabase.co';
+    var SB_KEY = 'sb_publishable_Mtj8hsNDsRGwFdI7vmzGOw_EMMz7egb';
+    var realFetch = window.fetch;
+    window.__sb = null;
 
-        function reply(obj) {
-            return new Response(JSON.stringify(obj), { status: 200, headers: { 'Content-Type': 'application/json' } });
+    window.sbReady = new Promise(function (resolve) {
+        function load() {
+            var s = document.createElement('script');
+            s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js';
+            s.async = true;
+            s.onload = function () {
+                try {
+                    window.__sb = window.supabase.createClient(SB_URL, SB_KEY, {
+                        auth: { flowType: 'pkce', persistSession: true, detectSessionInUrl: false, autoRefreshToken: true }
+                    });
+                } catch (e) { window.__sb = null; }
+                resolve(window.__sb);
+            };
+            s.onerror = function () { resolve(null); };
+            document.head.appendChild(s);
         }
-        async function cached(key, maxAge) {
-            var r = await sb.from('site_cache').select('data, updated_at').eq('key', key).maybeSingle();
-            if (r.error || !r.data) return null;
-            var age = (Date.now() - new Date(r.data.updated_at).getTime()) / 1000;
-            if (age > maxAge) return null;               // the bot has gone quiet: let the normal call show the normal offline state
-            return { data: r.data.data, age: age };
+        if (document.readyState === 'complete') load(); else window.addEventListener('load', load);
+    });
+
+    function reply(obj) {
+        return new Response(JSON.stringify(obj), { status: 200, headers: { 'Content-Type': 'application/json' } });
+    }
+    function within(p, ms) {      // never wait more than ms for Supabase; null means "ask the bot instead"
+        return new Promise(function (res, rej) {
+            var t = setTimeout(function () { res(null); }, ms);
+            p.then(function (v) { clearTimeout(t); res(v); }, function (e) { clearTimeout(t); rej(e); });
+        });
+    }
+    async function cached(key, maxAge) {
+        var sb = window.__sb; if (!sb) return null;
+        var r = await sb.from('site_cache').select('data, updated_at').eq('key', key).maybeSingle();
+        if (r.error || !r.data) return null;
+        var age = (Date.now() - new Date(r.data.updated_at).getTime()) / 1000;
+        if (age > maxAge) return null;               // the bot has gone quiet: let the normal call show the normal offline state
+        return { data: r.data.data, age: age };
+    }
+    async function handle(path) {
+        var sb = window.__sb; if (!sb) return null;
+        var m, c;
+        if (path === '/api/stats') {
+            c = await cached('stats', 90); if (!c) return null;
+            var s = Object.assign({}, c.data); s.uptime = (s.uptime || 0) + c.age; return reply(s);
         }
-        async function handle(path) {
-            var m, c;
-            if (path === '/api/stats') {
-                c = await cached('stats', 90); if (!c) return null;
-                var s = Object.assign({}, c.data); s.uptime = (s.uptime || 0) + c.age; return reply(s);
-            }
-            if (path === '/api/health') { c = await cached('stats', 90); return c ? reply({ status: 'ok', timestamp: Date.now() }) : null; }
-            if (path === '/api/featured') { c = await cached('featured', 900); return c ? reply(c.data) : null; }
-            if (path === '/api/c9/pool') { c = await cached('c9_pool', 900); return c ? reply(c.data) : null; }
-            if (path === '/api/c9/global-status') { c = await cached('c9_global', 90); return c ? reply(c.data) : null; }
-            if ((m = /^\/api\/c9\/status\/([^\/]+)$/.exec(path))) {
-                c = await cached('c9_guilds', 90); if (!c) return null;
-                return reply(c.data[decodeURIComponent(m[1])] || { active: false });
-            }
-            if ((m = /^\/api\/premium\/(\d{5,25})$/.exec(path))) {
-                var p = await sb.rpc('premium_status', { p_discord_id: m[1] });
-                return p.error || !p.data ? null : reply(p.data);
-            }
-            if ((m = /^\/api\/admin\/check\/(\d{5,25})$/.exec(path))) {
-                var a = await sb.rpc('premium_status', { p_discord_id: m[1] });
-                return a.error || !a.data ? null : reply({ isAdmin: !!a.data.isAdmin, userId: m[1] });
-            }
-            return null;
+        if (path === '/api/health') { c = await cached('stats', 90); return c ? reply({ status: 'ok', timestamp: Date.now() }) : null; }
+        if (path === '/api/featured') { c = await cached('featured', 900); return c ? reply(c.data) : null; }
+        if (path === '/api/c9/pool') { c = await cached('c9_pool', 900); return c ? reply(c.data) : null; }
+        if (path === '/api/c9/global-status') { c = await cached('c9_global', 90); return c ? reply(c.data) : null; }
+        if ((m = /^\/api\/c9\/status\/([^\/]+)$/.exec(path))) {
+            c = await cached('c9_guilds', 90); if (!c) return null;
+            return reply(c.data[decodeURIComponent(m[1])] || { active: false });
         }
-        window.fetch = function (input, init) {
-            var self = this, args = arguments;
-            try {
-                var url = typeof input === 'string' ? input : (input && input.url) || '';
-                var method = String((init && init.method) || (typeof input !== 'string' && input && input.method) || 'GET').toUpperCase();
-                if (method === 'GET' && typeof API_BASE !== 'undefined' && url.indexOf(API_BASE + '/api/') === 0) {
-                    var path = url.slice(API_BASE.length).split('?')[0];
-                    return handle(path).then(function (resp) { return resp || realFetch.apply(self, args); },
-                                             function () { return realFetch.apply(self, args); });
-                }
-            } catch (e) {}
-            return realFetch.apply(self, args);
-        };
-    })();
-    </script>
+        if ((m = /^\/api\/premium\/(\d{5,25})$/.exec(path))) {
+            var p = await sb.rpc('premium_status', { p_discord_id: m[1] });
+            return p.error || !p.data ? null : reply(p.data);
+        }
+        if ((m = /^\/api\/admin\/check\/(\d{5,25})$/.exec(path))) {
+            var a = await sb.rpc('premium_status', { p_discord_id: m[1] });
+            return a.error || !a.data ? null : reply({ isAdmin: !!a.data.isAdmin, userId: m[1] });
+        }
+        return null;
+    }
+    window.fetch = function (input, init) {
+        var self = this, args = arguments;
+        try {
+            var url = typeof input === 'string' ? input : (input && input.url) || '';
+            var method = String((init && init.method) || (typeof input !== 'string' && input && input.method) || 'GET').toUpperCase();
+            if (window.__sb && method === 'GET' && typeof API_BASE !== 'undefined' && url.indexOf(API_BASE + '/api/') === 0) {
+                var path = url.slice(API_BASE.length).split('?')[0];
+                return within(handle(path), 3000).then(function (resp) { return resp || realFetch.apply(self, args); },
+                                                       function () { return realFetch.apply(self, args); });
+            }
+        } catch (e) {}
+        return realFetch.apply(self, args);
+    };
+
+    /* If one of the page's scripts ever fails, say so on screen instead of leaving dead buttons with no explanation */
+    var shown = false;
+    window.addEventListener('error', function (e) {
+        try {
+            if (shown || !e.error) return;                                   // ignore image/font load failures
+            var f = e.filename || '';
+            if (f && f.indexOf(location.origin) !== 0) return;               // ignore other sites' scripts
+            shown = true;
+            var msg = (e.message || 'error') + (e.lineno ? ' (line ' + e.lineno + ')' : '');
+            var add = function () {
+                var d = document.createElement('div');
+                d.setAttribute('role', 'alert');
+                d.style.cssText = 'position:fixed;left:12px;bottom:12px;max-width:min(520px,92vw);z-index:99999;background:#2a0f14;color:#ffd7dc;border:1px solid #ff5d6c;border-radius:12px;padding:10px 14px;font:13px/1.4 system-ui,sans-serif;cursor:pointer';
+                d.textContent = '⚠ A script on this page hit an error: ' + msg + '  (tap to hide)';
+                d.onclick = function () { d.remove(); };
+                document.body.appendChild(d);
+            };
+            if (document.body) add(); else document.addEventListener('DOMContentLoaded', add);
+        } catch (x) {}
+    });
+})();
+</script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style id="theme-2026">
+/* ═════════ 2026 theme refresh: layered on top of the existing styles, nothing is removed ═════════ */
+:root{
+  --bg:#07090d; --surface:rgba(255,255,255,.04); --surface-2:rgba(255,255,255,.07); --stroke:rgba(255,255,255,.09);
+  --text:#eef2f6; --muted:#9aa6b2; --accent:#00FFD1; --accent-2:#7C5CFF; --radius:20px;
+  --glow:0 10px 40px rgba(0,255,209,.18);
+}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Inter','Segoe UI',system-ui,-apple-system,sans-serif; color:var(--text); letter-spacing:-.005em;
+  background:
+    radial-gradient(1100px 560px at 12% -8%, rgba(0,255,209,.11), transparent 60%),
+    radial-gradient(900px 520px at 100% 2%, rgba(124,92,255,.11), transparent 58%),
+    var(--bg);
+  background-attachment:fixed;
+}
+#matrix-canvas{opacity:.09}
+::selection{background:rgba(0,255,209,.28)}
+*{scrollbar-width:thin; scrollbar-color:rgba(255,255,255,.18) transparent}
+:focus-visible{outline:2px solid var(--accent); outline-offset:3px; border-radius:8px}
+
+/* headings */
+h1,h2,h3,.logo,.section-title,.hero-title{font-family:'Syne','Inter',sans-serif}
+.section-title{font-size:clamp(34px,5vw,56px); letter-spacing:-.03em; line-height:1.05; margin-bottom:48px}
+.section-subtitle{color:var(--muted); font-size:17px; margin:-28px auto 48px; max-width:640px}
+.hero-title{letter-spacing:-.035em; line-height:1.02; font-size:clamp(40px,6vw,72px)}
+.hero-subtitle{color:var(--muted)}
+
+/* header + nav */
+header{padding:14px 0; background:rgba(7,9,13,.72); backdrop-filter:saturate(170%) blur(18px); -webkit-backdrop-filter:saturate(170%) blur(18px); border-bottom:1px solid var(--stroke)}
+.header-content{min-height:44px}
+.logo{font-size:21px; letter-spacing:-.02em}
+.logo img{border-radius:12px; box-shadow:0 0 0 1px var(--stroke)}
+nav{gap:2px}
+nav a{color:var(--muted); font-size:14px; font-weight:500; padding:8px 12px; border-radius:999px; transition:color .2s, background .2s}
+nav a:hover{color:#fff; background:var(--surface-2)}
+nav a.active{color:var(--accent); background:rgba(0,255,209,.12)}
+nav a.btn-primary{margin-left:8px; color:#04120f; background:linear-gradient(135deg,#00FFD1,#00CCA5)}
+.nav-more{position:relative}
+.nav-more-btn{background:none; border:0; color:var(--muted); font:inherit; font-size:14px; font-weight:500; padding:8px 12px; border-radius:999px; cursor:pointer}
+.nav-more-btn:hover,.nav-more.open .nav-more-btn{color:#fff; background:var(--surface-2)}
+.nav-more:has(a.active) .nav-more-btn{color:var(--accent); background:rgba(0,255,209,.12)}
+.nav-more-menu{position:absolute; right:0; top:100%; min-width:210px; padding:8px; display:none; flex-direction:column; gap:2px;
+  background:rgba(12,15,20,.97); border:1px solid var(--stroke); border-radius:16px; box-shadow:0 24px 70px rgba(0,0,0,.6)}
+.nav-more:hover .nav-more-menu,.nav-more.open .nav-more-menu,.nav-more:focus-within .nav-more-menu{display:flex}
+.nav-more-menu a{width:100%; text-align:left; border-radius:10px; padding:10px 12px}
+@media (max-width:1240px){ nav a,.nav-more-btn{font-size:13px; padding:8px 9px} .logo{font-size:0} }
+@media (max-width:968px){
+  header{padding:12px 0}
+  nav{top:72px; background:rgba(7,9,13,.97); border-bottom:1px solid var(--stroke); max-height:calc(100vh - 72px); overflow-y:auto}
+  nav a{border-radius:12px; text-align:center}
+  nav a.btn-primary{margin:10px 0 0}
+  .nav-more-btn{display:none}
+  .nav-more-menu{position:static; display:flex; background:none; border:0; box-shadow:none; padding:0; min-width:0}
+  .nav-more{width:100%}
+  .logo{font-size:19px}
+}
+
+/* buttons */
+.btn-primary{border-radius:999px; padding:13px 28px; font-weight:700; letter-spacing:-.01em; box-shadow:var(--glow); transition:transform .2s, box-shadow .2s}
+.btn-primary:hover{transform:translateY(-2px); box-shadow:0 14px 50px rgba(0,255,209,.32)}
+.btn-secondary{border-radius:999px; padding:13px 28px; background:var(--surface-2); border:1px solid var(--stroke); backdrop-filter:blur(8px)}
+.btn-secondary:hover{border-color:rgba(0,255,209,.5); background:rgba(0,255,209,.08)}
+
+/* glass cards */
+.feature-card,.stat-card,.command-card,.pricing-card,.status-service-card,.status-resources,.session-card,.analytics-panel-box,
+.analytics-card,.badge-card,.character-card,.fa-spotlight-card,.fa-artist-card,.history-item,.show-card,.premium-feature,.admin-panel,.status-banner{
+  background:var(--surface); border:1px solid var(--stroke); border-radius:var(--radius);
+  backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+  transition:transform .25s ease, border-color .25s ease, box-shadow .25s ease, background .25s ease;
+}
+.feature-card:hover,.stat-card:hover,.command-card:hover,.pricing-card:hover,.status-service-card:hover,.session-card:hover,.character-card:hover,
+.fa-spotlight-card:hover,.fa-artist-card:hover,.badge-card:hover{
+  transform:translateY(-5px); border-color:rgba(0,255,209,.35); box-shadow:var(--glow); background:var(--surface-2);
+}
+.command-card code{background:rgba(0,0,0,.45); border-radius:10px; border:1px solid var(--stroke); color:var(--accent)}
+.pricing-card.popular{border-color:rgba(255,215,0,.55)}
+.stat-number{letter-spacing:-.03em}
+footer{background:linear-gradient(180deg,transparent,rgba(0,0,0,.55)); border-top:1px solid var(--stroke)}
+.footer-grid a:hover{color:var(--accent)}
+
+/* ═════════ Kurrasch Records ═════════ */
+.kr-hero{text-align:center; margin:10px auto 44px; max-width:760px}
+.kr-eyebrow{display:inline-block; font:500 12px 'DM Mono',monospace; letter-spacing:.22em; color:var(--accent); padding:6px 14px; border:1px solid rgba(0,255,209,.3); border-radius:999px; background:rgba(0,255,209,.07); margin-bottom:18px}
+.kr-hero .section-title{margin-bottom:16px}
+.kr-hero .section-subtitle{margin:0 auto 26px}
+.kr-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,360px),1fr)); gap:22px; margin-bottom:40px}
+.kr-card{background:var(--surface); border:1px solid var(--stroke); border-radius:24px; padding:20px; backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
+  transition:transform .25s, border-color .25s, box-shadow .25s; position:relative; overflow:hidden}
+.kr-card::before{content:''; position:absolute; inset:0 0 auto 0; height:3px; background:linear-gradient(90deg,var(--accent),var(--accent-2)); opacity:.85}
+.kr-card:hover{transform:translateY(-4px); border-color:rgba(0,255,209,.35); box-shadow:0 18px 60px rgba(0,255,209,.14)}
+.kr-card.kr-featured{grid-column:1/-1}
+.kr-card-head{display:flex; align-items:center; justify-content:space-between; gap:12px; margin:6px 2px 16px; flex-wrap:wrap}
+.kr-card-title{font:800 22px 'Syne',sans-serif; letter-spacing:-.02em; color:#fff}
+.kr-card-tag{font:500 11px 'DM Mono',monospace; letter-spacing:.16em; text-transform:uppercase; color:var(--muted)}
+.kr-open{font-size:13px; font-weight:600; color:var(--accent); text-decoration:none; padding:7px 14px; border:1px solid rgba(0,255,209,.3); border-radius:999px; transition:background .2s}
+.kr-open:hover{background:rgba(0,255,209,.12)}
+.kr-card iframe{display:block; width:100%; border:0; border-radius:14px; background:#121212}
+.kr-empty{color:var(--muted); text-align:center; padding:40px 0}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important; transition:none!important; scroll-behavior:auto!important}
+  #matrix-canvas{display:none}
+}
+</style>
 </head>
 <body>
     <div id="root"></div>
@@ -3002,21 +3173,26 @@
             <nav id="main-nav">
                 <a href="#home" class="active">Home</a>
                 <a href="#features">Features</a>
-                
                 <a href="#radio">Radio & Player</a>
                 <a href="#commands">Commands</a>
-                <a href="#status">Status</a>
                 <a href="#premium">Premium</a>
-                <a href="#gang">The Gang</a>
-                <a href="#admin">Admin</a>
-                <a href="#control" id="nav-control" style="display:none">Control</a>
-                <a href="#featured">Artists</a>
-                <a href="#sessions">Sessions</a>
-                <a href="#analytics">Analytics</a>
-                <a href="#history">History</a>
-                <a href="#badges">Badges</a>
                 <a href="#cloud9">Cloud 9</a>
-                <a href="#botpage">About</a>
+                <a href="#records">Kurrasch Records</a>
+                <a href="#featured">Artists</a>
+                <a href="#status">Status</a>
+                <div class="nav-more">
+                    <button type="button" class="nav-more-btn" aria-haspopup="true">More ▾</button>
+                    <div class="nav-more-menu">
+                        <a href="#gang">The Gang</a>
+                        <a href="#sessions">Sessions</a>
+                        <a href="#analytics">Analytics</a>
+                        <a href="#history">History</a>
+                        <a href="#badges">Badges</a>
+                        <a href="#botpage">About</a>
+                        <a href="#admin">Admin</a>
+                        <a href="#control" id="nav-control" style="display:none">Control</a>
+                    </div>
+                </div>
                 <a href="https://discord.com/oauth2/authorize?client_id=1049861443111112744&permissions=8&response_type=code&redirect_uri=https%3A%2F%2Fstansbeatbot.online%2F&integration_type=0&scope=identify+bot+guilds" class="btn-primary" target="_blank">Invite Bot</a>
             </nav>
         </div>
@@ -3079,7 +3255,7 @@
                 <div class="network-strip" style="margin-top:48px;text-align:center;">
                     <p style="color:#888;font-size:14px;letter-spacing:1px;text-transform:uppercase;margin-bottom:16px;">More from Kurrasch Systems</p>
                     <div class="hero-buttons" style="justify-content:center;">
-                        <a href="https://goodartiestsnews.com/" class="btn-secondary" target="_blank" rel="noopener noreferrer">Good Artists News</a>
+                        <a href="https://goodartiestsnews.com/" class="btn-secondary" target="_blank" rel="noopener noreferrer">Good Morning Northstar News</a>
                         <a href="https://novaframeio.com/" class="btn-secondary" target="_blank" rel="noopener noreferrer">Nova Frame</a>
                         <a href="https://midwestweather.online/" class="btn-secondary" target="_blank" rel="noopener noreferrer">Midwest Weather</a>
                     </div>
@@ -3642,6 +3818,8 @@
                     <div class="command-card"><code>/radio [genre]</code><p>Radio station mode with DJ announcer and American Dad drops between tracks</p></div>
                     <div class="command-card"><code>/mood [mood]</code><p>Queue music by mood — hype, chill, happy, sad, focus, heartbreak, party, late night</p></div>
                     <div class="command-card"><code>/announcer</code><p>Toggle radio-style song intro cards before each track</p></div>
+                    <div class="command-card"><code>/c9radio [action]</code><p>Cloud 9 Radio — original music from Jake Kade, Noah Kade, Ryder Lane and community artists, with American Dad drops between tracks. Start, stop, skip or see what's playing</p></div>
+                    <div class="command-card"><code>/c9submit</code><p>Submit your own original MP3 or WAV to Cloud 9 Radio (original music only)</p></div>
                     <div class="command-card"><code>/quiz</code><p>Music quiz — bot plays a clip, first to type the title wins. Leaderboard tracked</p></div>
                 </div>
 
@@ -3997,6 +4175,19 @@
     </div>
 
         <!-- Featured Artists Section -->
+        <!-- Kurrasch Records -->
+        <section id="records" class="tab-content">
+            <div class="container">
+                <div class="kr-hero">
+                    <span class="kr-eyebrow">KURRASCH SYSTEMS</span>
+                    <h2 class="section-title">Kurrasch Records</h2>
+                    <p class="section-subtitle">Original music from the artists we work with. Press play right here, or open any playlist in Spotify.</p>
+                    <a href="#cloud9" class="btn-primary">Hear them on Cloud 9 Radio</a>
+                </div>
+                <div class="kr-grid" id="kr-grid"><div class="kr-empty">Loading playlists…</div></div>
+            </div>
+        </section>
+
         <!-- Control Center (staff and owner; access enforced by Supabase roles) -->
         <section id="control" class="tab-content">
             <div class="container">
@@ -4755,6 +4946,7 @@
                     <p><a href="#gang">Meet The Gang</a></p>
                     <p><a href="#status">Bot Status</a></p>
                     <p><a href="#cloud9">Cloud 9 Radio</a></p>
+                    <p><a href="#records">Kurrasch Records</a></p>
                     <p><a href="#botpage">About the Bot</a></p>
                 </div>
                 <div>
@@ -4769,7 +4961,7 @@
                     <h3>Connect</h3>
                     <p><a href="https://discord.gg/AKHnnNrjZN" target="_blank">Discord</a></p>
                     <p><a href="https://x.com/lamaswithhats1" target="_blank">Twitter</a></p>
-                    <p><a href="https://goodartiestsnews.com/" target="_blank" rel="noopener noreferrer">Good Artists News</a></p>
+                    <p><a href="https://goodartiestsnews.com/" target="_blank" rel="noopener noreferrer">Good Morning Northstar News</a></p>
                     <p><a href="https://novaframeio.com/" target="_blank" rel="noopener noreferrer">Nova Frame</a></p>
                     <p><a href="https://midwestweather.online/" target="_blank" rel="noopener noreferrer">Midwest Weather</a></p>
                     <p><a href="/cdn-cgi/l/email-protection#cdbeb8bdbda2bfb98da6b8bfbfacbeaea5beb4beb9a8a0bee3aea2a0">Email Support</a></p>
@@ -5012,12 +5204,13 @@
             'commands':  "Stan's Beat Bot — Commands",
             'status':    "Stan's Beat Bot — Status",
             'admin':     "Stan's Beat Bot — Admin Panel",
-            'control':   "Stan's Beat Bot — Control Center"
+            'control':   "Stan's Beat Bot — Control Center",
+            'records':   "Kurrasch Records — Stan's Beat Bot"
         };
 
         function navigateTo(target, doPush) {
             if (doPush !== false) {
-                window.history.pushState({ tab: target }, PAGE_TITLES[target] || "Stan's Beat Bot", '#' + target);
+                try { window.history.pushState({ tab: target }, PAGE_TITLES[target] || "Stan's Beat Bot", '#' + target); } catch (e) { /* blocked inside sandboxed previews; the tab still switches */ }
             }
             document.title = PAGE_TITLES[target] || "Stan's Beat Bot";
             document.querySelectorAll('.tab-content').forEach(function(tab) { tab.classList.remove('active'); });
@@ -5034,6 +5227,7 @@
                 if (target === 'history')   { renderHistory(); loadServerHistory(); }
                 if (target === 'badges')    loadBadges();
                 if (target === 'control')   { if (window.ctlEnter) window.ctlEnter(); }
+                if (target === 'records')   { if (window.krRender) window.krRender(); }
             }
             document.querySelectorAll('nav a').forEach(function(a) { a.classList.remove('active'); });
             document.querySelectorAll('nav a[href="#' + target + '"]').forEach(function(a) { a.classList.add('active'); });
@@ -5047,7 +5241,7 @@
 
         // Deep-link on page load — e.g. stansbeatbot.online/#history goes straight there
         (function() {
-            var validTabs = ['home','search','featured','history','sessions','analytics','badges','premium','commands','status','admin','control'];
+            var validTabs = ['home','search','featured','history','sessions','analytics','badges','premium','commands','status','admin','control','records'];
             var hash = window.location.hash ? window.location.hash.substring(1) : '';
             if (hash && validTabs.indexOf(hash) !== -1) {
                 setTimeout(function() { navigateTo(hash, false); }, 150);
@@ -5632,7 +5826,7 @@
                         localStorage.setItem('discord_servers', JSON.stringify(userServers));
                         showAdminPanel();
                         sbbPopulateServers();
-                        window.history.replaceState({}, document.title, window.location.pathname);
+                        try { window.history.replaceState({}, document.title, window.location.pathname); } catch (e) { /* blocked inside sandboxed previews */ }
                         pollVCListeners();
                     }
                 } catch(e) { console.error('OAuth callback error:', e); }
@@ -6130,7 +6324,7 @@
         }
 
         // ── QUEUE ─────────────────────────────────────────
-        async function sbbPollQueue() {
+        async function _sbbPollQueueBase() {
             // Auto-detect if user just logged in and no server selected
             if (!SBB.serverId && currentUser && userServers && userServers.length) {
                 for (var i = 0; i < userServers.length; i++) {
@@ -7320,7 +7514,7 @@
         }
 
         // Hook sbbPollQueue to auto-add to history
-        var _origSbbPollQueue = sbbPollQueue;
+        var _origSbbPollQueue = _sbbPollQueueBase;
         var _lastHistoryTitle = '';
         async function sbbPollQueue() {
             await _origSbbPollQueue.apply(this, arguments);
@@ -7367,7 +7561,7 @@
 
         fetchStats();
         setInterval(fetchStats, 30000);
-        setInterval(sbbPollQueue, 5000);
+        /* duplicate poll removed: one 5-second poll is already running above */
         setInterval(pollVCListeners, 10000);
         // Refresh sessions every 30s
         setInterval(loadSessions, 30000);
@@ -8050,14 +8244,7 @@
 <script>
 (function () {
 'use strict';
-if (!window.supabase) { window.ctlEnter = function () { var r = document.getElementById('ctl-root'); if (r) r.innerHTML = '<p style="color:#ff5d6c">The sign-in library did not load. Check your connection and reload.</p>'; }; return; }
-
-// Public by design. Row Level Security in Supabase is what protects the data.
-var SUPABASE_URL = 'https://pcbxusgmjbixjaghvich.supabase.co';
-var SUPABASE_KEY = 'sb_publishable_Mtj8hsNDsRGwFdI7vmzGOw_EMMz7egb';
-var sb = window.__sb || window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
-  auth: { flowType: 'pkce', persistSession: true, detectSessionInUrl: false, autoRefreshToken: true }
-});
+function start(sb) {
 
 var RANK = { user: 0, moderator: 1, staff: 2, owner: 3 };
 var me = null, current = 'overview', pollTimer = null, pendingMsg = '';
@@ -8483,13 +8670,70 @@ window.ctlEnter = function () { boot(); };
       sessionStorage.removeItem('ctl_oauth');
       try { var ex = await sb.auth.exchangeCodeForSession(code); if (ex.error) throw ex.error; }
       catch (e) { pendingMsg = 'Sign-in failed: ' + (e.message || e); }
-      history.replaceState({}, document.title, location.pathname);
+      try { history.replaceState({}, document.title, location.pathname); } catch (e) { /* blocked inside sandboxed previews */ }
       if (typeof navigateTo === 'function') navigateTo('control');
     }
     me = await loadMe();
     setNavLink(!!me && can('staff'));
   } catch (e) { /* the Control tab shows its own errors */ }
 })();
+}
+
+// Start the control center only after the sign-in library has loaded; the rest of the site never waits for it
+var started = false;
+function begin(sb) { if (started) return; started = true; start(sb); }
+window.ctlEnter = function () {
+  var r = document.getElementById('ctl-root');
+  if (r) r.innerHTML = '<p class="ctl-note">Loading…</p>';
+  window.sbReady.then(function (sb) {
+    if (!sb) { if (r) r.innerHTML = '<p style="color:#ff5d6c">The sign-in library did not load. Check your connection and reload.</p>'; return; }
+    begin(sb); window.ctlEnter();      // start() replaces ctlEnter with the real one
+  });
+};
+window.sbReady.then(function (sb) { if (sb) begin(sb); });
+})();
+</script>
+<script>
+/* Kurrasch Records playlists and the "More" menu.
+   To add a playlist: add one line to KR_PLAYLISTS (the id is the part after /playlist/ in the Spotify link). */
+(function () {
+  var KR_PLAYLISTS = [
+    { id: '6jgTOO1xbjWLbzW3xJDBhb', title: 'Surviving the Noise', tag: 'Playlist' },
+    { id: '6qXpzN9Kqdy7Y9DW3BEsdf', title: 'Jake Kade',           tag: 'Artist playlist' },
+    { id: '40nFwLwcQYK0ttQatiPQ6p', title: 'Ryder Lane',          tag: 'Artist playlist' }
+  ];
+  var built = false;
+
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+
+  // Playlists load the first time the tab opens, so the page stays fast
+  window.krRender = function () {
+    if (built) return;
+    var grid = document.getElementById('kr-grid');
+    if (!grid) return;
+    var list = KR_PLAYLISTS.filter(function (p) { return /^[A-Za-z0-9]{10,32}$/.test(p.id); });
+    if (!list.length) { grid.innerHTML = '<div class="kr-empty">No playlists yet.</div>'; return; }
+    grid.innerHTML = list.map(function (p, i) {
+      return '<article class="kr-card' + (i === 0 ? ' kr-featured' : '') + '">' +
+        '<div class="kr-card-head"><div><div class="kr-card-tag">' + esc(p.tag) + '</div><div class="kr-card-title">' + esc(p.title) + '</div></div>' +
+        '<a class="kr-open" href="https://open.spotify.com/playlist/' + p.id + '" target="_blank" rel="noopener noreferrer">Open in Spotify</a></div>' +
+        '<iframe title="' + esc(p.title) + ' on Spotify" src="https://open.spotify.com/embed/playlist/' + p.id + '?utm_source=generator&theme=0" ' +
+        'height="352" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy" allowfullscreen></iframe>' +
+        '</article>';
+    }).join('');
+    built = true;
+  };
+
+  // "More" menu: tap to open on touch screens, close when clicking elsewhere
+  document.addEventListener('click', function (e) {
+    var btn = e.target.closest && e.target.closest('.nav-more-btn');
+    var openOne = document.querySelector('.nav-more.open');
+    if (btn) { btn.parentNode.classList.toggle('open'); return; }
+    if (openOne) openOne.classList.remove('open');
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') { var o = document.querySelector('.nav-more.open'); if (o) o.classList.remove('open'); }
+  });
 })();
 </script>
 </body>
